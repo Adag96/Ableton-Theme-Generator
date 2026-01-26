@@ -29,12 +29,12 @@ This document tracks which UI controls and visual elements are affected by each 
 
 | Parameter | Affected Controls | Notes |
 |-----------|-------------------|-------|
-| SurfaceBackground | | |
-| SurfaceHighlight | | |
-| SurfaceArea | | |
+| SurfaceBackground | **Browser:** Background of the entire browser panel.<br>**Arrangement:** Background of the main arrangement timeline (except actively selected track).<br>**Session View:** Background of track view (except actively selected track).<br>**Detail View:** Background of the effects/device area.<br>**Bottom Bar:** Background of status bar, Clip View selector, and Device View selector. | Primary background color for most major panels |
+| SurfaceHighlight | **Arrangement:** Background of selected track.<br>**Session View:** Background of selected track and its Clip Slots; background of selected Scene (horizontal row).<br>**Info View:** Header area background. | Highlights the currently selected/focused elements |
+| SurfaceArea | **Arrangement:** Borders around all tracks and their clips in Track View.<br>**Browser:** Borders around the different sections of the browser panel.<br>**Detail View:** Lines of the Clip Overview/Zooming Hotspot.<br>**Bottom Bar:** Border lines within the Clip View selector and Device View selector. | Used for structural divider lines and borders |
 | SurfaceAreaFocus | | |
-| Desktop | | |
-| DetailViewBackground | | |
+| Desktop | **Global:** All outer-most borders around panels (including main status/menu bar).<br>**Settings:** Header bar of the Settings pop-up; thin border between settings menu panel (left) and settings content (right).<br>**Browser:** Thin divider lines between Filter sections. | Primary border/frame color for major UI boundaries |
+| DetailViewBackground | **Clip View (Audio):** Background color behind waveforms in the Sample Editor; Time Ruler above the Sample Editor.<br>**Clip View (MIDI):** Background color for the MIDI Note Editor; Time Ruler above the MIDI Note Editor. | Background for clip editing areas |
 | ControlBackground | | |
 | BackgroundClip | | |
 | BackgroundClipFrame | | |
