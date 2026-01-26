@@ -16,7 +16,7 @@ This document tracks which UI controls and visual elements are affected by each 
 | ChosenPlay | | |
 | ChosenRecord | | |
 | ChosenPreListen | | |
-| SelectionBackground | | |
+| SelectionBackground | **Arrangement View:** Selected region on timeline; selection highlight for selected track; selection highlight for selected audio/MIDI clips (background only, not waveform or header).<br>**Session View:** Selection highlight for selected track; selection highlight for selected clip.<br>**Browser:** Selection highlight for selected category; selection highlight for selected item within browser.<br>**Detail View:** Selection highlight for selected device; selected region in Sample Editor; selected region in MIDI Note Editor.<br>**Menus:** Active and hover state for all dropdown menus (devices, top menu bar, settings, tracks, etc). | Primary selection color throughout the entire UI - very widely used |
 | StandbySelectionBackground | | |
 | SelectionForeground | | |
 | StandbySelectionForeground | | |
