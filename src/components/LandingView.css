@@ -1,0 +1,90 @@
+.landing-view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: var(--spacing-xl);
+}
+
+.landing-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-xl);
+  width: 100%;
+  max-width: 1200px;
+}
+
+.landing-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  background-color: var(--color-bg-secondary);
+  border: 2px solid var(--color-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 280px;
+  text-align: center;
+  gap: var(--spacing-md);
+}
+
+.landing-button:hover {
+  border-color: var(--color-accent);
+  background-color: var(--color-bg-tertiary);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.landing-button:active {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.landing-button-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-accent);
+  margin-bottom: var(--spacing-sm);
+  transition: all 0.3s ease;
+}
+
+.landing-button:hover .landing-button-icon {
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+  transform: scale(1.1);
+}
+
+.landing-button h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.landing-button p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  max-width: 280px;
+}
+
+/* Responsive layout for smaller screens */
+@media (max-width: 1024px) {
+  .landing-buttons {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+  }
+
+  .landing-button {
+    min-height: 200px;
+  }
+}
