@@ -7,4 +7,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getBuildNumber: () => ipcRenderer.invoke('get-build-number'),
   detectThemesDirectory: () => ipcRenderer.invoke('detect-themes-directory'),
   openPathInExplorer: (dirPath: string) => ipcRenderer.invoke('open-path-in-explorer', dirPath),
+  openFileDialog: () => ipcRenderer.invoke('open-file-dialog'),
 });

@@ -4,11 +4,17 @@ export interface ThemesDirectoryResult {
   edition: string | null;
 }
 
+export interface ImageFileResult {
+  filePath: string;
+  fileName: string;
+}
+
 export interface ElectronAPI {
   getVersion: () => Promise<string>;
   getBuildNumber: () => Promise<string>;
   detectThemesDirectory: () => Promise<ThemesDirectoryResult>;
   openPathInExplorer: (dirPath: string) => Promise<{ success: boolean; error: string | null }>;
+  openFileDialog: () => Promise<ImageFileResult | null>;
 }
 
 declare global {

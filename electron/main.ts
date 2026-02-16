@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import path from 'path';
 import fs from 'fs';
 
@@ -92,6 +92,23 @@ app.whenReady().then(() => {
   ipcMain.handle('open-path-in-explorer', async (_event, dirPath: string) => {
     const errorMessage = await shell.openPath(dirPath);
     return { success: errorMessage === '', error: errorMessage || null };
+  });
+
+  ipcMain.handle('open-file-dialog', async () => {
+    const result = await dialog.showOpenDialog({
+      properties: ['openFile'],
+      filters: [
+        { name: 'Images', extensions: ['png', 'jpg', 'jpeg'] },
+      ],
+    });
+
+    if (result.canceled || result.filePaths.length === 0) {
+      return null;
+    }
+
+    const filePath = result.filePaths[0];
+    const fileName = path.basename(filePath);
+    return { filePath, fileName };
   });
 
   createWindow();

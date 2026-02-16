@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { LandingView } from './components/LandingView';
 import { SettingsView } from './components/SettingsView';
+import { ImageImportView } from './components/ImageImportView';
+import type { ImageFileResult } from './electron';
 import './App.css';
 
 function App() {
   const [version, setVersion] = useState('0.0.1');
   const [buildNumber, setBuildNumber] = useState('1');
-  const [currentView, setCurrentView] = useState<'landing' | 'settings'>('landing');
+  const [currentView, setCurrentView] = useState<'landing' | 'settings' | 'import'>('landing');
+  const [importedImage, setImportedImage] = useState<ImageFileResult | null>(null);
 
   useEffect(() => {
     // Get version and build number from Electron API if available
@@ -27,8 +30,11 @@ function App() {
   }, []);
 
   const handleImportImage = () => {
-    console.log('Import image clicked');
-    // Functionality to be implemented
+    setCurrentView('import');
+  };
+
+  const handleImageLoaded = (image: ImageFileResult) => {
+    setImportedImage(image);
   };
 
   const handleBrowseThemes = () => {
@@ -38,6 +44,11 @@ function App() {
 
   const handleSettings = () => {
     setCurrentView('settings');
+  };
+
+  const handleBackToLanding = () => {
+    setCurrentView('landing');
+    setImportedImage(null);
   };
 
   return (
@@ -56,8 +67,14 @@ function App() {
             onBrowseThemes={handleBrowseThemes}
             onSettings={handleSettings}
           />
+        ) : currentView === 'settings' ? (
+          <SettingsView onBack={handleBackToLanding} />
         ) : (
-          <SettingsView onBack={() => setCurrentView('landing')} />
+          <ImageImportView
+            image={importedImage}
+            onImageLoaded={handleImageLoaded}
+            onBack={handleBackToLanding}
+          />
         )}
       </main>
 
