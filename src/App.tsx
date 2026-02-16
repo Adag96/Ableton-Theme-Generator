@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { LandingView } from './components/LandingView';
+import { SettingsView } from './components/SettingsView';
 import './App.css';
 
 function App() {
   const [version, setVersion] = useState('0.0.1');
   const [buildNumber, setBuildNumber] = useState('1');
+  const [currentView, setCurrentView] = useState<'landing' | 'settings'>('landing');
 
   useEffect(() => {
     // Get version and build number from Electron API if available
@@ -35,8 +37,7 @@ function App() {
   };
 
   const handleSettings = () => {
-    console.log('Settings clicked');
-    // Functionality to be implemented
+    setCurrentView('settings');
   };
 
   return (
@@ -49,11 +50,15 @@ function App() {
       </header>
 
       <main className="app-main">
-        <LandingView
-          onImportImage={handleImportImage}
-          onBrowseThemes={handleBrowseThemes}
-          onSettings={handleSettings}
-        />
+        {currentView === 'landing' ? (
+          <LandingView
+            onImportImage={handleImportImage}
+            onBrowseThemes={handleBrowseThemes}
+            onSettings={handleSettings}
+          />
+        ) : (
+          <SettingsView onBack={() => setCurrentView('landing')} />
+        )}
       </main>
 
       <footer className="app-footer">

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import path from 'path';
 import fs from 'fs';
 
@@ -16,6 +16,40 @@ function getBuildNumber(): string {
     console.error('Error reading build number:', error);
   }
   return '1';
+}
+
+interface ThemesDirectoryResult {
+  found: boolean;
+  path: string | null;
+  edition: string | null;
+}
+
+function detectAbletonThemesDirectory(): ThemesDirectoryResult {
+  const editions = ['Suite', 'Standard', 'Intro', 'Lite'];
+
+  for (const edition of editions) {
+    let themesPath: string;
+
+    if (process.platform === 'darwin') {
+      themesPath = `/Applications/Ableton Live 12 ${edition}.app/Contents/App-Resources/Themes`;
+    } else if (process.platform === 'win32') {
+      themesPath = path.join(
+        process.env.PROGRAMDATA || 'C:\\ProgramData',
+        'Ableton',
+        `Live 12 ${edition}`,
+        'Resources',
+        'Themes'
+      );
+    } else {
+      return { found: false, path: null, edition: null };
+    }
+
+    if (fs.existsSync(themesPath)) {
+      return { found: true, path: themesPath, edition };
+    }
+  }
+
+  return { found: false, path: null, edition: null };
 }
 
 function createWindow() {
@@ -50,6 +84,15 @@ app.whenReady().then(() => {
   // Set up IPC handlers
   ipcMain.handle('get-version', () => app.getVersion());
   ipcMain.handle('get-build-number', () => buildNumber);
+
+  ipcMain.handle('detect-themes-directory', () => {
+    return detectAbletonThemesDirectory();
+  });
+
+  ipcMain.handle('open-path-in-explorer', async (_event, dirPath: string) => {
+    const errorMessage = await shell.openPath(dirPath);
+    return { success: errorMessage === '', error: errorMessage || null };
+  });
 
   createWindow();
 });

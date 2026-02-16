@@ -1,8 +1,9 @@
 # Work Log
 
-## 2026-2-16 1:16
+## 2026-2-16 14:01
 - Created CLAUDE.md file in root directory
 - Created Claude directory with lessons and todo files
+- App now automatically detects Ableton Themes directory for both Mac and PC
 
 
 ## 2026-2-13 23:15
