@@ -1,0 +1,146 @@
+import type { AbletonThemeData, VuMeterGradient } from './types';
+import parameterMap from './parameter-map.json';
+
+const XML_HEADER = '<?xml version="1.0" encoding="UTF-8"?>';
+const ABLETON_OPEN = '<Ableton MajorVersion="5" MinorVersion="12.0_12120" SchemaChangeCount="4" Creator="Ableton Live 12.1d1" Revision="">';
+const ABLETON_CLOSE = '</Ableton>';
+
+/** VU meter parameter names in .ask file order */
+const VU_METER_NAMES = [
+  'StandardVuMeter',
+  'OverloadVuMeter',
+  'DisabledVuMeter',
+  'HeadphonesVuMeter',
+  'SendsOnlyVuMeter',
+  'BipolarGainReductionVuMeter',
+  'OrangeVuMeter',
+];
+
+/** Blend factor parameter names that appear in the .ask file */
+const BLEND_FACTOR_KEYS: Record<string, string> = {
+  DefaultBlendFactor: 'defaultBlendFactor',
+  IconBlendFactor: 'iconBlendFactor',
+  ClipBlendFactor: 'clipBlendFactor',
+  NoteBorderStandbyBlendFactor: 'noteBorderStandbyBlendFactor',
+  RetroDisplayBlendFactor: 'retroDisplayBlendFactor',
+  CheckControlNotCheckedBlendFactor: 'checkControlNotCheckedBlendFactor',
+  MixSurfaceAreaBlendFactor: 'mixSurfaceAreaBlendFactor',
+  TextFrameSegmentBlendFactor: 'textFrameSegmentBlendFactor',
+  NoteDisabledSelectedBlendFactor: 'noteDisabledSelectedBlendFactor',
+  MinVelocityNoteBlendFactor: 'minVelocityNoteBlendFactor',
+  StripedBackgroundShadeFactor: 'stripedBackgroundShadeFactor',
+  NonEditableAutomationAlpha: 'nonEditableAutomationAlpha',
+  DisabledContextMenuIconAlpha: 'disabledContextMenuIconAlpha',
+  ClipBorderAlpha: 'clipBorderAlpha',
+  ScrollBarAlpha: 'scrollBarAlpha',
+  ScrollBarOnHoverAlpha: 'scrollBarOnHoverAlpha',
+  ScrollBarBackgroundAlpha: 'scrollBarBackgroundAlpha',
+  InaudibleTakeLightness: 'inaudibleTakeLightness',
+  InaudibleTakeSaturation: 'inaudibleTakeSaturation',
+  InaudibleTakeNameLightness: 'inaudibleTakeNameLightness',
+  InaudibleTakeNameSaturation: 'inaudibleTakeNameSaturation',
+  AutomationLaneClipBodyLightness: 'automationLaneClipBodyLightness',
+  AutomationLaneClipBodySaturation: 'automationLaneClipBodySaturation',
+  AutomationLaneHeaderLightness: 'automationLaneHeaderLightness',
+  AutomationLaneHeaderSaturation: 'automationLaneHeaderSaturation',
+  TakeLaneHeaderLightness: 'takeLaneHeaderLightness',
+  TakeLaneHeaderSaturation: 'takeLaneHeaderSaturation',
+  TakeLaneHeaderNameLightness: 'takeLaneHeaderNameLightness',
+  TakeLaneHeaderNameSaturation: 'takeLaneHeaderNameSaturation',
+  AutomationLaneHeaderNameLightness: 'automationLaneHeaderNameLightness',
+  AutomationLaneHeaderNameSaturation: 'automationLaneHeaderNameSaturation',
+  ClipContrastColorAdjustment: 'clipContrastColorAdjustment',
+  SessionSlotOklabLCompensationFactor: 'sessionSlotOklabLCompensationFactor',
+};
+
+/** Format a numeric blend factor value to match Ableton's precision */
+function formatBlendValue(key: string, value: number): string {
+  // Integer parameters
+  const integerParams = [
+    'NonEditableAutomationAlpha', 'DisabledContextMenuIconAlpha',
+    'ClipBorderAlpha', 'ScrollBarAlpha', 'ScrollBarOnHoverAlpha',
+    'ScrollBarBackgroundAlpha', 'ClipContrastColorAdjustment',
+    'SessionSlotOklabLCompensationFactor',
+  ];
+  if (integerParams.includes(key)) return String(value);
+
+  // High-precision float parameters (the lightness/saturation adjustments)
+  const highPrecisionParams = [
+    'InaudibleTakeLightness', 'InaudibleTakeSaturation',
+    'InaudibleTakeNameLightness', 'InaudibleTakeNameSaturation',
+    'AutomationLaneClipBodyLightness', 'AutomationLaneClipBodySaturation',
+    'AutomationLaneHeaderLightness', 'AutomationLaneHeaderSaturation',
+    'TakeLaneHeaderLightness', 'TakeLaneHeaderSaturation',
+    'TakeLaneHeaderNameLightness', 'TakeLaneHeaderNameSaturation',
+    'AutomationLaneHeaderNameLightness', 'AutomationLaneHeaderNameSaturation',
+  ];
+  if (highPrecisionParams.includes(key)) {
+    // Ableton uses 18 decimal places for these
+    return value.toFixed(18).replace(/0+$/, '').replace(/\.$/, '');
+  }
+
+  // Clean float values (RetroDisplayBlendFactor = 1, CheckControlNotChecked = 0.5, etc.)
+  if (value === 1) return '1';
+  if (value === 0.5) return '0.5';
+  if (value === 0.375) return '0.375';
+
+  // Standard precision floats (10 decimal places)
+  return value.toFixed(10).replace(/0+$/, '').replace(/\.$/, '');
+}
+
+/** Generate a VU meter XML block */
+function generateVuMeterXml(name: string, meter: VuMeterGradient): string {
+  const lines = [
+    `\t\t<${name}>`,
+    `\t\t\t<OnlyMinimumToMaximum Value="${meter.onlyMinimumToMaximum}" />`,
+    `\t\t\t<Maximum Value="${meter.maximum}" />`,
+    `\t\t\t<AboveZeroDecibel Value="${meter.aboveZeroDecibel}" />`,
+    `\t\t\t<ZeroDecibel Value="${meter.zeroDecibel}" />`,
+    `\t\t\t<BelowZeroDecibel1 Value="${meter.belowZeroDecibel1}" />`,
+    `\t\t\t<BelowZeroDecibel2 Value="${meter.belowZeroDecibel2}" />`,
+    `\t\t\t<Minimum Value="${meter.minimum}" />`,
+    `\t\t</${name}>`,
+  ];
+  return lines.join('\n');
+}
+
+/**
+ * Generate a complete .ask XML file from theme data.
+ * Parameters are written in the exact order Ableton uses.
+ */
+export function generateAskXml(themeData: AbletonThemeData): string {
+  const lines: string[] = [XML_HEADER, ABLETON_OPEN, '\t<Theme>'];
+
+  // Write parameters in the canonical order from the parameterOrder array
+  for (const paramName of parameterMap.parameterOrder) {
+    // VU meters are handled separately
+    if (VU_METER_NAMES.includes(paramName)) {
+      const meter = themeData.vuMeters[paramName];
+      if (meter) {
+        lines.push(generateVuMeterXml(paramName, meter));
+      }
+      continue;
+    }
+
+    // Blend factors
+    if (paramName in BLEND_FACTOR_KEYS) {
+      const camelKey = BLEND_FACTOR_KEYS[paramName] as keyof typeof themeData.blendFactors;
+      const value = themeData.blendFactors[camelKey];
+      if (value !== undefined) {
+        lines.push(`\t\t<${paramName} Value="${formatBlendValue(paramName, value)}" />`);
+      }
+      continue;
+    }
+
+    // Color parameters
+    const value = themeData.parameters[paramName];
+    if (value !== undefined) {
+      lines.push(`\t\t<${paramName} Value="${value}" />`);
+    }
+  }
+
+  lines.push('\t</Theme>');
+  lines.push(ABLETON_CLOSE);
+
+  return lines.join('\n');
+}

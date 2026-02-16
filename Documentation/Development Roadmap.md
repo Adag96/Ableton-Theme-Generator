@@ -15,73 +15,72 @@ A desktop application that generates Ableton Live 12 themes from user-uploaded i
 ## Phase 1: Research & Documentation
 
 ### 1.1 Complete Parameter Mapping
-- [ ] Document all ~275 parameters and what they control in Live 12
-- [ ] Group parameters by UI region (browser, arrangement, mixer, devices, etc.)
-- [ ] Note which parameters typically share colors in default themes
+- [x] Document all ~236 color parameters and what they control in Live 12
+- [x] Group parameters by UI region (browser, arrangement, mixer, devices, etc.)
+- [x] Note which parameters typically share colors in default themes
 
 ### 1.2 Analyze Default Themes
-- [ ] Extract color data from 5-10 default Ableton themes
-- [ ] Count unique colors per theme
-- [ ] Identify the "core palette" structure (backgrounds, accents, text, clips, etc.)
-- [ ] Document color relationships (e.g., "secondary background is always X% lighter than primary")
+- [x] Extract color data from 6 default Ableton themes (neutral, warm, cool, creative)
+- [x] Count unique colors per theme (~110-115 unique per theme)
+- [x] Identify the "core palette" structure (backgrounds, accents, text, clips, etc.)
+- [x] Document color relationships — 15-stop neutral lightness ramp with HSL interpolation
 
 ### 1.3 Define Color Roles
-- [ ] Create semantic color roles as an intermediate layer between extracted colors and parameters
-- [ ] Example roles: `primary_bg`, `secondary_bg`, `accent_1`, `accent_2`, `text_primary`, `text_secondary`, `clip_color_1`, etc.
-- [ ] Map each of the 275 parameters to a color role
+- [x] Create 12 semantic color roles as intermediate layer (5 required, 7 derived)
+- [x] Define 15-stop neutral scale derivation system
+- [x] Map all 236 parameters to a color role or derivation rule (`src/theme/parameter-map.json`)
 
 ### 1.4 Validation
-- [ ] Manually build one theme file using the mapping logic
-- [ ] Test in Live 12 to validate all parameters are correctly assigned
-- [ ] Document any edge cases or constraints (contrast requirements, etc.)
+- [x] Built test theme ("Steel Blue Dark") using the mapping engine
+- [x] Tested in Live 12 — theme loads and renders correctly
+- [x] Documented contrast requirements (8 WCAG-based pairs) in `src/theme/contrast.ts`
+- [ ] Extended testing with more usage to identify edge-case parameter issues
 
-**Deliverable:** Complete specification document defining required color roles and parameter mappings
+**Deliverable:** Complete specification document (`Documentation/Semantic Color Roles Specification.md`) and working engine (`src/theme/`)
 
 ---
 
-## Phase 2: Core Engine (Python Backend)
+## Phase 2: Core Engine (TypeScript — runs in Electron)
+
+> Architecture decision: The engine is implemented in TypeScript rather than Python, eliminating the need for Python bundling/integration and simplifying distribution.
 
 ### 2.1 Color Extraction Module
-- [ ] Implement dominant color extraction using k-means clustering
+- [ ] Implement dominant color extraction (k-means clustering or similar)
 - [ ] Input: Image file (jpg, png, etc.)
-- [ ] Output: Ranked list of N colors matching required palette size
+- [ ] Output: 5 colors mapped to required roles (tone, surface_base, text_primary, accent_primary, accent_secondary)
 - [ ] Include logic to ensure sufficient contrast and variety in extracted colors
 
-**Dependencies:** `scikit-learn` or `colorthief`, `Pillow`
-
 ### 2.2 Palette Generation Module
-- [ ] Assign extracted colors to semantic color roles
-- [ ] Generate color variations (lighter/darker versions) for related parameters
+- [x] Resolve 5 input colors into 12 semantic color roles (`src/theme/derivation.ts` → `resolveRoles()`)
+- [x] Generate 15-stop neutral scale with lighter/darker variations (`buildNeutralScale()`)
 - [ ] Create 3-5 variant palettes by shifting role assignments
-- [ ] Implement contrast validation and auto-adjustment if needed
+- [x] Implement contrast validation (`src/theme/contrast.ts`)
 
 ### 2.3 Theme File Generator
-- [ ] Apply color mappings to all parameters
-- [ ] Generate valid .ask file structure
-- [ ] Validate output against known working themes
+- [x] Apply color mappings to all 236 parameters (`generateParameters()`)
+- [x] Generate valid .ask file structure (`src/theme/ask-generator.ts`)
+- [x] Validated output: 91.6% exact match against default Ableton theme
 
-### 2.4 CLI Tool
-- [ ] Create command-line interface for testing and development
-- [ ] Usage: `python theme_gen.py input.jpg --variants 4 --output ./themes/`
-- [ ] Generates multiple .ask files from a single image
+### 2.4 CLI/Script Tool
+- [x] Test script for development (`scripts/generate-test-theme.ts`)
+- [ ] Integrate generation into Electron app via IPC
 
-**Deliverable:** Working Python package that converts images to .ask theme files
+**Deliverable:** Working TypeScript engine that converts 5 colors to .ask theme files
 
 ---
 
 ## Phase 3: Desktop Application (Electron)
 
 ### 3.1 Project Setup
-- [ ] Initialize Electron project with electron-forge or electron-builder
-- [ ] Set up React or Vue for the renderer process (recommended: React + Vite)
-- [ ] Configure Python backend integration (child_process spawn or package Python with PyInstaller)
-- [ ] Set up IPC (Inter-Process Communication) between Electron main process and Python backend
+- [x] Initialize Electron project with Vite
+- [x] Set up React + TypeScript for the renderer process
+- [x] Set up IPC between Electron main process and renderer
+- [x] Ableton Live 12 Themes directory auto-detection (Mac + Windows)
 
 **Tech Stack:**
 - Electron (app shell, file system access, native dialogs)
 - React + Vite (UI framework)
-- Tailwind CSS (styling)
-- Python backend (color extraction and theme generation)
+- TypeScript (theme engine runs natively — no Python dependency)
 
 ### 3.2 Core UI Components
 - [ ] Drag-and-drop zone for image upload
@@ -140,90 +139,34 @@ A desktop application that generates Ableton Live 12 themes from user-uploaded i
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│                  Electron Main Process              │
-│  - File system access                               │
-│  - Native dialogs                                   │
-│  - Python process management                        │
+│                  Electron Main Process               │
+│  - File system access, native dialogs                │
+│  - Ableton Themes directory detection                │
+│  - .ask file writing                                 │
 └─────────────────────┬───────────────────────────────┘
                       │ IPC
 ┌─────────────────────▼───────────────────────────────┐
-│               Electron Renderer (React)             │
-│  - Drag-drop UI                                     │
-│  - Swatch display                                   │
-│  - User preferences                                 │
-└─────────────────────┬───────────────────────────────┘
-                      │ IPC → spawn
-┌─────────────────────▼───────────────────────────────┐
-│                  Python Backend                     │
-│  - Color extraction (scikit-learn/colorthief)       │
-│  - Palette generation                               │
-│  - .ask file generation                             │
+│               Electron Renderer (React)              │
+│  - Image upload UI                                   │
+│  - Color extraction (canvas-based)                   │
+│  - Theme engine (src/theme/*)                        │
+│  - Swatch preview                                    │
 └─────────────────────────────────────────────────────┘
 ```
 
-### Python-Electron Integration Options
-
-**Option A: Spawn Python Process**
-- Bundle Python script with the app
-- Call via child_process.spawn()
-- Communicate via stdout/stdin or temp files
-- Requires users to have Python installed OR bundle Python runtime
-
-**Option B: Package Python as Executable**
-- Use PyInstaller to create standalone executable
-- Bundle .exe/.app with Electron app
-- No Python dependency for end users
-- Larger app size but cleaner distribution
-
-**Recommended:** Option B for distribution simplicity
+No Python dependency — the entire engine runs in TypeScript/JavaScript within the Electron renderer process.
 
 ---
 
-## File Structure (Proposed)
+## Key Decisions (Resolved)
 
-```
-ableton-theme-generator/
-├── electron/
-│   ├── main/
-│   │   ├── index.ts
-│   │   └── python-bridge.ts
-│   ├── preload/
-│   │   └── index.ts
-│   └── renderer/
-│       ├── src/
-│       │   ├── components/
-│       │   ├── hooks/
-│       │   └── App.tsx
-│       └── index.html
-├── python/
-│   ├── theme_generator/
-│   │   ├── __init__.py
-│   │   ├── color_extraction.py
-│   │   ├── palette_generation.py
-│   │   ├── theme_builder.py
-│   │   └── mappings/
-│   │       └── parameters.json
-│   ├── cli.py
-│   └── requirements.txt
-├── docs/
-│   ├── parameter-mapping.md
-│   └── color-roles.md
-├── package.json
-├── ROADMAP.md
-└── README.md
-```
+1. **Number of color roles:** 12 semantic roles, only 5 required as input. See `Documentation/Semantic Color Roles Specification.md`.
 
----
+2. **Variant generation strategy:** TBD — rotate which extracted colors fill which roles.
 
-## Key Decisions to Make
+3. **Palette size flexibility:** Fixed at 5 required inputs (tone + 4 colors). Derived roles provide the flexibility.
 
-1. **Number of color roles:** How many semantic colors does a theme need? (Estimate: 10-16)
-
-2. **Variant generation strategy:** How do we create meaningfully different variants from the same image?
-
-3. **Palette size flexibility:** Should users be able to request more/fewer colors extracted?
-
-4. **Contrast handling:** Auto-adjust colors that don't meet contrast requirements, or warn the user?
+4. **Contrast handling:** Auto-validate with WCAG ratios. 8 foreground/background pairs checked. See `src/theme/contrast.ts`.
 
 ---
 
