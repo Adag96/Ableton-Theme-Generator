@@ -1,9 +1,9 @@
-import type { ExtractedColor, PaletteSelectionResult } from './types';
+import type { ExtractedColor, PaletteSelectionResult, RoleLocations } from './types';
 import type { ThemeTone } from '../theme/types';
 import { contrastRatio } from '../theme/color-utils';
 
 /** Minimum saturation for a color to be considered an accent (%) */
-const MIN_ACCENT_SATURATION = 40;
+const MIN_ACCENT_SATURATION = 35;
 
 /** Minimum contrast ratio for text legibility (WCAG AA) */
 const MIN_CONTRAST_RATIO = 4.5;
@@ -127,6 +127,22 @@ export function selectThemePalette(colors: ExtractedColor[]): PaletteSelectionRe
     secondaryHueDistance = 180;
   }
 
+  // Build role locations (undefined for synthetic/fallback colors)
+  const roleLocations: RoleLocations = {
+    surface_base: surfaceBase.location,
+    accent_primary: accentPrimary.location,
+  };
+
+  // textPrimary may be a fallback hex string, so only include location if we found a matching color
+  if (textPrimary?.location) {
+    roleLocations.text_primary = textPrimary.location;
+  }
+
+  // accentSecondary has location only if it came from extracted colors (not synthetic)
+  if (accentSecondary.location) {
+    roleLocations.accent_secondary = accentSecondary.location;
+  }
+
   return {
     roles: {
       tone,
@@ -135,6 +151,7 @@ export function selectThemePalette(colors: ExtractedColor[]): PaletteSelectionRe
       accent_primary: accentPrimary.hex,
       accent_secondary: accentSecondary.hex,
     },
+    roleLocations,
     extractedColors: colors,
     debug: {
       contrastRatio: finalContrast,

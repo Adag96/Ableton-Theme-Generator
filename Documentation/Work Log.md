@@ -1,7 +1,11 @@
 # Work Log
 
-## 2026-2-17 11:44
+## 2026-2-17 12:52
 - Built a color extraction system that pulls 4 colors from an imported image and defines light or dark tone convention
+- Uploaded image now shows preview thumbnail, which was broken
+- Color extraction now shows swatches for the identified colors on top of the imported image
+- Removed build number tracking
+
 
 ## 2026-2-16 17:47
 - Created CLAUDE.md file in root directory

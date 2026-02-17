@@ -1,4 +1,4 @@
-import type { ExtractedColor, ExtractionOptions, RGB } from './types';
+import type { ColorLocation, ExtractedColor, ExtractionOptions, RGB } from './types';
 import { rgbToHex, rgbToHsl } from '../theme/color-utils';
 
 const DEFAULT_OPTIONS: Required<ExtractionOptions> = {
@@ -18,9 +18,17 @@ function colorKey(r: number, g: number, b: number): number {
   return (r << 16) | (g << 8) | b;
 }
 
+/** Color entry with accumulated location for centroid calculation */
+interface ColorEntry {
+  rgb: RGB;
+  count: number;
+  /** Accumulated location sum for centroid calculation */
+  locationSum: { x: number; y: number };
+}
+
 /** Color bucket for median cut algorithm */
 interface ColorBucket {
-  colors: Array<{ rgb: RGB; count: number }>;
+  colors: ColorEntry[];
   totalCount: number;
 }
 
@@ -83,14 +91,18 @@ function splitBucket(bucket: ColorBucket): [ColorBucket, ColorBucket] {
   ];
 }
 
-/** Get weighted average color from a bucket */
-function averageBucketColor(bucket: ColorBucket): { rgb: RGB; count: number } {
+/** Get weighted average color and centroid location from a bucket */
+function averageBucketColor(bucket: ColorBucket): { rgb: RGB; count: number; location: ColorLocation } {
   let r = 0, g = 0, b = 0;
+  let locationSumX = 0, locationSumY = 0;
 
-  for (const { rgb, count } of bucket.colors) {
+  for (const { rgb, count, locationSum } of bucket.colors) {
     r += rgb.r * count;
     g += rgb.g * count;
     b += rgb.b * count;
+    // Accumulate location sums for centroid
+    locationSumX += locationSum.x;
+    locationSumY += locationSum.y;
   }
 
   return {
@@ -100,7 +112,135 @@ function averageBucketColor(bucket: ColorBucket): { rgb: RGB; count: number } {
       b: Math.round(b / bucket.totalCount),
     },
     count: bucket.totalCount,
+    // Centroid = average of all pixel locations in the bucket
+    location: {
+      x: locationSumX / bucket.totalCount,
+      y: locationSumY / bucket.totalCount,
+    },
   };
+}
+
+/** Calculate HSL saturation from RGB (0-100) */
+function rgbSaturation(r: number, g: number, b: number): number {
+  const rNorm = r / 255, gNorm = g / 255, bNorm = b / 255;
+  const max = Math.max(rNorm, gNorm, bNorm);
+  const min = Math.min(rNorm, gNorm, bNorm);
+  const l = (max + min) / 2;
+
+  if (max === min) return 0;
+
+  const d = max - min;
+  return (l > 0.5 ? d / (2 - max - min) : d / (max + min)) * 100;
+}
+
+/** Calculate hue from RGB (0-360) */
+function rgbHue(r: number, g: number, b: number): number {
+  const rNorm = r / 255, gNorm = g / 255, bNorm = b / 255;
+  const max = Math.max(rNorm, gNorm, bNorm);
+  const min = Math.min(rNorm, gNorm, bNorm);
+
+  if (max === min) return 0;
+
+  const d = max - min;
+  let h = 0;
+
+  if (max === rNorm) {
+    h = ((gNorm - bNorm) / d + (gNorm < bNorm ? 6 : 0)) / 6;
+  } else if (max === gNorm) {
+    h = ((bNorm - rNorm) / d + 2) / 6;
+  } else {
+    h = ((rNorm - gNorm) / d + 4) / 6;
+  }
+
+  return h * 360;
+}
+
+/** Calculate circular hue distance */
+function hueDistance(h1: number, h2: number): number {
+  const diff = Math.abs(h1 - h2);
+  return Math.min(diff, 360 - diff);
+}
+
+/** Check if a color entry is well-represented by existing buckets */
+function isWellRepresented(
+  entry: ColorEntry,
+  bucketAverages: Array<{ rgb: RGB; hue: number; saturation: number }>
+): boolean {
+  const entryHue = rgbHue(entry.rgb.r, entry.rgb.g, entry.rgb.b);
+  const entrySat = rgbSaturation(entry.rgb.r, entry.rgb.g, entry.rgb.b);
+
+  for (const bucket of bucketAverages) {
+    const hueDist = hueDistance(entryHue, bucket.hue);
+    const satDiff = Math.abs(entrySat - bucket.saturation);
+
+    // Well-represented = within 30 hue degrees and 20% saturation
+    if (hueDist < 30 && satDiff < 20) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/** Find saturated colors that weren't captured well by median cut */
+function findSaturatedOutliers(
+  colorMap: Map<number, ColorEntry>,
+  existingBuckets: ColorBucket[]
+): ColorBucket[] {
+  const MIN_OUTLIER_SATURATION = 50;
+  const MAX_OUTLIERS = 3;
+
+  // Compute bucket averages for comparison
+  const bucketAverages = existingBuckets
+    .filter(b => b.colors.length > 0)
+    .map(bucket => {
+      const avg = averageBucketColor(bucket);
+      return {
+        rgb: avg.rgb,
+        hue: rgbHue(avg.rgb.r, avg.rgb.g, avg.rgb.b),
+        saturation: rgbSaturation(avg.rgb.r, avg.rgb.g, avg.rgb.b),
+      };
+    });
+
+  // Find saturated entries not well-represented
+  const outlierCandidates: Array<{ entry: ColorEntry; saturation: number }> = [];
+
+  for (const entry of colorMap.values()) {
+    const saturation = rgbSaturation(entry.rgb.r, entry.rgb.g, entry.rgb.b);
+
+    if (saturation >= MIN_OUTLIER_SATURATION && !isWellRepresented(entry, bucketAverages)) {
+      outlierCandidates.push({ entry, saturation });
+    }
+  }
+
+  // Sort by saturation * count to prioritize both saturation and presence
+  outlierCandidates.sort((a, b) => {
+    const scoreA = a.saturation * Math.log(a.entry.count + 1);
+    const scoreB = b.saturation * Math.log(b.entry.count + 1);
+    return scoreB - scoreA;
+  });
+
+  // Create small buckets for top outliers, ensuring hue diversity
+  const outlierBuckets: ColorBucket[] = [];
+  const usedHues: number[] = [];
+
+  for (const { entry } of outlierCandidates) {
+    if (outlierBuckets.length >= MAX_OUTLIERS) break;
+
+    const hue = rgbHue(entry.rgb.r, entry.rgb.g, entry.rgb.b);
+
+    // Skip if too close in hue to an already-added outlier
+    const tooClose = usedHues.some(h => hueDistance(h, hue) < 30);
+    if (tooClose) continue;
+
+    usedHues.push(hue);
+    outlierBuckets.push({
+      colors: [entry],
+      totalCount: entry.count,
+    });
+  }
+
+  return outlierBuckets;
 }
 
 /**
@@ -137,8 +277,8 @@ export function extractColorsFromImage(
   const pixels = imageData.data;
   const totalPixels = width * height;
 
-  // Build color frequency map with quantization
-  const colorMap = new Map<number, { rgb: RGB; count: number }>();
+  // Build color frequency map with quantization and location tracking
+  const colorMap = new Map<number, ColorEntry>();
 
   for (let i = 0; i < pixels.length; i += 4) {
     const r = quantize(pixels[i], opts.quantizationBits);
@@ -149,13 +289,21 @@ export function extractColorsFromImage(
     // Skip transparent pixels
     if (a < 128) continue;
 
+    // Calculate pixel coordinates (normalized 0-1)
+    const pixelIndex = i / 4;
+    const x = (pixelIndex % width) / width;
+    const y = Math.floor(pixelIndex / width) / height;
+
     const key = colorKey(r, g, b);
     const existing = colorMap.get(key);
 
     if (existing) {
       existing.count++;
+      // Accumulate location for centroid calculation
+      existing.locationSum.x += x;
+      existing.locationSum.y += y;
     } else {
-      colorMap.set(key, { rgb: { r, g, b }, count: 1 });
+      colorMap.set(key, { rgb: { r, g, b }, count: 1, locationSum: { x, y } });
     }
   }
 
@@ -187,17 +335,22 @@ export function extractColorsFromImage(
     buckets.splice(maxIndex, 1, left, right);
   }
 
+  // Phase 2: Hunt for saturated outliers not captured by median cut
+  const saturatedOutliers = findSaturatedOutliers(colorMap, buckets);
+  buckets.push(...saturatedOutliers);
+
   // Convert buckets to extracted colors
   const colors: ExtractedColor[] = buckets
     .filter(b => b.colors.length > 0)
     .map(bucket => {
-      const { rgb, count } = averageBucketColor(bucket);
+      const { rgb, count, location } = averageBucketColor(bucket);
       return {
         hex: rgbToHex(rgb.r, rgb.g, rgb.b),
         rgb,
         hsl: rgbToHsl(rgb.r, rgb.g, rgb.b),
         population: count,
         percentage: (count / totalPixels) * 100,
+        location,
       };
     })
     .sort((a, b) => b.population - a.population);

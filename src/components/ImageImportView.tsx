@@ -132,11 +132,58 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
         <div className="import-confirmation">
           <div className="import-preview">
             {imageDataUrl ? (
-              <img
-                src={imageDataUrl}
-                alt={image.fileName}
-                className="import-preview-image"
-              />
+              <div className="import-preview-container">
+                <img
+                  src={imageDataUrl}
+                  alt={image.fileName}
+                  className="import-preview-image"
+                />
+                {/* Color location markers */}
+                {palette?.roleLocations && (
+                  <>
+                    {palette.roleLocations.surface_base && (
+                      <div
+                        className="color-marker"
+                        style={{
+                          backgroundColor: palette.roles.surface_base,
+                          left: `${palette.roleLocations.surface_base.x * 100}%`,
+                          top: `${palette.roleLocations.surface_base.y * 100}%`,
+                        }}
+                      />
+                    )}
+                    {palette.roleLocations.text_primary && (
+                      <div
+                        className="color-marker"
+                        style={{
+                          backgroundColor: palette.roles.text_primary,
+                          left: `${palette.roleLocations.text_primary.x * 100}%`,
+                          top: `${palette.roleLocations.text_primary.y * 100}%`,
+                        }}
+                      />
+                    )}
+                    {palette.roleLocations.accent_primary && (
+                      <div
+                        className="color-marker"
+                        style={{
+                          backgroundColor: palette.roles.accent_primary,
+                          left: `${palette.roleLocations.accent_primary.x * 100}%`,
+                          top: `${palette.roleLocations.accent_primary.y * 100}%`,
+                        }}
+                      />
+                    )}
+                    {palette.roleLocations.accent_secondary && (
+                      <div
+                        className="color-marker"
+                        style={{
+                          backgroundColor: palette.roles.accent_secondary,
+                          left: `${palette.roleLocations.accent_secondary.x * 100}%`,
+                          top: `${palette.roleLocations.accent_secondary.y * 100}%`,
+                        }}
+                      />
+                    )}
+                  </>
+                )}
+              </div>
             ) : (
               <div className="import-preview-loading">
                 <div className="import-spinner" />

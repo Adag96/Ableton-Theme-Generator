@@ -123,12 +123,39 @@
   flex-shrink: 1;
 }
 
+.import-preview-container {
+  position: relative;
+  display: inline-block;
+}
+
 .import-preview-image {
+  display: block;
   max-width: 100%;
   max-height: 40vh;
   object-fit: contain;
   border-radius: var(--border-radius);
   border: 1px solid var(--color-border);
+}
+
+/* Color location markers */
+.color-marker {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.color-marker::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 .import-preview-loading {

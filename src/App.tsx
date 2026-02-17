@@ -8,7 +8,6 @@ import './App.css';
 
 function App() {
   const [version, setVersion] = useState('0.0.1');
-  const [buildNumber, setBuildNumber] = useState('1');
   const [currentView, setCurrentView] = useState<'landing' | 'settings' | 'import'>('landing');
   const [importedImage, setImportedImage] = useState<ImageFileResult | null>(null);
   // Will be used when theme generation view is implemented
@@ -20,9 +19,7 @@ function App() {
       if (window.electronAPI) {
         try {
           const ver = await window.electronAPI.getVersion();
-          const build = await window.electronAPI.getBuildNumber();
           setVersion(ver);
-          setBuildNumber(build);
         } catch (error) {
           console.error('Error loading version info:', error);
         }
@@ -94,14 +91,7 @@ function App() {
           Made by <strong>Lonebody</strong>
         </p>
         <div className="footer-version">
-          <div className="version-info">
-            <span className="version-label">Version:</span>
-            <span className="version-value">{version}</span>
-          </div>
-          <div className="version-info">
-            <span className="version-label">Build:</span>
-            <span className="version-value">#{buildNumber}</span>
-          </div>
+          <span className="version-value">v{version}</span>
         </div>
       </footer>
     </div>
