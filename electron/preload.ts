@@ -6,6 +6,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getVersion: () => ipcRenderer.invoke('get-version'),
   getBuildNumber: () => ipcRenderer.invoke('get-build-number'),
   detectThemesDirectory: () => ipcRenderer.invoke('detect-themes-directory'),
+  listThemeFiles: (dirPath: string) => ipcRenderer.invoke('list-theme-files', dirPath),
+  deleteThemeFile: (filePath: string) => ipcRenderer.invoke('delete-theme-file', filePath),
   openPathInExplorer: (dirPath: string) => ipcRenderer.invoke('open-path-in-explorer', dirPath),
   openFileDialog: () => ipcRenderer.invoke('open-file-dialog'),
   readImageAsDataUrl: (filePath: string) => ipcRenderer.invoke('read-image-as-data-url', filePath),

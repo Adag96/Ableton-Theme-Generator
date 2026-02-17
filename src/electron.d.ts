@@ -17,10 +17,17 @@ export interface SaveThemeResult {
   error: string | null;
 }
 
+export interface ThemeFileInfo {
+  name: string;
+  createdByApp: boolean;
+}
+
 export interface ElectronAPI {
   getVersion: () => Promise<string>;
   getBuildNumber: () => Promise<string>;
   detectThemesDirectory: () => Promise<ThemesDirectoryResult>;
+  listThemeFiles: (dirPath: string) => Promise<ThemeFileInfo[]>;
+  deleteThemeFile: (filePath: string) => Promise<{ success: boolean; error?: string }>;
   openPathInExplorer: (dirPath: string) => Promise<{ success: boolean; error: string | null }>;
   openFileDialog: () => Promise<ImageFileResult | null>;
   readImageAsDataUrl: (filePath: string) => Promise<string | null>;
