@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import type { ImageFileResult } from '../electron';
 import { useColorExtraction } from '../hooks/useColorExtraction';
 import type { PaletteSelectionResult } from '../extraction';
+import type { ThemeTone } from '../theme/types';
 import './ImageImportView.css';
 
 interface ImageImportViewProps {
@@ -27,6 +28,12 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
   const [isDragOver, setIsDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
+  const [selectedTone, setSelectedTone] = useState<ThemeTone | null>(null);
+
+  // Reset tone selection when image changes
+  useEffect(() => {
+    setSelectedTone(null);
+  }, [image?.filePath]);
 
   // Load image as data URL for preview
   useEffect(() => {
@@ -40,8 +47,10 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
     });
   }, [image?.filePath]);
 
+  // Extraction runs only when both image and tone are selected
   const { palette, isExtracting, error: extractionError } = useColorExtraction(
-    image?.filePath ?? null
+    image?.filePath ?? null,
+    selectedTone ?? undefined
   );
 
   const handleBrowse = useCallback(async () => {
@@ -138,7 +147,7 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
                   alt={image.fileName}
                   className="import-preview-image"
                 />
-                {/* Color location markers */}
+                {/* Color location markers - only show after extraction */}
                 {palette?.roleLocations && (
                   <>
                     {palette.roleLocations.surface_base && (
@@ -195,8 +204,27 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
             <p className="import-file-path">{image.filePath}</p>
           </div>
 
-          {/* Color extraction state */}
-          {isExtracting && (
+          {/* Tone selection - shown before extraction */}
+          <div className="import-tone-section">
+            <p className="import-tone-label">Theme Style</p>
+            <div className="import-tone-toggle">
+              <button
+                className={`tone-toggle-option ${selectedTone === 'dark' ? 'tone-toggle-option-active' : ''}`}
+                onClick={() => setSelectedTone('dark')}
+              >
+                Dark
+              </button>
+              <button
+                className={`tone-toggle-option ${selectedTone === 'light' ? 'tone-toggle-option-active' : ''}`}
+                onClick={() => setSelectedTone('light')}
+              >
+                Light
+              </button>
+            </div>
+          </div>
+
+          {/* Color extraction state - only shows after tone is selected */}
+          {selectedTone && isExtracting && (
             <div className="import-extraction-status">
               <div className="import-spinner" />
               <span>Extracting colors...</span>
@@ -207,6 +235,7 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
             <p className="import-error">{extractionError}</p>
           )}
 
+          {/* Palette swatches - shown after extraction completes */}
           {palette && (
             <div className="import-palette">
               <div className="import-palette-swatches">
@@ -239,9 +268,6 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
                   <span className="import-swatch-label">Accent 2</span>
                 </div>
               </div>
-              <p className="import-palette-tone">
-                {palette.roles.tone === 'dark' ? 'Dark' : 'Light'} theme detected
-              </p>
             </div>
           )}
 

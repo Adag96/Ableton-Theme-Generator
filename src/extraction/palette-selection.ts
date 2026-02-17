@@ -36,26 +36,66 @@ function complementaryHue(hue: number): number {
   return (hue + 180) % 360;
 }
 
+/** Options for palette selection */
+export interface PaletteSelectionOptions {
+  /** User's preferred tone. If provided, prioritizes colors matching this tone for surface_base. */
+  tonePreference?: ThemeTone;
+}
+
 /**
  * Select semantic color roles from extracted colors.
  *
  * Algorithm:
- * 1. surface_base = most prominent color
- * 2. tone = dark if surface_base lightness < 50
+ * 1. surface_base = best color matching tone preference (or most prominent if no preference)
+ * 2. tone = user preference, or derived from surface_base lightness
  * 3. text_primary = first color with good contrast, or fallback
  * 4. accent_primary = most saturated (prefer warm hues)
  * 5. accent_secondary = next saturated with hue distance, or complement
  */
-export function selectThemePalette(colors: ExtractedColor[]): PaletteSelectionResult {
+export function selectThemePalette(
+  colors: ExtractedColor[],
+  options: PaletteSelectionOptions = {}
+): PaletteSelectionResult {
   if (colors.length === 0) {
     throw new Error('No colors provided for palette selection');
   }
 
-  // 1. Surface base: most prominent (already sorted by population)
-  const surfaceBase = colors[0];
+  const { tonePreference } = options;
 
-  // 2. Tone: determined by surface lightness
-  const tone: ThemeTone = surfaceBase.hsl.l < 50 ? 'dark' : 'light';
+  // 1. Surface base: select based on tone preference
+  let surfaceBase: ExtractedColor;
+
+  if (tonePreference) {
+    // Find colors matching the tone preference
+    const matchingColors = colors.filter(c =>
+      tonePreference === 'dark' ? c.hsl.l < 50 : c.hsl.l >= 50
+    );
+
+    if (matchingColors.length > 0) {
+      // Pick the most prominent color that matches the preference
+      surfaceBase = matchingColors[0];
+    } else {
+      // No matching colors found - adjust the most prominent color
+      // For light themes with only dark colors: brighten the most desaturated color
+      // For dark themes with only light colors: darken the most desaturated color
+      const sortedByLowSaturation = [...colors].sort((a, b) => a.hsl.s - b.hsl.s);
+      const baseColor = sortedByLowSaturation[0];
+
+      // Create an adjusted color
+      const targetLightness = tonePreference === 'dark' ? 20 : 75;
+      surfaceBase = {
+        ...baseColor,
+        hex: hslToHex(baseColor.hsl.h, Math.min(baseColor.hsl.s, 15), targetLightness),
+        hsl: { h: baseColor.hsl.h, s: Math.min(baseColor.hsl.s, 15), l: targetLightness },
+      };
+    }
+  } else {
+    // No preference: use most prominent (original behavior)
+    surfaceBase = colors[0];
+  }
+
+  // 2. Tone: use preference if provided, otherwise derive from surface lightness
+  const tone: ThemeTone = tonePreference ?? (surfaceBase.hsl.l < 50 ? 'dark' : 'light');
 
   // 3. Text primary: find color with best contrast
   let textPrimary: ExtractedColor | null = null;

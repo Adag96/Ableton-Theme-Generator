@@ -18,6 +18,8 @@ Desktop application that generates custom Ableton Live 12 themes from images. Us
 | Documentation | `Documentation/` |
 | Product Brief | `Documentation/Product Brief.md` |
 | Development Roadmap | `Documentation/Development Roadmap.md` |
+| Feature Overview | `Documentation/Feature Overview.md` |
+| Semantic Color Roles | `Documentation/Semantic Color Roles Specification.md` |
 | Theme Convention | `Documentation/Ableton Theme Convention.md` |
 | Work Log | `Documentation/Work Log.md` |
 | Parameter Mapping | `parameter_control_mapping.md` |

@@ -297,8 +297,54 @@
   white-space: nowrap;
 }
 
-.import-palette-tone {
+/* Tone selection */
+
+.import-tone-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.import-tone-label {
   font-size: 12px;
   color: var(--color-text-secondary);
-  margin: var(--spacing-sm) 0 0 0;
+  margin: 0;
+}
+
+.import-tone-toggle {
+  display: flex;
+  gap: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.tone-toggle-option {
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--color-bg-secondary);
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tone-toggle-option:first-child {
+  border-right: 1px solid var(--color-border);
+}
+
+.tone-toggle-option:hover:not(.tone-toggle-option-active) {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text);
+}
+
+.tone-toggle-option-active {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.tone-toggle-option-active:hover {
+  background: var(--color-accent-hover);
 }
