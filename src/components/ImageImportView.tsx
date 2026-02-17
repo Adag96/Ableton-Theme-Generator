@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { ImageFileResult } from '../electron';
 import { useColorExtraction } from '../hooks/useColorExtraction';
 import type { PaletteSelectionResult } from '../extraction';
@@ -26,6 +26,19 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
+
+  // Load image as data URL for preview
+  useEffect(() => {
+    if (!image?.filePath || !window.electronAPI) {
+      setImageDataUrl(null);
+      return;
+    }
+
+    window.electronAPI.readImageAsDataUrl(image.filePath).then((dataUrl) => {
+      setImageDataUrl(dataUrl);
+    });
+  }, [image?.filePath]);
 
   const { palette, isExtracting, error: extractionError } = useColorExtraction(
     image?.filePath ?? null
@@ -118,11 +131,17 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
       ) : (
         <div className="import-confirmation">
           <div className="import-preview">
-            <img
-              src={`file://${image.filePath}`}
-              alt={image.fileName}
-              className="import-preview-image"
-            />
+            {imageDataUrl ? (
+              <img
+                src={imageDataUrl}
+                alt={image.fileName}
+                className="import-preview-image"
+              />
+            ) : (
+              <div className="import-preview-loading">
+                <div className="import-spinner" />
+              </div>
+            )}
           </div>
           <div className="import-details">
             <h3 className="import-file-name">{image.fileName}</h3>

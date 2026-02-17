@@ -109,22 +109,35 @@
   flex: 1;
   gap: var(--spacing-lg);
   padding: var(--spacing-lg) 0;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .import-preview {
-  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 0;
   width: 100%;
-  max-width: 600px;
+  max-width: 400px;
+  max-height: 40vh;
+  flex-shrink: 1;
 }
 
 .import-preview-image {
   max-width: 100%;
-  max-height: 100%;
+  max-height: 40vh;
   object-fit: contain;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--color-border);
+}
+
+.import-preview-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 100px;
+  background-color: var(--color-bg-secondary);
   border-radius: var(--border-radius);
   border: 1px solid var(--color-border);
 }
