@@ -33,8 +33,8 @@ export const LandingView: React.FC<LandingViewProps> = ({
               <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
             </svg>
           </div>
-          <h3>Browse Saved Themes</h3>
-          <p>View and manage your previously generated theme library</p>
+          <h3>My Themes</h3>
+          <p>View and manage your generated theme library</p>
         </button>
 
         <button className="landing-button" onClick={onSettings}>

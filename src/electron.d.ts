@@ -1,3 +1,5 @@
+import type { ThemeLibrary } from './types/theme-library';
+
 export interface ThemesDirectoryResult {
   found: boolean;
   path: string | null;
@@ -23,6 +25,8 @@ export interface ElectronAPI {
   openFileDialog: () => Promise<ImageFileResult | null>;
   readImageAsDataUrl: (filePath: string) => Promise<string | null>;
   saveThemeFile: (xmlContent: string, defaultFileName: string) => Promise<SaveThemeResult>;
+  loadThemeLibrary: () => Promise<ThemeLibrary>;
+  saveThemeLibrary: (library: ThemeLibrary) => Promise<{ success: boolean; error?: string }>;
 }
 
 declare global {

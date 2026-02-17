@@ -254,7 +254,7 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
               disabled={!palette || isExtracting}
               onClick={() => palette && onContinue(palette)}
             >
-              {isExtracting ? 'Extracting...' : 'Continue'}
+              {isExtracting ? 'Extracting...' : 'Generate Theme'}
             </button>
           </div>
         </div>

@@ -11,4 +11,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   readImageAsDataUrl: (filePath: string) => ipcRenderer.invoke('read-image-as-data-url', filePath),
   saveThemeFile: (xmlContent: string, defaultFileName: string) =>
     ipcRenderer.invoke('save-theme-file', xmlContent, defaultFileName),
+  loadThemeLibrary: () => ipcRenderer.invoke('load-theme-library'),
+  saveThemeLibrary: (library: unknown) => ipcRenderer.invoke('save-theme-library', library),
 });

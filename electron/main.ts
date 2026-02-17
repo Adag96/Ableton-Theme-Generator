@@ -150,6 +150,31 @@ app.whenReady().then(() => {
     }
   });
 
+  // Theme library persistence
+  const themeLibraryPath = path.join(app.getPath('userData'), 'theme-library.json');
+
+  ipcMain.handle('load-theme-library', async () => {
+    try {
+      if (fs.existsSync(themeLibraryPath)) {
+        const data = fs.readFileSync(themeLibraryPath, 'utf8');
+        return JSON.parse(data);
+      }
+    } catch (error) {
+      console.error('Error loading theme library:', error);
+    }
+    return { version: 1, themes: [] };
+  });
+
+  ipcMain.handle('save-theme-library', async (_event, library: unknown) => {
+    try {
+      fs.writeFileSync(themeLibraryPath, JSON.stringify(library, null, 2), 'utf8');
+      return { success: true };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      return { success: false, error: errorMessage };
+    }
+  });
+
   createWindow();
 });
 

@@ -1,0 +1,103 @@
+.theme-card {
+  background-color: var(--color-bg-secondary);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+}
+
+.theme-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.theme-card-preview {
+  width: 100%;
+  height: 120px;
+  overflow: hidden;
+  background-color: var(--color-bg-primary);
+}
+
+.theme-card-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.theme-card-content {
+  padding: 16px;
+}
+
+.theme-card-name {
+  margin: 0 0 12px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 24px;
+}
+
+.theme-card-swatches {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.theme-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.theme-card-tone {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.theme-card-tone-dark {
+  background-color: rgba(30, 30, 30, 0.8);
+  color: #aaa;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.theme-card-tone-light {
+  background-color: rgba(240, 240, 240, 0.9);
+  color: #555;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.theme-card-delete {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+  color: white;
+}
+
+.theme-card:hover .theme-card-delete {
+  opacity: 1;
+}
+
+.theme-card-delete:hover {
+  background-color: rgba(200, 50, 50, 0.8);
+}
