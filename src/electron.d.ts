@@ -15,6 +15,7 @@ export interface ElectronAPI {
   detectThemesDirectory: () => Promise<ThemesDirectoryResult>;
   openPathInExplorer: (dirPath: string) => Promise<{ success: boolean; error: string | null }>;
   openFileDialog: () => Promise<ImageFileResult | null>;
+  readImageAsDataUrl: (filePath: string) => Promise<string | null>;
 }
 
 declare global {

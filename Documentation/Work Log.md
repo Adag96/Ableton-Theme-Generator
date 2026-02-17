@@ -1,5 +1,8 @@
 # Work Log
 
+## 2026-2-17 11:44
+- Built a color extraction system that pulls 4 colors from an imported image and defines light or dark tone convention
+
 ## 2026-2-16 17:47
 - Created CLAUDE.md file in root directory
 - Created Claude directory with lessons and todo files

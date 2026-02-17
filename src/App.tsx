@@ -3,6 +3,7 @@ import { LandingView } from './components/LandingView';
 import { SettingsView } from './components/SettingsView';
 import { ImageImportView } from './components/ImageImportView';
 import type { ImageFileResult } from './electron';
+import type { PaletteSelectionResult } from './extraction';
 import './App.css';
 
 function App() {
@@ -10,6 +11,8 @@ function App() {
   const [buildNumber, setBuildNumber] = useState('1');
   const [currentView, setCurrentView] = useState<'landing' | 'settings' | 'import'>('landing');
   const [importedImage, setImportedImage] = useState<ImageFileResult | null>(null);
+  // Will be used when theme generation view is implemented
+  const [, setExtractedPalette] = useState<PaletteSelectionResult | null>(null);
 
   useEffect(() => {
     // Get version and build number from Electron API if available
@@ -49,6 +52,13 @@ function App() {
   const handleBackToLanding = () => {
     setCurrentView('landing');
     setImportedImage(null);
+    setExtractedPalette(null);
+  };
+
+  const handlePaletteReady = (palette: PaletteSelectionResult) => {
+    setExtractedPalette(palette);
+    console.log('Palette extracted:', palette.roles);
+    // TODO: Navigate to theme generation view
   };
 
   return (
@@ -73,6 +83,7 @@ function App() {
           <ImageImportView
             image={importedImage}
             onImageLoaded={handleImageLoaded}
+            onContinue={handlePaletteReady}
             onBack={handleBackToLanding}
           />
         )}

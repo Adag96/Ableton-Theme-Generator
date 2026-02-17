@@ -8,4 +8,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
   detectThemesDirectory: () => ipcRenderer.invoke('detect-themes-directory'),
   openPathInExplorer: (dirPath: string) => ipcRenderer.invoke('open-path-in-explorer', dirPath),
   openFileDialog: () => ipcRenderer.invoke('open-file-dialog'),
+  readImageAsDataUrl: (filePath: string) => ipcRenderer.invoke('read-image-as-data-url', filePath),
 });

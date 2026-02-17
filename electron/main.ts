@@ -94,6 +94,18 @@ app.whenReady().then(() => {
     return { success: errorMessage === '', error: errorMessage || null };
   });
 
+  ipcMain.handle('read-image-as-data-url', async (_event, filePath: string) => {
+    try {
+      const data = fs.readFileSync(filePath);
+      const ext = path.extname(filePath).toLowerCase();
+      const mimeType = ext === '.png' ? 'image/png' : 'image/jpeg';
+      return `data:${mimeType};base64,${data.toString('base64')}`;
+    } catch (error) {
+      console.error('Error reading image:', error);
+      return null;
+    }
+  });
+
   ipcMain.handle('open-file-dialog', async () => {
     const result = await dialog.showOpenDialog({
       properties: ['openFile'],

@@ -1,10 +1,13 @@
 import { useState, useCallback } from 'react';
 import type { ImageFileResult } from '../electron';
+import { useColorExtraction } from '../hooks/useColorExtraction';
+import type { PaletteSelectionResult } from '../extraction';
 import './ImageImportView.css';
 
 interface ImageImportViewProps {
   image: ImageFileResult | null;
   onImageLoaded: (image: ImageFileResult) => void;
+  onContinue: (palette: PaletteSelectionResult) => void;
   onBack: () => void;
 }
 
@@ -18,10 +21,15 @@ function isAcceptedFile(fileName: string): boolean {
 export const ImageImportView: React.FC<ImageImportViewProps> = ({
   image,
   onImageLoaded,
+  onContinue,
   onBack,
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const { palette, isExtracting, error: extractionError } = useColorExtraction(
+    image?.filePath ?? null
+  );
 
   const handleBrowse = useCallback(async () => {
     if (!window.electronAPI) return;
@@ -120,12 +128,67 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
             <h3 className="import-file-name">{image.fileName}</h3>
             <p className="import-file-path">{image.filePath}</p>
           </div>
+
+          {/* Color extraction state */}
+          {isExtracting && (
+            <div className="import-extraction-status">
+              <div className="import-spinner" />
+              <span>Extracting colors...</span>
+            </div>
+          )}
+
+          {extractionError && (
+            <p className="import-error">{extractionError}</p>
+          )}
+
+          {palette && (
+            <div className="import-palette">
+              <div className="import-palette-swatches">
+                <div
+                  className="import-swatch"
+                  style={{ backgroundColor: palette.roles.surface_base }}
+                  title={`Surface: ${palette.roles.surface_base}`}
+                >
+                  <span className="import-swatch-label">Surface</span>
+                </div>
+                <div
+                  className="import-swatch"
+                  style={{ backgroundColor: palette.roles.text_primary }}
+                  title={`Text: ${palette.roles.text_primary}`}
+                >
+                  <span className="import-swatch-label">Text</span>
+                </div>
+                <div
+                  className="import-swatch"
+                  style={{ backgroundColor: palette.roles.accent_primary }}
+                  title={`Accent 1: ${palette.roles.accent_primary}`}
+                >
+                  <span className="import-swatch-label">Accent 1</span>
+                </div>
+                <div
+                  className="import-swatch"
+                  style={{ backgroundColor: palette.roles.accent_secondary }}
+                  title={`Accent 2: ${palette.roles.accent_secondary}`}
+                >
+                  <span className="import-swatch-label">Accent 2</span>
+                </div>
+              </div>
+              <p className="import-palette-tone">
+                {palette.roles.tone === 'dark' ? 'Dark' : 'Light'} theme detected
+              </p>
+            </div>
+          )}
+
           <div className="import-actions">
             <button className="import-action-button import-change-button" onClick={handleBrowse}>
               Change Image
             </button>
-            <button className="import-action-button import-continue-button" disabled>
-              Continue
+            <button
+              className="import-action-button import-continue-button"
+              disabled={!palette || isExtracting}
+              onClick={() => palette && onContinue(palette)}
+            >
+              {isExtracting ? 'Extracting...' : 'Continue'}
             </button>
           </div>
         </div>

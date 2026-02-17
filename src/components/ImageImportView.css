@@ -193,3 +193,72 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+/* Extraction status */
+
+.import-extraction-status {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.import-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Color palette display */
+
+.import-palette {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.import-palette-swatches {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.import-swatch {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  border: 2px solid var(--color-border);
+  cursor: default;
+  transition: transform 0.15s ease;
+}
+
+.import-swatch:hover {
+  transform: scale(1.08);
+}
+
+.import-swatch-label {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.import-palette-tone {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin: var(--spacing-sm) 0 0 0;
+}
