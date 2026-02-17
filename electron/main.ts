@@ -123,6 +123,33 @@ app.whenReady().then(() => {
     return { filePath, fileName };
   });
 
+  ipcMain.handle('save-theme-file', async (_event, xmlContent: string, defaultFileName: string) => {
+    // Detect Ableton themes directory for default save location
+    const themesDir = detectAbletonThemesDirectory();
+
+    const result = await dialog.showSaveDialog({
+      title: 'Save Ableton Theme',
+      defaultPath: themesDir.found && themesDir.path
+        ? path.join(themesDir.path, defaultFileName)
+        : defaultFileName,
+      filters: [
+        { name: 'Ableton Theme', extensions: ['ask'] },
+      ],
+    });
+
+    if (result.canceled || !result.filePath) {
+      return { success: false, filePath: null, error: null };
+    }
+
+    try {
+      fs.writeFileSync(result.filePath, xmlContent, 'utf8');
+      return { success: true, filePath: result.filePath, error: null };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      return { success: false, filePath: null, error: errorMessage };
+    }
+  });
+
   createWindow();
 });
 

@@ -4,6 +4,8 @@ import { SettingsView } from './components/SettingsView';
 import { ImageImportView } from './components/ImageImportView';
 import type { ImageFileResult } from './electron';
 import type { PaletteSelectionResult } from './extraction';
+import { generateTheme } from './theme/derivation';
+import { generateAskXml } from './theme/ask-generator';
 import './App.css';
 
 function App() {
@@ -52,10 +54,36 @@ function App() {
     setExtractedPalette(null);
   };
 
-  const handlePaletteReady = (palette: PaletteSelectionResult) => {
+  const handlePaletteReady = async (palette: PaletteSelectionResult) => {
     setExtractedPalette(palette);
     console.log('Palette extracted:', palette.roles);
-    // TODO: Navigate to theme generation view
+
+    // Generate theme from extracted palette
+    const themeData = generateTheme(palette.roles);
+    const xmlContent = generateAskXml(themeData);
+
+    // Derive filename from imported image
+    const baseFileName = importedImage?.fileName
+      ? importedImage.fileName.replace(/\.[^/.]+$/, '') // Remove extension
+      : 'Generated Theme';
+    const defaultFileName = `${baseFileName}.ask`;
+
+    // Save the theme file
+    if (window.electronAPI) {
+      try {
+        const result = await window.electronAPI.saveThemeFile(xmlContent, defaultFileName);
+        if (result.success) {
+          console.log('Theme saved to:', result.filePath);
+          // Return to landing after successful save
+          handleBackToLanding();
+        } else if (result.error) {
+          console.error('Failed to save theme:', result.error);
+        }
+        // If user cancelled, stay on the current view
+      } catch (error) {
+        console.error('Error saving theme:', error);
+      }
+    }
   };
 
   return (

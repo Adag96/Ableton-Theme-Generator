@@ -9,6 +9,12 @@ export interface ImageFileResult {
   fileName: string;
 }
 
+export interface SaveThemeResult {
+  success: boolean;
+  filePath: string | null;
+  error: string | null;
+}
+
 export interface ElectronAPI {
   getVersion: () => Promise<string>;
   getBuildNumber: () => Promise<string>;
@@ -16,6 +22,7 @@ export interface ElectronAPI {
   openPathInExplorer: (dirPath: string) => Promise<{ success: boolean; error: string | null }>;
   openFileDialog: () => Promise<ImageFileResult | null>;
   readImageAsDataUrl: (filePath: string) => Promise<string | null>;
+  saveThemeFile: (xmlContent: string, defaultFileName: string) => Promise<SaveThemeResult>;
 }
 
 declare global {
