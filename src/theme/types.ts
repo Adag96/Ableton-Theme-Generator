@@ -1,6 +1,17 @@
 /** Theme tone controls derivation direction (light vs dark neutral ramp) */
 export type ThemeTone = 'light' | 'dark';
 
+/** Contrast level controls the lightness spread between surface colors */
+export type ContrastLevel = 'low' | 'medium' | 'high' | 'very-high';
+
+/** Multipliers for each contrast level (applied to lightness offsets) */
+export const CONTRAST_MULTIPLIERS: Record<ContrastLevel, number> = {
+  low: 1.0,       // Current/original behavior
+  medium: 1.4,    // Default - moderate increase
+  high: 1.8,      // Noticeable contrast boost
+  'very-high': 2.2, // Maximum differentiation
+};
+
 /**
  * The 12 semantic color roles that define a theme.
  * Only tone, surface_base, text_primary, accent_primary, and accent_secondary
@@ -12,6 +23,8 @@ export interface SemanticColorRoles {
   text_primary: string;
   accent_primary: string;
   accent_secondary: string;
+  /** Contrast level for surface color differentiation (default: 'medium') */
+  contrastLevel?: ContrastLevel;
   surface_highlight?: string;
   surface_border?: string;
   detail_bg?: string;

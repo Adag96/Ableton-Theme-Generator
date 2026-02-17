@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import type { ImageFileResult } from '../electron';
 import { useColorExtraction } from '../hooks/useColorExtraction';
 import type { PaletteSelectionResult } from '../extraction';
-import type { ThemeTone } from '../theme/types';
+import type { ThemeTone, ContrastLevel } from '../theme/types';
 import './ImageImportView.css';
 
 interface ImageImportViewProps {
@@ -29,6 +29,7 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const [selectedTone, setSelectedTone] = useState<ThemeTone | null>(null);
+  const [contrastLevel, setContrastLevel] = useState<ContrastLevel>('medium');
 
   // Reset tone selection when image changes
   useEffect(() => {
@@ -204,22 +205,60 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
             <p className="import-file-path">{image.filePath}</p>
           </div>
 
-          {/* Tone selection - shown before extraction */}
-          <div className="import-tone-section">
-            <p className="import-tone-label">Theme Style</p>
-            <div className="import-tone-toggle">
-              <button
-                className={`tone-toggle-option ${selectedTone === 'dark' ? 'tone-toggle-option-active' : ''}`}
-                onClick={() => setSelectedTone('dark')}
-              >
-                Dark
-              </button>
-              <button
-                className={`tone-toggle-option ${selectedTone === 'light' ? 'tone-toggle-option-active' : ''}`}
-                onClick={() => setSelectedTone('light')}
-              >
-                Light
-              </button>
+          {/* Theme options section */}
+          <div className="import-options-section">
+            {/* Tone selection */}
+            <div className="import-option-group">
+              <p className="import-option-label">Theme Style</p>
+              <div className="import-tone-toggle">
+                <button
+                  className={`tone-toggle-option ${selectedTone === 'dark' ? 'tone-toggle-option-active' : ''}`}
+                  onClick={() => setSelectedTone('dark')}
+                >
+                  Dark
+                </button>
+                <button
+                  className={`tone-toggle-option ${selectedTone === 'light' ? 'tone-toggle-option-active' : ''}`}
+                  onClick={() => setSelectedTone('light')}
+                >
+                  Light
+                </button>
+              </div>
+            </div>
+
+            {/* Contrast level selection */}
+            <div className="import-option-group">
+              <p className="import-option-label">Contrast</p>
+              <div className="import-contrast-toggle">
+                <button
+                  className={`contrast-toggle-option ${contrastLevel === 'low' ? 'contrast-toggle-option-active' : ''}`}
+                  onClick={() => setContrastLevel('low')}
+                  title="Subtle surface differentiation (Ableton default style)"
+                >
+                  Low
+                </button>
+                <button
+                  className={`contrast-toggle-option ${contrastLevel === 'medium' ? 'contrast-toggle-option-active' : ''}`}
+                  onClick={() => setContrastLevel('medium')}
+                  title="Moderate contrast boost (recommended)"
+                >
+                  Medium
+                </button>
+                <button
+                  className={`contrast-toggle-option ${contrastLevel === 'high' ? 'contrast-toggle-option-active' : ''}`}
+                  onClick={() => setContrastLevel('high')}
+                  title="Higher visual separation between panels"
+                >
+                  High
+                </button>
+                <button
+                  className={`contrast-toggle-option ${contrastLevel === 'very-high' ? 'contrast-toggle-option-active' : ''}`}
+                  onClick={() => setContrastLevel('very-high')}
+                  title="Maximum differentiation between surfaces"
+                >
+                  Max
+                </button>
+              </div>
             </div>
           </div>
 
@@ -278,7 +317,10 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
             <button
               className="import-action-button import-continue-button"
               disabled={!palette || isExtracting}
-              onClick={() => palette && onContinue(palette)}
+              onClick={() => palette && onContinue({
+                ...palette,
+                roles: { ...palette.roles, contrastLevel },
+              })}
             >
               {isExtracting ? 'Extracting...' : 'Generate Theme'}
             </button>

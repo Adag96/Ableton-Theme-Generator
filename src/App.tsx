@@ -103,6 +103,7 @@ function App() {
               accent_primary: pendingTheme.palette.roles.accent_primary,
               accent_secondary: pendingTheme.palette.roles.accent_secondary,
             },
+            contrastLevel: pendingTheme.palette.roles.contrastLevel,
             previewImage: pendingTheme.previewImage,
           };
 

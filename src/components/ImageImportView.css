@@ -297,20 +297,28 @@
   white-space: nowrap;
 }
 
-/* Tone selection */
+/* Theme options section */
 
-.import-tone-section {
+.import-options-section {
+  display: flex;
+  gap: var(--spacing-xl);
+  align-items: flex-start;
+}
+
+.import-option-group {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--spacing-xs);
 }
 
-.import-tone-label {
+.import-option-label {
   font-size: 12px;
   color: var(--color-text-secondary);
   margin: 0;
 }
+
+/* Tone toggle */
 
 .import-tone-toggle {
   display: flex;
@@ -346,5 +354,45 @@
 }
 
 .tone-toggle-option-active:hover {
+  background: var(--color-accent-hover);
+}
+
+/* Contrast toggle */
+
+.import-contrast-toggle {
+  display: flex;
+  gap: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.contrast-toggle-option {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--color-bg-secondary);
+  border: none;
+  border-right: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.contrast-toggle-option:last-child {
+  border-right: none;
+}
+
+.contrast-toggle-option:hover:not(.contrast-toggle-option-active) {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text);
+}
+
+.contrast-toggle-option-active {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.contrast-toggle-option-active:hover {
   background: var(--color-accent-hover);
 }

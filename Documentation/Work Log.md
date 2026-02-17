@@ -1,6 +1,6 @@
 # Work Log
 
-## 2026-2-17 17:26
+## 2026-2-17 18:41
 - Built a color extraction system that pulls 4 colors from an imported image and defines light or dark tone convention
 - Uploaded image now shows preview thumbnail, which was broken
 - Color extraction now shows swatches for the identified colors on top of the imported image
@@ -10,6 +10,7 @@
 - Settings view now displays the full list of identified .ask theme files within the directory
 - User can now specify whether they want a Dark or Light theme to be generated prior to extracting colors
 - Created 'Feature Overview' document
+- Added Contrast settings for theme generation
 
 
 ## 2026-2-16 17:47

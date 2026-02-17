@@ -1,3 +1,5 @@
+import type { ContrastLevel } from '../theme/types';
+
 export interface SavedTheme {
   id: string;
   name: string;
@@ -10,6 +12,7 @@ export interface SavedTheme {
     accent_primary: string;
     accent_secondary: string;
   };
+  contrastLevel?: ContrastLevel;
   previewImage?: string;
 }
 

@@ -23,27 +23,46 @@ An Ableton Live 12 theme file (.ask) contains 236 parameters. However, these 236
 | 3 | `text_primary` | **Yes** | Primary text and icons throughout the UI |
 | 4 | `accent_primary` | **Yes** | Active toggle color (ChosenDefault, Progress, retro displays) |
 | 5 | `accent_secondary` | **Yes** | Alternative highlight (ChosenAlternative, RangeDefault, threshold lines) |
-| 6 | `surface_highlight` | Derived | Selected track/focused element background |
-| 7 | `surface_border` | Derived | Outer frames, desktop borders |
-| 8 | `detail_bg` | Derived | Clip editor area backgrounds |
-| 9 | `control_bg` | Derived | Input field and knob backgrounds |
-| 10 | `text_secondary` | Derived | Disabled/dim text, borders |
-| 11 | `selection_bg` | Derived | Selection highlight background |
-| 12 | `selection_fg` | Derived | Text on selection highlights |
+| 6 | `contrastLevel` | Optional | Surface contrast multiplier: `"low"` \| `"medium"` (default) \| `"high"` \| `"very-high"` |
+| 7 | `surface_highlight` | Derived | Selected track/focused element background |
+| 8 | `surface_border` | Derived | Outer frames, desktop borders |
+| 9 | `detail_bg` | Derived | Clip editor area backgrounds |
+| 10 | `control_bg` | Derived | Input field and knob backgrounds |
+| 11 | `text_secondary` | Derived | Disabled/dim text, borders |
+| 12 | `selection_bg` | Derived | Selection highlight background |
+| 13 | `selection_fg` | Derived | Text on selection highlights |
+
+### Contrast Level
+
+The `contrastLevel` parameter controls the lightness spread between surface colors. Higher contrast creates more visual separation between panels and controls.
+
+| Level | Multiplier | Effect |
+|-------|------------|--------|
+| `low` | 1.0× | Original/subtle (matches Ableton default style) |
+| `medium` | 1.4× | Moderate contrast boost (default) |
+| `high` | 1.8× | Noticeable visual separation |
+| `very-high` | 2.2× | Maximum differentiation |
+
+The multiplier is applied to the base lightness offsets when deriving surface colors:
+- `surface_highlight`: base offset +6L (dark) or +9L (light)
+- `surface_border`: base offset -4L (dark) or -5L (light)
+- `control_bg`: base offset -9L (dark) or +16L (light)
 
 ### Derivation Rules for Optional Roles
 
-When not provided, optional roles are derived from the required ones:
+When not provided, optional roles are derived from the required ones. Surface color derivations are scaled by the contrast multiplier (CM):
 
 | Role | Dark Theme Derivation | Light Theme Derivation |
 |------|----------------------|----------------------|
-| `surface_highlight` | surface_base lightness + 6 | surface_base lightness + 9 |
-| `surface_border` | surface_base lightness - 4 | surface_base lightness - 5 |
+| `surface_highlight` | surface_base lightness + (6 × CM) | surface_base lightness + (9 × CM) |
+| `surface_border` | surface_base lightness - (4 × CM) | surface_base lightness - (5 × CM) |
 | `detail_bg` | lerp(surface_base, surface_highlight, 0.5) | same |
-| `control_bg` | surface_base lightness - 9 | surface_base lightness + 16 |
+| `control_bg` | surface_base lightness - (9 × CM) | surface_base lightness + (16 × CM) |
 | `text_secondary` | lerp(surface_base, text_primary, 0.5) | same |
 | `selection_bg` | accent_secondary hue, S≤40, L=78 | accent_secondary hue, S≤40, L=88 |
 | `selection_fg` | #070707 | #121212 |
+
+Where CM = contrast multiplier (1.0 for low, 1.4 for medium, 1.8 for high, 2.2 for very-high).
 
 ---
 

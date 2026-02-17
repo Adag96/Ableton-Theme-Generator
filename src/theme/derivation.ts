@@ -5,7 +5,9 @@ import type {
   BlendFactors,
   AbletonThemeData,
   VuMeterGradient,
+  ContrastLevel,
 } from './types';
+import { CONTRAST_MULTIPLIERS } from './types';
 import {
   hexToHsl,
   hslToHex,
@@ -19,18 +21,28 @@ import parameterMap from './parameter-map.json';
 /**
  * Resolve partial semantic roles into a complete set.
  * Missing optional roles are derived from the required ones.
+ * The contrastLevel parameter scales the lightness offsets between surface colors.
  */
 export function resolveRoles(input: SemanticColorRoles): ResolvedColorRoles {
   const isDark = input.tone === 'dark';
   const baseHsl = hexToHsl(input.surface_base);
 
+  // Get contrast multiplier (default to 'medium')
+  const contrastLevel: ContrastLevel = input.contrastLevel ?? 'medium';
+  const cm = CONTRAST_MULTIPLIERS[contrastLevel];
+
+  // Base offsets (these are the "low" contrast values - original behavior)
+  const highlightOffset = isDark ? 6 : 9;
+  const borderOffset = isDark ? 4 : 5;
+  const controlOffset = isDark ? 9 : 16;
+
   // surface_highlight: slightly lighter (dark) or lighter (light) than surface_base
   const surface_highlight = input.surface_highlight
-    ?? hslToHex(baseHsl.h, baseHsl.s, isDark ? baseHsl.l + 6 : baseHsl.l + 9);
+    ?? hslToHex(baseHsl.h, baseHsl.s, baseHsl.l + highlightOffset * cm);
 
   // surface_border: slightly darker (dark) or darker (light) than surface_base
   const surface_border = input.surface_border
-    ?? hslToHex(baseHsl.h, baseHsl.s, isDark ? baseHsl.l - 4 : baseHsl.l - 5);
+    ?? hslToHex(baseHsl.h, baseHsl.s, baseHsl.l - borderOffset * cm);
 
   // detail_bg: between surface_base and surface_highlight
   const detail_bg = input.detail_bg
@@ -38,7 +50,9 @@ export function resolveRoles(input: SemanticColorRoles): ResolvedColorRoles {
 
   // control_bg: much darker (dark) or much lighter (light) than surface_base
   const control_bg = input.control_bg
-    ?? hslToHex(baseHsl.h, baseHsl.s, isDark ? baseHsl.l - 9 : baseHsl.l + 16);
+    ?? hslToHex(baseHsl.h, baseHsl.s, isDark
+        ? baseHsl.l - controlOffset * cm
+        : baseHsl.l + controlOffset * cm);
 
   // text_secondary: midpoint between text_primary and surface_base
   const text_secondary = input.text_secondary
