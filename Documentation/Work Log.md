@@ -1,6 +1,6 @@
 # Work Log
 
-## 2026-2-19 11:32
+## 2026-2-19 16:31
 - Card previews in 'My Themes' view can now be expanded to show more features (color swatches, download, rename, delete)
 - Implemented a contrast pairing validation check and auto-correct feature for icons and text
 - Added separate handling for installed and uninstalled themes. Uninstalling a theme now removes the .ask file from directory
@@ -8,6 +8,8 @@
 - Contrast and visibility improvements for dark theme generation:
     - Surface highlights are now at least 12% lighter than surface base (previously as low as 8%)
     - Dark themes now enforce a minimum 5% lightness for control backgrounds, preventing 'invisible controls' issue
+- Created confirmation dialog overlay for deleting themes from 'My Themes' view
+- Attempt to make themes match images more closely: created 'Faithful', 'Vibrant' and 'Muted' extraction variants
 
 
 ## 2026-2-18 23:25

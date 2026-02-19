@@ -1,6 +1,14 @@
 /** Theme tone controls derivation direction (light vs dark neutral ramp) */
 export type ThemeTone = 'light' | 'dark';
 
+/**
+ * Variant mode controls how the surface color is selected from the image.
+ * - 'faithful': Use the most prominent/perceptible color - replicate the image's feel
+ * - 'vibrant': Use the most saturated viable color - bold, colorful surfaces
+ * - 'muted': Conservative approach - desaturated, safe surfaces (original behavior)
+ */
+export type VariantMode = 'faithful' | 'vibrant' | 'muted';
+
 /** Contrast level controls the lightness spread between surface colors */
 export type ContrastLevel = 'low' | 'medium' | 'high' | 'very-high';
 

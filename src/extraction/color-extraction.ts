@@ -3,7 +3,7 @@ import { rgbToHex, rgbToHsl } from '../theme/color-utils';
 
 const DEFAULT_OPTIONS: Required<ExtractionOptions> = {
   maxSize: 400,
-  colorCount: 10,
+  colorCount: 16,
   quantizationBits: 5,
 };
 

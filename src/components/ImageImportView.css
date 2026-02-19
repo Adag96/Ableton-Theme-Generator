@@ -396,3 +396,43 @@
 .contrast-toggle-option-active:hover {
   background: var(--color-accent-hover);
 }
+
+/* Variant mode tabs */
+
+.import-variant-tabs {
+  display: flex;
+  gap: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.variant-tab {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--color-bg-secondary);
+  border: none;
+  border-right: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.variant-tab:last-child {
+  border-right: none;
+}
+
+.variant-tab:hover:not(.variant-tab-active) {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text);
+}
+
+.variant-tab-active {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.variant-tab-active:hover {
+  background: var(--color-accent-hover);
+}

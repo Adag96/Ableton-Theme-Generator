@@ -1,5 +1,5 @@
 import type { ExtractedColor, PaletteSelectionResult, RoleLocations } from './types';
-import type { ThemeTone } from '../theme/types';
+import type { ThemeTone, VariantMode } from '../theme/types';
 import { contrastRatio } from '../theme/color-utils';
 
 /** Minimum saturation for a color to be considered an accent (%) */
@@ -11,11 +11,20 @@ const MIN_CONTRAST_RATIO = 4.5;
 /** Minimum hue distance between primary and secondary accents */
 const MIN_HUE_DISTANCE = 60;
 
-/** Maximum saturation for surface colors (%) - prevents aggressive backgrounds */
-const MAX_SURFACE_SATURATION = 40;
+/** Maximum saturation for muted mode surface colors (%) */
+const MUTED_MAX_SATURATION = 40;
 
-/** Target saturation when desaturating a surface fallback (%) */
-const DESATURATED_FALLBACK_TARGET = 30;
+/** Target saturation when desaturating for muted mode (%) */
+const MUTED_DESATURATED_TARGET = 30;
+
+/** Maximum saturation for faithful mode before slight reduction (%) */
+const FAITHFUL_MAX_SATURATION = 60;
+
+/** Maximum saturation for vibrant mode surfaces (%) */
+const VIBRANT_MAX_SATURATION = 75;
+
+/** Minimum saturation for vibrant mode to consider a color (%) */
+const VIBRANT_MIN_SATURATION = 30;
 
 /** Ideal hue distance for color harmony (degrees) - peaks at 150° */
 const IDEAL_HARMONY_DISTANCE = 150;
@@ -23,16 +32,6 @@ const IDEAL_HARMONY_DISTANCE = 150;
 /** Default fallback colors */
 const FALLBACK_TEXT_DARK = '#ffffff';
 const FALLBACK_TEXT_LIGHT = '#121212';
-
-/** Check if a hue is in the warm range (reds, oranges, yellows) */
-function isWarmHue(hue: number): boolean {
-  return (hue >= 0 && hue <= 60) || (hue >= 300 && hue <= 360);
-}
-
-/** Check if a hue is in the cool range (cyans, blues) */
-function isCoolHue(hue: number): boolean {
-  return hue >= 180 && hue <= 270;
-}
 
 /** Calculate circular hue distance */
 function hueDistance(h1: number, h2: number): number {
@@ -56,20 +55,110 @@ function harmonyScore(hue1: number, hue2: number): number {
   return Math.max(0, 20 - Math.abs(distance - IDEAL_HARMONY_DISTANCE));
 }
 
+/**
+ * Select surface color based on variant mode.
+ * This is THE KEY decision that shapes the theme's overall feel.
+ */
+function selectSurfaceColor(
+  colors: ExtractedColor[],
+  tonePreference: ThemeTone,
+  variantMode: VariantMode
+): ExtractedColor {
+  // Filter colors matching the tone preference
+  const matchingColors = colors.filter(c =>
+    tonePreference === 'dark' ? c.hsl.l < 50 : c.hsl.l >= 50
+  );
+
+  // If no colors match the tone, we need to create one
+  if (matchingColors.length === 0) {
+    const baseColor = variantMode === 'vibrant'
+      ? [...colors].sort((a, b) => b.hsl.s - a.hsl.s)[0]  // Most saturated
+      : colors[0];  // Most prominent
+
+    const targetLightness = tonePreference === 'dark' ? 18 : 78;
+    const targetSaturation = variantMode === 'muted'
+      ? Math.min(baseColor.hsl.s, MUTED_DESATURATED_TARGET)
+      : Math.min(baseColor.hsl.s, variantMode === 'vibrant' ? VIBRANT_MAX_SATURATION : FAITHFUL_MAX_SATURATION);
+
+    return {
+      ...baseColor,
+      hex: hslToHex(baseColor.hsl.h, targetSaturation, targetLightness),
+      hsl: { h: baseColor.hsl.h, s: targetSaturation, l: targetLightness },
+    };
+  }
+
+  // FAITHFUL mode: Use the most prominent color, preserve its character
+  if (variantMode === 'faithful') {
+    const baseColor = matchingColors[0];  // Most prominent matching color
+
+    // Only cap extreme saturation, otherwise keep as-is
+    if (baseColor.hsl.s > FAITHFUL_MAX_SATURATION) {
+      return {
+        ...baseColor,
+        hex: hslToHex(baseColor.hsl.h, FAITHFUL_MAX_SATURATION, baseColor.hsl.l),
+        hsl: { h: baseColor.hsl.h, s: FAITHFUL_MAX_SATURATION, l: baseColor.hsl.l },
+      };
+    }
+    return baseColor;
+  }
+
+  // VIBRANT mode: Use the most saturated color that matches the tone
+  if (variantMode === 'vibrant') {
+    // Sort by saturation (highest first)
+    const sortedBySaturation = [...matchingColors].sort((a, b) => b.hsl.s - a.hsl.s);
+
+    // Find a color with good saturation
+    const vibrantCandidate = sortedBySaturation.find(c => c.hsl.s >= VIBRANT_MIN_SATURATION);
+    const baseColor = vibrantCandidate ?? sortedBySaturation[0];
+
+    // Cap at max vibrant saturation
+    if (baseColor.hsl.s > VIBRANT_MAX_SATURATION) {
+      return {
+        ...baseColor,
+        hex: hslToHex(baseColor.hsl.h, VIBRANT_MAX_SATURATION, baseColor.hsl.l),
+        hsl: { h: baseColor.hsl.h, s: VIBRANT_MAX_SATURATION, l: baseColor.hsl.l },
+      };
+    }
+    return baseColor;
+  }
+
+  // MUTED mode: Conservative approach - low saturation surfaces
+  const lowSatCandidates = matchingColors.filter(c => c.hsl.s <= MUTED_MAX_SATURATION);
+
+  if (lowSatCandidates.length > 0) {
+    return lowSatCandidates[0];  // Most prominent low-saturation color
+  }
+
+  // No low-sat candidates - desaturate the most prominent
+  const baseColor = matchingColors[0];
+  return {
+    ...baseColor,
+    hex: hslToHex(baseColor.hsl.h, MUTED_DESATURATED_TARGET, baseColor.hsl.l),
+    hsl: { h: baseColor.hsl.h, s: MUTED_DESATURATED_TARGET, l: baseColor.hsl.l },
+  };
+}
+
 /** Options for palette selection */
 export interface PaletteSelectionOptions {
-  /** User's preferred tone. If provided, prioritizes colors matching this tone for surface_base. */
+  /** User's preferred tone (required for meaningful surface selection) */
   tonePreference?: ThemeTone;
+  /**
+   * Variant mode controls how the surface color is selected:
+   * - 'faithful': Use most prominent color - replicate image feel (default)
+   * - 'vibrant': Use most saturated color - bold, colorful surfaces
+   * - 'muted': Conservative approach - desaturated, safe surfaces
+   */
+  variantMode?: VariantMode;
 }
 
 /**
  * Select semantic color roles from extracted colors.
  *
  * Algorithm:
- * 1. surface_base = best color matching tone preference (or most prominent if no preference)
- * 2. tone = user preference, or derived from surface_base lightness
+ * 1. surface_base = selected based on variant mode (faithful/vibrant/muted)
+ * 2. tone = user preference (required)
  * 3. text_primary = first color with good contrast, or fallback
- * 4. accent_primary = most saturated (prefer warm hues)
+ * 4. accent_primary = most saturated with harmony bonus
  * 5. accent_secondary = next saturated with hue distance, or complement
  */
 export function selectThemePalette(
@@ -80,69 +169,14 @@ export function selectThemePalette(
     throw new Error('No colors provided for palette selection');
   }
 
-  const { tonePreference } = options;
+  const { tonePreference, variantMode = 'faithful' } = options;
 
-  // 1. Surface base: select based on tone preference
-  // Apply saturation filtering to prevent aggressive backgrounds
-  let surfaceBase: ExtractedColor;
+  // 1. Tone: required for surface selection
+  // If not provided, derive from most prominent color
+  const tone: ThemeTone = tonePreference ?? (colors[0].hsl.l < 50 ? 'dark' : 'light');
 
-  if (tonePreference) {
-    // Find colors matching the tone preference
-    const matchingColors = colors.filter(c =>
-      tonePreference === 'dark' ? c.hsl.l < 50 : c.hsl.l >= 50
-    );
-
-    if (matchingColors.length > 0) {
-      // Filter to low-saturation candidates (good for backgrounds)
-      const lowSatCandidates = matchingColors.filter(c => c.hsl.s <= MAX_SURFACE_SATURATION);
-
-      if (lowSatCandidates.length > 0) {
-        // Pick the most prominent low-saturation color
-        surfaceBase = lowSatCandidates[0];
-      } else {
-        // No low-saturation candidates - desaturate the best match
-        const baseColor = matchingColors[0];
-        const targetSaturation = DESATURATED_FALLBACK_TARGET;
-        surfaceBase = {
-          ...baseColor,
-          hex: hslToHex(baseColor.hsl.h, targetSaturation, baseColor.hsl.l),
-          hsl: { h: baseColor.hsl.h, s: targetSaturation, l: baseColor.hsl.l },
-        };
-      }
-    } else {
-      // No matching colors found - adjust the most prominent color
-      // For light themes with only dark colors: brighten the most desaturated color
-      // For dark themes with only light colors: darken the most desaturated color
-      const sortedByLowSaturation = [...colors].sort((a, b) => a.hsl.s - b.hsl.s);
-      const baseColor = sortedByLowSaturation[0];
-
-      // Create an adjusted color with controlled saturation
-      const targetLightness = tonePreference === 'dark' ? 20 : 75;
-      const targetSaturation = Math.min(baseColor.hsl.s, DESATURATED_FALLBACK_TARGET);
-      surfaceBase = {
-        ...baseColor,
-        hex: hslToHex(baseColor.hsl.h, targetSaturation, targetLightness),
-        hsl: { h: baseColor.hsl.h, s: targetSaturation, l: targetLightness },
-      };
-    }
-  } else {
-    // No preference: use most prominent, but still apply saturation filter
-    const lowSatCandidates = colors.filter(c => c.hsl.s <= MAX_SURFACE_SATURATION);
-    if (lowSatCandidates.length > 0) {
-      surfaceBase = lowSatCandidates[0];
-    } else {
-      // Desaturate the most prominent color
-      const baseColor = colors[0];
-      surfaceBase = {
-        ...baseColor,
-        hex: hslToHex(baseColor.hsl.h, DESATURATED_FALLBACK_TARGET, baseColor.hsl.l),
-        hsl: { h: baseColor.hsl.h, s: DESATURATED_FALLBACK_TARGET, l: baseColor.hsl.l },
-      };
-    }
-  }
-
-  // 2. Tone: use preference if provided, otherwise derive from surface lightness
-  const tone: ThemeTone = tonePreference ?? (surfaceBase.hsl.l < 50 ? 'dark' : 'light');
+  // 2. Surface base: THE KEY DECISION - uses variant mode
+  const surfaceBase = selectSurfaceColor(colors, tone, variantMode);
 
   // 3. Text primary: find color with best contrast
   let textPrimary: ExtractedColor | null = null;
@@ -166,24 +200,25 @@ export function selectThemePalette(
   const textPrimaryHex = textPrimary?.hex ?? (tone === 'dark' ? FALLBACK_TEXT_DARK : FALLBACK_TEXT_LIGHT);
   const finalContrast = textPrimary ? bestContrast : contrastRatio(textPrimaryHex, surfaceBase.hex);
 
-  // 4. Accent primary: most saturated, prefer warm hues, with harmony consideration
+  // 4. Accent primary: most saturated with harmony consideration
   const accentCandidates = colors
     .filter(c => c.hsl.s >= MIN_ACCENT_SATURATION)
     .filter(c => c.hex !== surfaceBase.hex && c.hex !== textPrimaryHex);
 
-  // Sort by saturation, with warm hue bonus and harmony bonus relative to surface
+  // Sort by saturation with harmony bonus relative to surface
   const sortedByAccent = [...accentCandidates].sort((a, b) => {
     const aHarmony = harmonyScore(a.hsl.h, surfaceBase.hsl.h);
     const bHarmony = harmonyScore(b.hsl.h, surfaceBase.hsl.h);
-    const aScore = a.hsl.s + (isWarmHue(a.hsl.h) ? 10 : 0) + aHarmony * 0.5;
-    const bScore = b.hsl.s + (isWarmHue(b.hsl.h) ? 10 : 0) + bHarmony * 0.5;
+
+    const aScore = a.hsl.s + aHarmony * 0.5;
+    const bScore = b.hsl.s + bHarmony * 0.5;
     return bScore - aScore;
   });
 
   // Use most saturated, or fall back to most prominent non-surface color
   const accentPrimary = sortedByAccent[0] ?? colors.find(c => c.hex !== surfaceBase.hex) ?? colors[0];
 
-  // 5. Accent secondary: next saturated with hue distance, prefer cool, with harmony bonus
+  // 5. Accent secondary: next saturated with hue distance for contrast
   let accentSecondary: ExtractedColor | null = null;
   let bestSecondaryScore = 0;
   let secondaryHueDistance = 0;
@@ -193,9 +228,9 @@ export function selectThemePalette(
 
     const dist = hueDistance(color.hsl.h, accentPrimary.hsl.h);
     if (dist >= MIN_HUE_DISTANCE) {
-      // Combine: hue distance, cool preference, and harmony with primary accent
+      // Combine: hue distance and harmony with primary accent
       const harmony = harmonyScore(color.hsl.h, accentPrimary.hsl.h);
-      const score = dist + (isCoolHue(color.hsl.h) ? 20 : 0) + harmony;
+      const score = dist + harmony;
       if (!accentSecondary || score > bestSecondaryScore) {
         accentSecondary = color;
         bestSecondaryScore = score;

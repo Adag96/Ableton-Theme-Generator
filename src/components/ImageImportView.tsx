@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import type { ImageFileResult } from '../electron';
 import { useColorExtraction } from '../hooks/useColorExtraction';
 import type { PaletteSelectionResult } from '../extraction';
-import type { ThemeTone, ContrastLevel } from '../theme/types';
+import type { ThemeTone, ContrastLevel, VariantMode } from '../theme/types';
 import './ImageImportView.css';
 
 interface ImageImportViewProps {
@@ -30,6 +30,7 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const [selectedTone, setSelectedTone] = useState<ThemeTone | null>(null);
   const [contrastLevel, setContrastLevel] = useState<ContrastLevel>('medium');
+  const [variantMode, setVariantMode] = useState<VariantMode>('faithful');
 
   // Reset tone selection when image changes
   useEffect(() => {
@@ -51,7 +52,8 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
   // Extraction runs only when both image and tone are selected
   const { palette, isExtracting, error: extractionError } = useColorExtraction(
     image?.filePath ?? null,
-    selectedTone ?? undefined
+    selectedTone ?? undefined,
+    variantMode
   );
 
   const handleBrowse = useCallback(async () => {
@@ -257,6 +259,34 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
                   title="Maximum differentiation between surfaces"
                 >
                   Max
+                </button>
+              </div>
+            </div>
+
+            {/* Surface style / variant mode selection */}
+            <div className="import-option-group">
+              <p className="import-option-label">Surface Style</p>
+              <div className="import-variant-tabs">
+                <button
+                  className={`variant-tab ${variantMode === 'faithful' ? 'variant-tab-active' : ''}`}
+                  onClick={() => setVariantMode('faithful')}
+                  title="Use the most prominent color - replicate the image's feel"
+                >
+                  Faithful
+                </button>
+                <button
+                  className={`variant-tab ${variantMode === 'vibrant' ? 'variant-tab-active' : ''}`}
+                  onClick={() => setVariantMode('vibrant')}
+                  title="Use the most saturated color - bold, colorful surfaces"
+                >
+                  Vibrant
+                </button>
+                <button
+                  className={`variant-tab ${variantMode === 'muted' ? 'variant-tab-active' : ''}`}
+                  onClick={() => setVariantMode('muted')}
+                  title="Conservative approach - desaturated, safe surfaces"
+                >
+                  Muted
                 </button>
               </div>
             </div>

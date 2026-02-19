@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { extractColorsFromImage, selectThemePalette } from '../extraction';
 import type { PaletteSelectionResult, PaletteSelectionOptions } from '../extraction';
-import type { ThemeTone } from '../theme/types';
+import type { ThemeTone, VariantMode } from '../theme/types';
 
 interface UseColorExtractionResult {
   /** Selected palette with semantic roles */
@@ -11,7 +11,7 @@ interface UseColorExtractionResult {
   /** Error message if extraction failed */
   error: string | null;
   /** Manually trigger extraction for a new image path */
-  extract: (imagePath: string, tonePreference?: ThemeTone) => void;
+  extract: (imagePath: string, tonePreference?: ThemeTone, variantMode?: VariantMode) => void;
 }
 
 /**
@@ -19,17 +19,19 @@ interface UseColorExtractionResult {
  *
  * @param imagePath - Path to the image file (or null to skip)
  * @param tonePreference - Optional tone preference to guide color selection
+ * @param variantMode - Optional variant mode for accent color temperature (default: 'neutral')
  * @returns Extraction state and palette result
  */
 export function useColorExtraction(
   imagePath: string | null,
-  tonePreference?: ThemeTone
+  tonePreference?: ThemeTone,
+  variantMode?: VariantMode
 ): UseColorExtractionResult {
   const [palette, setPalette] = useState<PaletteSelectionResult | null>(null);
   const [isExtracting, setIsExtracting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const extract = useCallback(async (path: string, tone?: ThemeTone) => {
+  const extract = useCallback(async (path: string, tone?: ThemeTone, variant?: VariantMode) => {
     setIsExtracting(true);
     setError(null);
     setPalette(null);
@@ -50,7 +52,10 @@ export function useColorExtraction(
       img.onload = () => {
         try {
           const colors = extractColorsFromImage(img);
-          const options: PaletteSelectionOptions = tone ? { tonePreference: tone } : {};
+          const options: PaletteSelectionOptions = {
+            ...(tone && { tonePreference: tone }),
+            ...(variant && { variantMode: variant }),
+          };
           const result = selectThemePalette(colors, options);
           setPalette(result);
         } catch (err) {
@@ -74,16 +79,16 @@ export function useColorExtraction(
     }
   }, []);
 
-  // Auto-extract when imagePath or tonePreference changes
+  // Auto-extract when imagePath, tonePreference, or variantMode changes
   useEffect(() => {
     if (imagePath && tonePreference) {
-      extract(imagePath, tonePreference);
+      extract(imagePath, tonePreference, variantMode);
     } else if (!imagePath) {
       setPalette(null);
       setError(null);
     }
     // Note: extraction only runs when BOTH imagePath and tonePreference are set
-  }, [imagePath, tonePreference, extract]);
+  }, [imagePath, tonePreference, variantMode, extract]);
 
   return { palette, isExtracting, error, extract };
 }
