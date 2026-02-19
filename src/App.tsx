@@ -24,7 +24,7 @@ function App() {
   const [importedImage, setImportedImage] = useState<ImageFileResult | null>(null);
   const [pendingTheme, setPendingTheme] = useState<PendingTheme | null>(null);
   const [showNameDialog, setShowNameDialog] = useState(false);
-  const { library, addTheme, removeTheme } = useThemeLibrary();
+  const { library, addTheme, removeTheme, renameTheme } = useThemeLibrary();
 
   useEffect(() => {
     // Get version and build number from Electron API if available
@@ -105,6 +105,7 @@ function App() {
             },
             contrastLevel: pendingTheme.palette.roles.contrastLevel,
             previewImage: pendingTheme.previewImage,
+            roleLocations: pendingTheme.palette.roleLocations,
           };
 
           await addTheme(savedTheme);
@@ -150,6 +151,7 @@ function App() {
             themes={library.themes}
             onBack={handleBackToLanding}
             onDeleteTheme={removeTheme}
+            onRenameTheme={renameTheme}
           />
         ) : (
           <ImageImportView

@@ -34,6 +34,8 @@ export interface ElectronAPI {
   saveThemeFile: (xmlContent: string, defaultFileName: string) => Promise<SaveThemeResult>;
   loadThemeLibrary: () => Promise<ThemeLibrary>;
   saveThemeLibrary: (library: ThemeLibrary) => Promise<{ success: boolean; error?: string }>;
+  copyThemeToDownloads: (sourcePath: string, fileName: string) => Promise<{ success: boolean; destPath?: string; error?: string }>;
+  renameThemeFile: (oldPath: string, newPath: string) => Promise<{ success: boolean; newPath?: string; error?: string }>;
 }
 
 declare global {

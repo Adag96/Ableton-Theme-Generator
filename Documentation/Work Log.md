@@ -1,5 +1,9 @@
 # Work Log
 
+## 2026-2-19 00:09
+- Card previews in 'My Themes' view can now be expanded to show more features (color swatches, download, rename, delete)
+
+
 ## 2026-2-18 23:25
 - Added scroll functionality and card resizing to 'My Themes' view
 - Added sorting and theme type filters to 'My Themes' view

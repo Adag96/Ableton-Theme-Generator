@@ -28,5 +28,36 @@ export function useThemeLibrary() {
     await window.electronAPI?.saveThemeLibrary(updated);
   }, [library]);
 
-  return { library, isLoading, addTheme, removeTheme };
+  const renameTheme = useCallback(async (id: string, newName: string): Promise<{ success: boolean; error?: string }> => {
+    const theme = library.themes.find(t => t.id === id);
+    if (!theme) return { success: false, error: 'Theme not found' };
+
+    // Get the directory and construct new path
+    const lastSlash = theme.filePath.lastIndexOf('/');
+    const backSlash = theme.filePath.lastIndexOf('\\');
+    const separatorIndex = Math.max(lastSlash, backSlash);
+    const dir = separatorIndex >= 0 ? theme.filePath.substring(0, separatorIndex) : '';
+    const separator = lastSlash > backSlash ? '/' : '\\';
+    const newPath = `${dir}${separator}${newName}.ask`;
+
+    // Rename file on disk
+    const result = await window.electronAPI?.renameThemeFile(theme.filePath, newPath);
+    if (!result?.success) {
+      return { success: false, error: result?.error ?? 'Failed to rename file' };
+    }
+
+    // Update library
+    const updated = {
+      ...library,
+      themes: library.themes.map(t =>
+        t.id === id ? { ...t, name: newName, filePath: newPath } : t
+      ),
+    };
+    setLibrary(updated);
+    await window.electronAPI?.saveThemeLibrary(updated);
+
+    return { success: true };
+  }, [library]);
+
+  return { library, isLoading, addTheme, removeTheme, renameTheme };
 }

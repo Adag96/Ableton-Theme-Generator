@@ -268,6 +268,49 @@ app.whenReady().then(() => {
     }
   });
 
+  // Copy theme file to Downloads folder
+  ipcMain.handle('copy-theme-to-downloads', async (_event, sourcePath: string, fileName: string) => {
+    try {
+      if (!fs.existsSync(sourcePath)) {
+        return { success: false, error: 'Source file not found' };
+      }
+      const downloadsPath = app.getPath('downloads');
+      let destPath = path.join(downloadsPath, fileName);
+
+      // Handle name collision by appending number
+      let counter = 1;
+      const ext = path.extname(fileName);
+      const baseName = path.basename(fileName, ext);
+      while (fs.existsSync(destPath)) {
+        destPath = path.join(downloadsPath, `${baseName} (${counter})${ext}`);
+        counter++;
+      }
+
+      fs.copyFileSync(sourcePath, destPath);
+      return { success: true, destPath };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      return { success: false, error: errorMessage };
+    }
+  });
+
+  // Rename theme file
+  ipcMain.handle('rename-theme-file', async (_event, oldPath: string, newPath: string) => {
+    try {
+      if (!fs.existsSync(oldPath)) {
+        return { success: false, error: 'File not found' };
+      }
+      if (fs.existsSync(newPath)) {
+        return { success: false, error: 'A theme with that name already exists' };
+      }
+      fs.renameSync(oldPath, newPath);
+      return { success: true, newPath };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      return { success: false, error: errorMessage };
+    }
+  });
+
   createWindow();
 });
 

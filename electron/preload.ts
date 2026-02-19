@@ -15,4 +15,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('save-theme-file', xmlContent, defaultFileName),
   loadThemeLibrary: () => ipcRenderer.invoke('load-theme-library'),
   saveThemeLibrary: (library: unknown) => ipcRenderer.invoke('save-theme-library', library),
+  copyThemeToDownloads: (sourcePath: string, fileName: string) =>
+    ipcRenderer.invoke('copy-theme-to-downloads', sourcePath, fileName),
+  renameThemeFile: (oldPath: string, newPath: string) =>
+    ipcRenderer.invoke('rename-theme-file', oldPath, newPath),
 });

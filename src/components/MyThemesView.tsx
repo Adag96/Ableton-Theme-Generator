@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import type { SavedTheme } from '../types/theme-library';
 import { ThemeCard } from './ThemeCard';
+import { ThemeDetailModal } from './ThemeDetailModal';
 import './MyThemesView.css';
 
 type ToneFilter = 'all' | 'dark' | 'light';
@@ -19,16 +20,19 @@ interface MyThemesViewProps {
   themes: SavedTheme[];
   onBack: () => void;
   onDeleteTheme: (id: string) => void;
+  onRenameTheme: (id: string, newName: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 export const MyThemesView: React.FC<MyThemesViewProps> = ({
   themes,
   onBack,
   onDeleteTheme,
+  onRenameTheme,
 }) => {
   const [filter, setFilter] = useState<ToneFilter>('all');
   const [sortBy, setSortBy] = useState<SortOption>('recent');
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [selectedThemeId, setSelectedThemeId] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Load preferences from localStorage on mount
@@ -113,6 +117,17 @@ export const MyThemesView: React.FC<MyThemesViewProps> = ({
   }, [themes.length, filter, filteredAndSortedThemes.length]);
 
   const hasThemes = themes.length > 0;
+
+  // Derive selectedTheme from ID
+  const selectedTheme = selectedThemeId ? themes.find(t => t.id === selectedThemeId) ?? null : null;
+
+  const handleDownload = async (theme: SavedTheme) => {
+    const fileName = `${theme.name}.ask`;
+    const result = await window.electronAPI?.copyThemeToDownloads(theme.filePath, fileName);
+    if (!result?.success) {
+      console.error('Download failed:', result?.error);
+    }
+  };
 
   return (
     <div className="my-themes-view">
@@ -213,11 +228,21 @@ export const MyThemesView: React.FC<MyThemesViewProps> = ({
                 key={theme.id}
                 theme={theme}
                 onDelete={() => onDeleteTheme(theme.id)}
+                onClick={() => setSelectedThemeId(theme.id)}
               />
             ))}
           </div>
         )}
       </div>
+
+      <ThemeDetailModal
+        isOpen={selectedThemeId !== null}
+        theme={selectedTheme}
+        onClose={() => setSelectedThemeId(null)}
+        onRename={onRenameTheme}
+        onDownload={handleDownload}
+        onDelete={onDeleteTheme}
+      />
     </div>
   );
 };

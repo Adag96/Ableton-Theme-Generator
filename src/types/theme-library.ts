@@ -1,4 +1,5 @@
 import type { ContrastLevel } from '../theme/types';
+import type { RoleLocations } from '../extraction/types';
 
 export interface SavedTheme {
   id: string;
@@ -14,6 +15,7 @@ export interface SavedTheme {
   };
   contrastLevel?: ContrastLevel;
   previewImage?: string;
+  roleLocations?: RoleLocations;
 }
 
 export interface ThemeLibrary {

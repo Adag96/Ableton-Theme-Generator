@@ -5,11 +5,17 @@ import './ThemeCard.css';
 interface ThemeCardProps {
   theme: SavedTheme;
   onDelete: () => void;
+  onClick: () => void;
 }
 
-export const ThemeCard: React.FC<ThemeCardProps> = ({ theme, onDelete }) => {
+export const ThemeCard: React.FC<ThemeCardProps> = ({ theme, onDelete, onClick }) => {
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDelete();
+  };
+
   return (
-    <div className="theme-card">
+    <div className="theme-card" onClick={onClick} style={{ cursor: 'pointer' }}>
       {theme.previewImage && (
         <div className="theme-card-preview">
           <img src={theme.previewImage} alt={theme.name} />
@@ -47,7 +53,7 @@ export const ThemeCard: React.FC<ThemeCardProps> = ({ theme, onDelete }) => {
         </span>
       </div>
 
-      <button className="theme-card-delete" onClick={onDelete} title="Delete theme">
+      <button className="theme-card-delete" onClick={handleDeleteClick} title="Delete theme">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="3 6 5 6 21 6"/>
           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
