@@ -19,6 +19,12 @@ import {
 import { adjustForContrast } from './contrast';
 import parameterMap from './parameter-map.json';
 
+/** Minimum lightness spread between surface_base and surface_highlight (dark themes only) */
+const MIN_HIGHLIGHT_SPREAD_DARK = 12;
+
+/** Minimum lightness for control_bg to ensure visibility */
+const MIN_CONTROL_BG_LIGHTNESS = 5;
+
 /**
  * Resolve partial semantic roles into a complete set.
  * Missing optional roles are derived from the required ones.
@@ -37,9 +43,25 @@ export function resolveRoles(input: SemanticColorRoles): ResolvedColorRoles {
   const borderOffset = isDark ? 4 : 5;
   const controlOffset = isDark ? 9 : 16;
 
-  // surface_highlight: slightly lighter (dark) or lighter (light) than surface_base
+  // surface_highlight: slightly lighter than surface_base for both dark and light themes
+  // Enforce minimum spread for dark themes to ensure UI element visibility
+  let highlightL = baseHsl.l + highlightOffset * cm;
+
+  if (isDark) {
+    const spread = highlightL - baseHsl.l;
+    if (spread < MIN_HIGHLIGHT_SPREAD_DARK) {
+      highlightL = baseHsl.l + MIN_HIGHLIGHT_SPREAD_DARK;
+    }
+    // Clamp dark themes to 95% max
+    highlightL = Math.min(highlightL, 95);
+  } else {
+    // Light themes: let highlights go toward white (no aggressive clamping)
+    // Only clamp to 100% (valid lightness range)
+    highlightL = Math.min(highlightL, 100);
+  }
+
   const surface_highlight = input.surface_highlight
-    ?? hslToHex(baseHsl.h, baseHsl.s, baseHsl.l + highlightOffset * cm);
+    ?? hslToHex(baseHsl.h, baseHsl.s, highlightL);
 
   // surface_border: slightly darker (dark) or darker (light) than surface_base
   const surface_border = input.surface_border
@@ -50,10 +72,21 @@ export function resolveRoles(input: SemanticColorRoles): ResolvedColorRoles {
     ?? lerpColor(input.surface_base, surface_highlight, 0.5);
 
   // control_bg: much darker (dark) or much lighter (light) than surface_base
+  // Enforce minimum lightness to ensure visibility
+  let controlL = isDark
+    ? baseHsl.l - controlOffset * cm
+    : baseHsl.l + controlOffset * cm;
+
+  if (isDark && controlL < MIN_CONTROL_BG_LIGHTNESS) {
+    controlL = MIN_CONTROL_BG_LIGHTNESS;
+  }
+  // For light themes, clamp to not exceed 95%
+  if (!isDark && controlL > 95) {
+    controlL = 95;
+  }
+
   const control_bg = input.control_bg
-    ?? hslToHex(baseHsl.h, baseHsl.s, isDark
-        ? baseHsl.l - controlOffset * cm
-        : baseHsl.l + controlOffset * cm);
+    ?? hslToHex(baseHsl.h, baseHsl.s, controlL);
 
   // text_secondary: midpoint between text_primary and surface_base
   const text_secondary = input.text_secondary
@@ -68,7 +101,7 @@ export function resolveRoles(input: SemanticColorRoles): ResolvedColorRoles {
   const selection_fg = input.selection_fg
     ?? (isDark ? '#070707' : '#121212');
 
-  return {
+  const result: ResolvedColorRoles = {
     tone: input.tone,
     surface_base: input.surface_base,
     surface_highlight,
@@ -82,6 +115,16 @@ export function resolveRoles(input: SemanticColorRoles): ResolvedColorRoles {
     selection_bg,
     selection_fg,
   };
+
+  // Include optional extended roles if provided
+  if (input.surface_secondary) {
+    result.surface_secondary = input.surface_secondary;
+  }
+  if (input.accent_tertiary) {
+    result.accent_tertiary = input.accent_tertiary;
+  }
+
+  return result;
 }
 
 /**
@@ -245,6 +288,9 @@ function resolveParameter(
     accent_secondary: roles.accent_secondary,
     selection_bg: roles.selection_bg,
     selection_fg: roles.selection_fg,
+    // Optional extended roles (fall back to existing roles if not set)
+    surface_secondary: roles.surface_secondary ?? roles.surface_highlight,
+    accent_tertiary: roles.accent_tertiary ?? roles.accent_secondary,
   };
 
   const scaleMap: Record<string, string> = {

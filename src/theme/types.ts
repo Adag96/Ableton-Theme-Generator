@@ -13,7 +13,7 @@ export const CONTRAST_MULTIPLIERS: Record<ContrastLevel, number> = {
 };
 
 /**
- * The 12 semantic color roles that define a theme.
+ * The 12+ semantic color roles that define a theme.
  * Only tone, surface_base, text_primary, accent_primary, and accent_secondary
  * are required — the rest are derived automatically if omitted.
  */
@@ -32,9 +32,13 @@ export interface SemanticColorRoles {
   text_secondary?: string;
   selection_bg?: string;
   selection_fg?: string;
+  /** Optional 5th color for secondary surface areas (experimental) */
+  surface_secondary?: string;
+  /** Optional 6th color for tertiary accent (experimental) */
+  accent_tertiary?: string;
 }
 
-/** All 12 roles resolved — no optional fields after derivation */
+/** All 12+ roles resolved — no optional fields after derivation */
 export interface ResolvedColorRoles {
   tone: ThemeTone;
   surface_base: string;
@@ -48,6 +52,10 @@ export interface ResolvedColorRoles {
   accent_secondary: string;
   selection_bg: string;
   selection_fg: string;
+  /** Optional: secondary surface color for panels (if provided in input) */
+  surface_secondary?: string;
+  /** Optional: tertiary accent color (if provided in input) */
+  accent_tertiary?: string;
 }
 
 /**

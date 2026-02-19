@@ -1,10 +1,13 @@
 # Work Log
 
-## 2026-2-19 01:12
+## 2026-2-19 11:32
 - Card previews in 'My Themes' view can now be expanded to show more features (color swatches, download, rename, delete)
 - Implemented a contrast pairing validation check and auto-correct feature for icons and text
 - Added separate handling for installed and uninstalled themes. Uninstalling a theme now removes the .ask file from directory
 - Added separate sections in 'My Themes' page for installed vs available themes
+- Contrast and visibility improvements for dark theme generation:
+    - Surface highlights are now at least 12% lighter than surface base (previously as low as 8%)
+    - Dark themes now enforce a minimum 5% lightness for control backgrounds, preventing 'invisible controls' issue
 
 
 ## 2026-2-18 23:25

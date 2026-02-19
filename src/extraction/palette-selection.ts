@@ -11,6 +11,15 @@ const MIN_CONTRAST_RATIO = 4.5;
 /** Minimum hue distance between primary and secondary accents */
 const MIN_HUE_DISTANCE = 60;
 
+/** Maximum saturation for surface colors (%) - prevents aggressive backgrounds */
+const MAX_SURFACE_SATURATION = 40;
+
+/** Target saturation when desaturating a surface fallback (%) */
+const DESATURATED_FALLBACK_TARGET = 30;
+
+/** Ideal hue distance for color harmony (degrees) - peaks at 150° */
+const IDEAL_HARMONY_DISTANCE = 150;
+
 /** Default fallback colors */
 const FALLBACK_TEXT_DARK = '#ffffff';
 const FALLBACK_TEXT_LIGHT = '#121212';
@@ -34,6 +43,17 @@ function hueDistance(h1: number, h2: number): number {
 /** Get complementary hue */
 function complementaryHue(hue: number): number {
   return (hue + 180) % 360;
+}
+
+/**
+ * Calculate harmony score based on hue distance.
+ * Peaks at ~150° (split-complementary), good for 120-180° range.
+ * Returns a bonus score (0-20) to add to existing scoring.
+ */
+function harmonyScore(hue1: number, hue2: number): number {
+  const distance = hueDistance(hue1, hue2);
+  // Score peaks at IDEAL_HARMONY_DISTANCE (150°)
+  return Math.max(0, 20 - Math.abs(distance - IDEAL_HARMONY_DISTANCE));
 }
 
 /** Options for palette selection */
@@ -63,6 +83,7 @@ export function selectThemePalette(
   const { tonePreference } = options;
 
   // 1. Surface base: select based on tone preference
+  // Apply saturation filtering to prevent aggressive backgrounds
   let surfaceBase: ExtractedColor;
 
   if (tonePreference) {
@@ -72,8 +93,22 @@ export function selectThemePalette(
     );
 
     if (matchingColors.length > 0) {
-      // Pick the most prominent color that matches the preference
-      surfaceBase = matchingColors[0];
+      // Filter to low-saturation candidates (good for backgrounds)
+      const lowSatCandidates = matchingColors.filter(c => c.hsl.s <= MAX_SURFACE_SATURATION);
+
+      if (lowSatCandidates.length > 0) {
+        // Pick the most prominent low-saturation color
+        surfaceBase = lowSatCandidates[0];
+      } else {
+        // No low-saturation candidates - desaturate the best match
+        const baseColor = matchingColors[0];
+        const targetSaturation = DESATURATED_FALLBACK_TARGET;
+        surfaceBase = {
+          ...baseColor,
+          hex: hslToHex(baseColor.hsl.h, targetSaturation, baseColor.hsl.l),
+          hsl: { h: baseColor.hsl.h, s: targetSaturation, l: baseColor.hsl.l },
+        };
+      }
     } else {
       // No matching colors found - adjust the most prominent color
       // For light themes with only dark colors: brighten the most desaturated color
@@ -81,17 +116,29 @@ export function selectThemePalette(
       const sortedByLowSaturation = [...colors].sort((a, b) => a.hsl.s - b.hsl.s);
       const baseColor = sortedByLowSaturation[0];
 
-      // Create an adjusted color
+      // Create an adjusted color with controlled saturation
       const targetLightness = tonePreference === 'dark' ? 20 : 75;
+      const targetSaturation = Math.min(baseColor.hsl.s, DESATURATED_FALLBACK_TARGET);
       surfaceBase = {
         ...baseColor,
-        hex: hslToHex(baseColor.hsl.h, Math.min(baseColor.hsl.s, 15), targetLightness),
-        hsl: { h: baseColor.hsl.h, s: Math.min(baseColor.hsl.s, 15), l: targetLightness },
+        hex: hslToHex(baseColor.hsl.h, targetSaturation, targetLightness),
+        hsl: { h: baseColor.hsl.h, s: targetSaturation, l: targetLightness },
       };
     }
   } else {
-    // No preference: use most prominent (original behavior)
-    surfaceBase = colors[0];
+    // No preference: use most prominent, but still apply saturation filter
+    const lowSatCandidates = colors.filter(c => c.hsl.s <= MAX_SURFACE_SATURATION);
+    if (lowSatCandidates.length > 0) {
+      surfaceBase = lowSatCandidates[0];
+    } else {
+      // Desaturate the most prominent color
+      const baseColor = colors[0];
+      surfaceBase = {
+        ...baseColor,
+        hex: hslToHex(baseColor.hsl.h, DESATURATED_FALLBACK_TARGET, baseColor.hsl.l),
+        hsl: { h: baseColor.hsl.h, s: DESATURATED_FALLBACK_TARGET, l: baseColor.hsl.l },
+      };
+    }
   }
 
   // 2. Tone: use preference if provided, otherwise derive from surface lightness
@@ -119,23 +166,26 @@ export function selectThemePalette(
   const textPrimaryHex = textPrimary?.hex ?? (tone === 'dark' ? FALLBACK_TEXT_DARK : FALLBACK_TEXT_LIGHT);
   const finalContrast = textPrimary ? bestContrast : contrastRatio(textPrimaryHex, surfaceBase.hex);
 
-  // 4. Accent primary: most saturated, prefer warm hues
+  // 4. Accent primary: most saturated, prefer warm hues, with harmony consideration
   const accentCandidates = colors
     .filter(c => c.hsl.s >= MIN_ACCENT_SATURATION)
     .filter(c => c.hex !== surfaceBase.hex && c.hex !== textPrimaryHex);
 
-  // Sort by saturation, with warm hue bonus
+  // Sort by saturation, with warm hue bonus and harmony bonus relative to surface
   const sortedByAccent = [...accentCandidates].sort((a, b) => {
-    const aScore = a.hsl.s + (isWarmHue(a.hsl.h) ? 10 : 0);
-    const bScore = b.hsl.s + (isWarmHue(b.hsl.h) ? 10 : 0);
+    const aHarmony = harmonyScore(a.hsl.h, surfaceBase.hsl.h);
+    const bHarmony = harmonyScore(b.hsl.h, surfaceBase.hsl.h);
+    const aScore = a.hsl.s + (isWarmHue(a.hsl.h) ? 10 : 0) + aHarmony * 0.5;
+    const bScore = b.hsl.s + (isWarmHue(b.hsl.h) ? 10 : 0) + bHarmony * 0.5;
     return bScore - aScore;
   });
 
   // Use most saturated, or fall back to most prominent non-surface color
   const accentPrimary = sortedByAccent[0] ?? colors.find(c => c.hex !== surfaceBase.hex) ?? colors[0];
 
-  // 5. Accent secondary: next saturated with hue distance, prefer cool
+  // 5. Accent secondary: next saturated with hue distance, prefer cool, with harmony bonus
   let accentSecondary: ExtractedColor | null = null;
+  let bestSecondaryScore = 0;
   let secondaryHueDistance = 0;
 
   for (const color of sortedByAccent) {
@@ -143,10 +193,12 @@ export function selectThemePalette(
 
     const dist = hueDistance(color.hsl.h, accentPrimary.hsl.h);
     if (dist >= MIN_HUE_DISTANCE) {
-      // Prefer cool hues for secondary
-      const score = dist + (isCoolHue(color.hsl.h) ? 20 : 0);
-      if (!accentSecondary || score > secondaryHueDistance + (isCoolHue(accentSecondary.hsl.h) ? 20 : 0)) {
+      // Combine: hue distance, cool preference, and harmony with primary accent
+      const harmony = harmonyScore(color.hsl.h, accentPrimary.hsl.h);
+      const score = dist + (isCoolHue(color.hsl.h) ? 20 : 0) + harmony;
+      if (!accentSecondary || score > bestSecondaryScore) {
         accentSecondary = color;
+        bestSecondaryScore = score;
         secondaryHueDistance = dist;
       }
     }

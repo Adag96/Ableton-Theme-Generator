@@ -103,8 +103,8 @@ function findMinimalAdjustment(
   return bestColor;
 }
 
-/** Color roles that can be adjusted (excludes 'tone') */
-type AdjustableColorRole = Exclude<keyof ResolvedColorRoles, 'tone'>;
+/** Color roles that can be adjusted (excludes 'tone' and optional extended roles) */
+type AdjustableColorRole = Exclude<keyof ResolvedColorRoles, 'tone' | 'surface_secondary' | 'accent_tertiary'>;
 
 /**
  * Adjust colors to meet all contrast requirements.
@@ -117,8 +117,11 @@ export function adjustForContrast(roles: ResolvedColorRoles): ResolvedColorRoles
   for (const req of CONTRAST_REQUIREMENTS) {
     const fgRole = req.foregroundRole as AdjustableColorRole;
     const bgRole = req.backgroundRole as AdjustableColorRole;
-    const fg = adjusted[fgRole];
-    const bg = adjusted[bgRole];
+    const fg = adjusted[fgRole] as string;
+    const bg = adjusted[bgRole] as string;
+
+    // Skip if either color is not set (shouldn't happen for core roles)
+    if (!fg || !bg) continue;
 
     if (contrastRatio(fg, bg) < req.minRatio) {
       const adjustBackground = req.adjust === 'background';
@@ -128,12 +131,12 @@ export function adjustForContrast(roles: ResolvedColorRoles): ResolvedColorRoles
         // Adjust background to contrast with foreground
         // Direction: if fg is dark, lighten bg; if fg is light, darken bg
         const direction: 1 | -1 = fgLum < 0.5 ? 1 : -1;
-        adjusted[bgRole] = findMinimalAdjustment(bg, fg, req.minRatio, direction);
+        (adjusted as Record<string, string>)[bgRole] = findMinimalAdjustment(bg, fg, req.minRatio, direction);
       } else {
         // Adjust foreground to contrast with background (default)
         const bgLum = relativeLuminance(bg);
         const direction: 1 | -1 = bgLum < 0.5 ? 1 : -1;
-        adjusted[fgRole] = findMinimalAdjustment(fg, bg, req.minRatio, direction);
+        (adjusted as Record<string, string>)[fgRole] = findMinimalAdjustment(fg, bg, req.minRatio, direction);
       }
     }
   }

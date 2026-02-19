@@ -54,15 +54,19 @@ When not provided, optional roles are derived from the required ones. Surface co
 
 | Role | Dark Theme Derivation | Light Theme Derivation |
 |------|----------------------|----------------------|
-| `surface_highlight` | surface_base lightness + (6 × CM) | surface_base lightness + (9 × CM) |
+| `surface_highlight` | surface_base lightness + (6 × CM), min 12% spread | surface_base lightness + (9 × CM) |
 | `surface_border` | surface_base lightness - (4 × CM) | surface_base lightness - (5 × CM) |
 | `detail_bg` | lerp(surface_base, surface_highlight, 0.5) | same |
-| `control_bg` | surface_base lightness - (9 × CM) | surface_base lightness + (16 × CM) |
+| `control_bg` | surface_base lightness - (9 × CM), min L=5% | surface_base lightness + (16 × CM) |
 | `text_secondary` | lerp(surface_base, text_primary, 0.5) | same |
 | `selection_bg` | accent_secondary hue, S≤40, L=78 | accent_secondary hue, S≤40, L=88 |
 | `selection_fg` | #070707 | #121212 |
 
 Where CM = contrast multiplier (1.0 for low, 1.4 for medium, 1.8 for high, 2.2 for very-high).
+
+**Dark Theme Minimums:** To ensure UI element visibility, dark themes enforce:
+- `surface_highlight` must be at least 12% lighter than `surface_base` (ensures selected tracks/devices are distinguishable)
+- `control_bg` lightness cannot fall below 5% (prevents invisible controls on very dark themes)
 
 ---
 
