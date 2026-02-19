@@ -8,6 +8,7 @@ Desktop application that generates custom Ableton Live 12 themes from images. Us
 - **Vite** - Build tool and dev server
 - **React** - UI framework
 - **TypeScript** - Type-safe JavaScript
+- **Supabase** - Backend: auth, Postgres database, file storage (community gallery)
 
 ## Quick Reference
 
@@ -19,6 +20,7 @@ Desktop application that generates custom Ableton Live 12 themes from images. Us
 | Product Brief | `Documentation/Product Brief.md` |
 | Development Roadmap | `Documentation/Development Roadmap.md` |
 | Feature Overview | `Documentation/Feature Overview.md` |
+| Backend Setup Guide | `Documentation/Backend Setup Guide.md` |
 | Semantic Color Roles | `Documentation/Semantic Color Roles Specification.md` |
 | Theme Convention | `Documentation/Ableton Theme Convention.md` |
 | Work Log | `Documentation/Work Log.md` |

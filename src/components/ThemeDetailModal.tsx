@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { SavedTheme } from '../types/theme-library';
 import { ConfirmationDialog } from './ConfirmationDialog';
+import { AuthModal } from './AuthModal';
+import { SubmitThemeModal } from './SubmitThemeModal';
+import { useAuth } from '../hooks/useAuth';
 import './ThemeDetailModal.css';
 
 interface ThemeDetailModalProps {
@@ -30,12 +33,15 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
   onInstall,
   onUninstall,
 }) => {
+  const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
   const [renameError, setRenameError] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -45,6 +51,8 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
     }
     setIsEditing(false);
     setConfirmDelete(false);
+    setShowAuthModal(false);
+    setShowSubmitModal(false);
   }, [theme]);
 
   useEffect(() => {
@@ -141,6 +149,14 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
     setConfirmDelete(false);
   };
 
+  const handleSubmitToGallery = () => {
+    if (user) {
+      setShowSubmitModal(true);
+    } else {
+      setShowAuthModal(true);
+    }
+  };
+
   if (!isOpen || !theme) return null;
 
   const roleLocations = theme.roleLocations ?? {};
@@ -164,7 +180,6 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
                 alt={theme.name}
                 className="modal-preview-image"
               />
-              {/* Color markers */}
               {roleLocations.surface_base && (
                 <div
                   className="color-marker"
@@ -336,6 +351,18 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
           )}
 
           <button
+            className="modal-action-button modal-action-submit"
+            onClick={handleSubmitToGallery}
+            title="Submit this theme to the community gallery"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 2L11 13" />
+              <path d="M22 2L15 22 11 13 2 9l20-7z" />
+            </svg>
+            Share
+          </button>
+
+          <button
             className="modal-action-button modal-action-delete"
             onClick={handleDeleteClick}
             title="Delete theme"
@@ -362,6 +389,25 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
           onCancel={handleDeleteCancel}
         />
       </div>
+
+      {/* Auth modal — shown before submit if not signed in */}
+      {showAuthModal && (
+        <AuthModal
+          onClose={() => setShowAuthModal(false)}
+          onSuccess={() => {
+            setShowAuthModal(false);
+            setShowSubmitModal(true);
+          }}
+        />
+      )}
+
+      {/* Submit modal */}
+      {showSubmitModal && (
+        <SubmitThemeModal
+          theme={theme}
+          onClose={() => setShowSubmitModal(false)}
+        />
+      )}
     </div>
   );
 };

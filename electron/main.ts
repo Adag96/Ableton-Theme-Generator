@@ -338,6 +338,56 @@ app.whenReady().then(() => {
     }
   });
 
+  // Read .ask file content as UTF-8 text (used for uploading to community gallery)
+  ipcMain.handle('read-theme-file-as-text', async (_event, filePath: string) => {
+    try {
+      if (!fs.existsSync(filePath) || !filePath.endsWith('.ask')) {
+        return { success: false, error: 'File not found or invalid type' };
+      }
+      const content = fs.readFileSync(filePath, 'utf8');
+      return { success: true, content };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      return { success: false, error: errorMessage };
+    }
+  });
+
+  // Download a community theme from a URL and write it to the Ableton themes directory
+  ipcMain.handle('download-community-theme', async (_event, { url, name }: { url: string; name: string }) => {
+    try {
+      const themesDir = detectAbletonThemesDirectory();
+      if (!themesDir.found || !themesDir.path) {
+        return { success: false, error: 'Ableton themes directory not found. Check Settings.' };
+      }
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        return { success: false, error: `Download failed: ${response.statusText}` };
+      }
+
+      const buffer = Buffer.from(await response.arrayBuffer());
+
+      // Sanitize name for use as a filename
+      const sanitizedName = name.replace(/[/\\:*?"<>|]/g, '').trim() || 'Community Theme';
+      let fileName = `${sanitizedName}.ask`;
+      let filePath = path.join(themesDir.path, fileName);
+
+      // Handle name collision
+      let counter = 1;
+      while (fs.existsSync(filePath)) {
+        fileName = `${sanitizedName} (${counter}).ask`;
+        filePath = path.join(themesDir.path, fileName);
+        counter++;
+      }
+
+      fs.writeFileSync(filePath, buffer);
+      return { success: true, filePath };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      return { success: false, error: errorMessage };
+    }
+  });
+
   // Delete theme file from library context (skip signature check for our own themes)
   ipcMain.handle('delete-library-theme-file', async (_event, filePath: string) => {
     try {

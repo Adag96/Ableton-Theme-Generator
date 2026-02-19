@@ -39,6 +39,8 @@ export interface ElectronAPI {
   checkFileExists: (filePath: string) => Promise<boolean>;
   writeThemeFile: (filePath: string, xmlContent: string) => Promise<{ success: boolean; error?: string }>;
   deleteLibraryThemeFile: (filePath: string) => Promise<{ success: boolean; error?: string }>;
+  readThemeFileAsText: (filePath: string) => Promise<{ success: boolean; content?: string; error?: string }>;
+  downloadCommunityTheme: (args: { url: string; name: string }) => Promise<{ success: boolean; filePath?: string; error?: string }>;
 }
 
 declare global {

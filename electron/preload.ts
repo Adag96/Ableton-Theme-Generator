@@ -25,4 +25,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('write-theme-file', filePath, xmlContent),
   deleteLibraryThemeFile: (filePath: string) =>
     ipcRenderer.invoke('delete-library-theme-file', filePath),
+  readThemeFileAsText: (filePath: string) =>
+    ipcRenderer.invoke('read-theme-file-as-text', filePath),
+  downloadCommunityTheme: (args: { url: string; name: string }) =>
+    ipcRenderer.invoke('download-community-theme', args),
 });

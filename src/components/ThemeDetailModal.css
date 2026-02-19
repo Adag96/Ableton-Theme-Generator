@@ -261,6 +261,17 @@
   cursor: not-allowed;
 }
 
+.modal-action-submit {
+  color: var(--color-accent);
+  border-color: rgba(0, 212, 170, 0.3);
+}
+
+.modal-action-submit:hover:not(:disabled) {
+  background-color: rgba(0, 212, 170, 0.1);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
 .modal-action-delete {
   margin-left: auto;
 }
