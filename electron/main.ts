@@ -170,7 +170,11 @@ app.whenReady().then(() => {
   });
 
   ipcMain.handle('open-file-dialog', async () => {
+    const prefs = loadPreferences();
+    const defaultPath = prefs.lastImageDir || app.getPath('pictures');
+
     const result = await dialog.showOpenDialog({
+      defaultPath,
       properties: ['openFile'],
       filters: [
         { name: 'Images', extensions: ['png', 'jpg', 'jpeg'] },
@@ -183,6 +187,10 @@ app.whenReady().then(() => {
 
     const filePath = result.filePaths[0];
     const fileName = path.basename(filePath);
+
+    // Remember this directory for next time
+    savePreferences({ ...prefs, lastImageDir: path.dirname(filePath) });
+
     return { filePath, fileName };
   });
 
@@ -215,6 +223,28 @@ app.whenReady().then(() => {
 
   // Theme library persistence
   const themeLibraryPath = path.join(app.getPath('userData'), 'theme-library.json');
+
+  // User preferences persistence
+  const preferencesPath = path.join(app.getPath('userData'), 'preferences.json');
+
+  function loadPreferences(): { lastImageDir?: string } {
+    try {
+      if (fs.existsSync(preferencesPath)) {
+        return JSON.parse(fs.readFileSync(preferencesPath, 'utf8'));
+      }
+    } catch (error) {
+      console.error('Error loading preferences:', error);
+    }
+    return {};
+  }
+
+  function savePreferences(prefs: { lastImageDir?: string }) {
+    try {
+      fs.writeFileSync(preferencesPath, JSON.stringify(prefs, null, 2), 'utf8');
+    } catch (error) {
+      console.error('Error saving preferences:', error);
+    }
+  }
 
   ipcMain.handle('load-theme-library', async () => {
     try {

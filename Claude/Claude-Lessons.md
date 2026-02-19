@@ -27,4 +27,10 @@ Each lesson follows this structure:
 
 ## Lessons
 
-(No lessons recorded yet) 
+### 2026-02-18 | Workflow | Asana ticket lookup by custom field ID
+
+**What happened**: User provided ticket ID "ABL-12" (stored in a custom field). I used `asana_typeahead_search` which only searches task names — returned nothing.
+
+**Root cause**: Typeahead search is name-only. Custom field values require full-text search.
+
+**Rule**: When looking up Asana tickets by a custom field ID (like "ABL-12"), use `asana_search_tasks` with the `text` parameter, not `asana_typeahead_search`. 

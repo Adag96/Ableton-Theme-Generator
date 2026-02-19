@@ -1,7 +1,9 @@
 # Work Log
 
-## 2026-2-18 20:51
+## 2026-2-18 22:59
 - Added scroll functionality and card resizing to 'My Themes' view
+- Added sorting and theme type filters to 'My Themes' view
+- Import image feature now defaults to Pictures directory, then remembers the directory the user last loaded
 
 
 ## 2026-2-17 18:41
