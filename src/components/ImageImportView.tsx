@@ -30,7 +30,7 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const [selectedTone, setSelectedTone] = useState<ThemeTone | null>(null);
   const [contrastLevel, setContrastLevel] = useState<ContrastLevel>('medium');
-  const [variantMode, setVariantMode] = useState<VariantMode>('faithful');
+  const [variantMode, setVariantMode] = useState<VariantMode>('transparent');
 
   // Reset tone selection when image changes
   useEffect(() => {
@@ -268,25 +268,18 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
               <p className="import-option-label">Surface Style</p>
               <div className="import-variant-tabs">
                 <button
-                  className={`variant-tab ${variantMode === 'faithful' ? 'variant-tab-active' : ''}`}
-                  onClick={() => setVariantMode('faithful')}
-                  title="Use the most prominent color - replicate the image's feel"
+                  className={`variant-tab ${variantMode === 'transparent' ? 'variant-tab-active' : ''}`}
+                  onClick={() => setVariantMode('transparent')}
+                  title="Subtle hue tint — professional, clearly image-related"
                 >
-                  Faithful
+                  Transparent
                 </button>
                 <button
                   className={`variant-tab ${variantMode === 'vibrant' ? 'variant-tab-active' : ''}`}
                   onClick={() => setVariantMode('vibrant')}
-                  title="Use the most saturated color - bold, colorful surfaces"
+                  title="Bold, dramatically colored surfaces"
                 >
                   Vibrant
-                </button>
-                <button
-                  className={`variant-tab ${variantMode === 'muted' ? 'variant-tab-active' : ''}`}
-                  onClick={() => setVariantMode('muted')}
-                  title="Conservative approach - desaturated, safe surfaces"
-                >
-                  Muted
                 </button>
               </div>
             </div>

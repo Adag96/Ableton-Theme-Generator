@@ -139,9 +139,14 @@ export function buildNeutralScale(roles: ResolvedColorRoles): NeutralScale {
   const textHsl = hexToHsl(roles.text_primary);
   const secondaryHsl = hexToHsl(roles.text_secondary);
 
-  // Use surface hue/saturation as the tint for the neutral scale
+  // Use surface hue as the tint for the neutral scale.
+  // Saturation ramp: deep stops (n0–n2) get more saturation for visible tinting,
+  // mid stops (n9–n9b) get less, and high-mid stops (n11–n11b) are near-neutral.
   const h = surfaceHsl.h;
-  const s = surfaceHsl.s;
+  const sDeep = Math.min(surfaceHsl.s * 1.4, 70); // n0–n2: panel backs — colorful
+  const sSurf = surfaceHsl.s;                      // n3–n8: surface zone — as-is
+  const sMid  = surfaceHsl.s * 0.45;               // n9–n9b: scrollbars, rulers
+  const sHigh = surfaceHsl.s * 0.20;               // n11–n11b: secondary text — near neutral
 
   if (isDark) {
     // Calibrated against Default Dark Neutral Medium:
@@ -152,20 +157,20 @@ export function buildNeutralScale(roles: ResolvedColorRoles): NeutralScale {
     // n11=#868686(L~52.5), n11b=#919191(L~56.9), n12=#b5b5b5(L~70.9)
     const n9L = highlightHsl.l + (secondaryHsl.l - highlightHsl.l) * 0.49;
     return {
-      n0_deepest:   hslToHex(h, s, controlHsl.l * 0.23),
-      n1_deep:      hslToHex(h, s, controlHsl.l * 0.57),
-      n2_dark:      hslToHex(h, s, controlHsl.l * 0.80),
+      n0_deepest:   hslToHex(h, sDeep, controlHsl.l * 0.23),
+      n1_deep:      hslToHex(h, sDeep, controlHsl.l * 0.57),
+      n2_dark:      hslToHex(h, sDeep, controlHsl.l * 0.80),
       n3_control:   roles.control_bg,
-      n4_area:      hslToHex(h, s, controlHsl.l + (surfaceHsl.l - controlHsl.l) * 0.25),
+      n4_area:      hslToHex(h, sSurf, controlHsl.l + (surfaceHsl.l - controlHsl.l) * 0.25),
       n5_border:    roles.surface_border,
       n6_surface:   roles.surface_base,
       n7_detail:    roles.detail_bg,
       n8_highlight: roles.surface_highlight,
-      n9_mid_low:   hslToHex(h, s, n9L),
-      n9b_mid:      hslToHex(h, s, n9L + (secondaryHsl.l - n9L) * 0.5),
+      n9_mid_low:   hslToHex(h, sMid, n9L),
+      n9b_mid:      hslToHex(h, sMid, n9L + (secondaryHsl.l - n9L) * 0.5),
       n10_mid:      roles.text_secondary,
-      n11_mid_high: hslToHex(h, s, secondaryHsl.l + (textHsl.l - secondaryHsl.l) * 0.26),
-      n11b_ruler:   hslToHex(h, s, secondaryHsl.l + (textHsl.l - secondaryHsl.l) * 0.44),
+      n11_mid_high: hslToHex(h, sHigh, secondaryHsl.l + (textHsl.l - secondaryHsl.l) * 0.26),
+      n11b_ruler:   hslToHex(h, sHigh, secondaryHsl.l + (textHsl.l - secondaryHsl.l) * 0.44),
       n12_text:     roles.text_primary,
     };
   } else {
@@ -178,20 +183,20 @@ export function buildNeutralScale(roles: ResolvedColorRoles): NeutralScale {
     // n11=#a5a5a5(L~64.7), n11b=#cfcfcf(L~81.2), n12=#121212(L~7.1)
     const n9L = secondaryHsl.l - (secondaryHsl.l - textHsl.l) * 0.34;
     return {
-      n0_deepest:   hslToHex(h, s, textHsl.l * 0.38),
-      n1_deep:      hslToHex(h, s, textHsl.l + (secondaryHsl.l - textHsl.l) * 0.20),
-      n2_dark:      hslToHex(h, s, textHsl.l + (secondaryHsl.l - textHsl.l) * 0.47),
+      n0_deepest:   hslToHex(h, sDeep, textHsl.l * 0.38),
+      n1_deep:      hslToHex(h, sDeep, textHsl.l + (secondaryHsl.l - textHsl.l) * 0.20),
+      n2_dark:      hslToHex(h, sDeep, textHsl.l + (secondaryHsl.l - textHsl.l) * 0.47),
       n3_control:   roles.control_bg,
-      n4_area:      hslToHex(h, s, secondaryHsl.l),
+      n4_area:      hslToHex(h, sSurf, secondaryHsl.l),
       n5_border:    roles.surface_border,
       n6_surface:   roles.surface_base,
       n7_detail:    roles.detail_bg,
       n8_highlight: roles.surface_highlight,
-      n9_mid_low:   hslToHex(h, s, n9L),
-      n9b_mid:      hslToHex(h, s, n9L + (secondaryHsl.l - n9L) * 0.38),
+      n9_mid_low:   hslToHex(h, sMid, n9L),
+      n9b_mid:      hslToHex(h, sMid, n9L + (secondaryHsl.l - n9L) * 0.38),
       n10_mid:      roles.text_secondary,
-      n11_mid_high: hslToHex(h, s, surfaceHsl.l),
-      n11b_ruler:   hslToHex(h, s, controlHsl.l),
+      n11_mid_high: hslToHex(h, sHigh, surfaceHsl.l),
+      n11b_ruler:   hslToHex(h, sHigh, controlHsl.l),
       n12_text:     roles.text_primary,
     };
   }

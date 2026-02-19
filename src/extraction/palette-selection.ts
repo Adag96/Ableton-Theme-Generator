@@ -11,20 +11,20 @@ const MIN_CONTRAST_RATIO = 4.5;
 /** Minimum hue distance between primary and secondary accents */
 const MIN_HUE_DISTANCE = 60;
 
-/** Maximum saturation for muted mode surface colors (%) */
-const MUTED_MAX_SATURATION = 40;
+/** Surface saturation for transparent mode, dark themes (%) */
+const TRANSPARENT_SURFACE_SAT_DARK = 20;
 
-/** Target saturation when desaturating for muted mode (%) */
-const MUTED_DESATURATED_TARGET = 30;
+/** Surface saturation for transparent mode, light themes (%) */
+const TRANSPARENT_SURFACE_SAT_LIGHT = 25;
 
-/** Maximum saturation for faithful mode before slight reduction (%) */
-const FAITHFUL_MAX_SATURATION = 60;
+/** Surface saturation for vibrant mode (%) */
+const VIBRANT_SURFACE_SAT = 55;
 
-/** Maximum saturation for vibrant mode surfaces (%) */
-const VIBRANT_MAX_SATURATION = 75;
+/** Fixed surface lightness for dark themes (%) */
+const DARK_SURFACE_LIGHTNESS = 22;
 
-/** Minimum saturation for vibrant mode to consider a color (%) */
-const VIBRANT_MIN_SATURATION = 30;
+/** Fixed surface lightness for light themes (%) */
+const LIGHT_SURFACE_LIGHTNESS = 80;
 
 /** Ideal hue distance for color harmony (degrees) - peaks at 150° */
 const IDEAL_HARMONY_DISTANCE = 150;
@@ -56,85 +56,51 @@ function harmonyScore(hue1: number, hue2: number): number {
 }
 
 /**
- * Select surface color based on variant mode.
- * This is THE KEY decision that shapes the theme's overall feel.
+ * Compute the dominant hue from a set of colors using a saturation-weighted circular mean.
+ * Weighting by saturation × population ensures chromatic colors drive the result.
+ * Returns 0 as a fallback for fully achromatic images.
+ */
+function computeDominantHue(colors: ExtractedColor[]): number {
+  let sinSum = 0;
+  let cosSum = 0;
+
+  for (const color of colors) {
+    const weight = color.hsl.s * color.population;
+    const hueRad = (color.hsl.h * Math.PI) / 180;
+    sinSum += weight * Math.sin(hueRad);
+    cosSum += weight * Math.cos(hueRad);
+  }
+
+  // All colors are achromatic — fall back to neutral (hue 0)
+  if (sinSum === 0 && cosSum === 0) return 0;
+
+  const hueRad = Math.atan2(sinSum, cosSum);
+  const hue = (hueRad * 180) / Math.PI;
+  return hue < 0 ? hue + 360 : hue;
+}
+
+/**
+ * Synthesize a surface color at the image's dominant hue.
+ * Decouples "what hue is the image" from "does the image have dark pixels of that hue."
+ * Lightness and saturation are design-calibrated constants, not extracted from pixels.
  */
 function selectSurfaceColor(
   colors: ExtractedColor[],
   tonePreference: ThemeTone,
   variantMode: VariantMode
 ): ExtractedColor {
-  // Filter colors matching the tone preference
-  const matchingColors = colors.filter(c =>
-    tonePreference === 'dark' ? c.hsl.l < 50 : c.hsl.l >= 50
-  );
+  const dominantHue = computeDominantHue(colors);
+  const lightness = tonePreference === 'dark' ? DARK_SURFACE_LIGHTNESS : LIGHT_SURFACE_LIGHTNESS;
+  const saturation = variantMode === 'vibrant'
+    ? VIBRANT_SURFACE_SAT
+    : (tonePreference === 'dark' ? TRANSPARENT_SURFACE_SAT_DARK : TRANSPARENT_SURFACE_SAT_LIGHT);
 
-  // If no colors match the tone, we need to create one
-  if (matchingColors.length === 0) {
-    const baseColor = variantMode === 'vibrant'
-      ? [...colors].sort((a, b) => b.hsl.s - a.hsl.s)[0]  // Most saturated
-      : colors[0];  // Most prominent
-
-    const targetLightness = tonePreference === 'dark' ? 18 : 78;
-    const targetSaturation = variantMode === 'muted'
-      ? Math.min(baseColor.hsl.s, MUTED_DESATURATED_TARGET)
-      : Math.min(baseColor.hsl.s, variantMode === 'vibrant' ? VIBRANT_MAX_SATURATION : FAITHFUL_MAX_SATURATION);
-
-    return {
-      ...baseColor,
-      hex: hslToHex(baseColor.hsl.h, targetSaturation, targetLightness),
-      hsl: { h: baseColor.hsl.h, s: targetSaturation, l: targetLightness },
-    };
-  }
-
-  // FAITHFUL mode: Use the most prominent color, preserve its character
-  if (variantMode === 'faithful') {
-    const baseColor = matchingColors[0];  // Most prominent matching color
-
-    // Only cap extreme saturation, otherwise keep as-is
-    if (baseColor.hsl.s > FAITHFUL_MAX_SATURATION) {
-      return {
-        ...baseColor,
-        hex: hslToHex(baseColor.hsl.h, FAITHFUL_MAX_SATURATION, baseColor.hsl.l),
-        hsl: { h: baseColor.hsl.h, s: FAITHFUL_MAX_SATURATION, l: baseColor.hsl.l },
-      };
-    }
-    return baseColor;
-  }
-
-  // VIBRANT mode: Use the most saturated color that matches the tone
-  if (variantMode === 'vibrant') {
-    // Sort by saturation (highest first)
-    const sortedBySaturation = [...matchingColors].sort((a, b) => b.hsl.s - a.hsl.s);
-
-    // Find a color with good saturation
-    const vibrantCandidate = sortedBySaturation.find(c => c.hsl.s >= VIBRANT_MIN_SATURATION);
-    const baseColor = vibrantCandidate ?? sortedBySaturation[0];
-
-    // Cap at max vibrant saturation
-    if (baseColor.hsl.s > VIBRANT_MAX_SATURATION) {
-      return {
-        ...baseColor,
-        hex: hslToHex(baseColor.hsl.h, VIBRANT_MAX_SATURATION, baseColor.hsl.l),
-        hsl: { h: baseColor.hsl.h, s: VIBRANT_MAX_SATURATION, l: baseColor.hsl.l },
-      };
-    }
-    return baseColor;
-  }
-
-  // MUTED mode: Conservative approach - low saturation surfaces
-  const lowSatCandidates = matchingColors.filter(c => c.hsl.s <= MUTED_MAX_SATURATION);
-
-  if (lowSatCandidates.length > 0) {
-    return lowSatCandidates[0];  // Most prominent low-saturation color
-  }
-
-  // No low-sat candidates - desaturate the most prominent
-  const baseColor = matchingColors[0];
   return {
-    ...baseColor,
-    hex: hslToHex(baseColor.hsl.h, MUTED_DESATURATED_TARGET, baseColor.hsl.l),
-    hsl: { h: baseColor.hsl.h, s: MUTED_DESATURATED_TARGET, l: baseColor.hsl.l },
+    hex: hslToHex(dominantHue, saturation, lightness),
+    rgb: { r: 0, g: 0, b: 0 }, // synthetic — rgb unused downstream
+    hsl: { h: dominantHue, s: saturation, l: lightness },
+    population: 0,
+    percentage: 0,
   };
 }
 
@@ -143,10 +109,9 @@ export interface PaletteSelectionOptions {
   /** User's preferred tone (required for meaningful surface selection) */
   tonePreference?: ThemeTone;
   /**
-   * Variant mode controls how the surface color is selected:
-   * - 'faithful': Use most prominent color - replicate image feel (default)
-   * - 'vibrant': Use most saturated color - bold, colorful surfaces
-   * - 'muted': Conservative approach - desaturated, safe surfaces
+   * Variant mode controls the saturation of the synthesized surface:
+   * - 'transparent': Subtle hue tint — professional (default)
+   * - 'vibrant': Bold, dramatically colored surfaces
    */
   variantMode?: VariantMode;
 }
@@ -155,7 +120,7 @@ export interface PaletteSelectionOptions {
  * Select semantic color roles from extracted colors.
  *
  * Algorithm:
- * 1. surface_base = selected based on variant mode (faithful/vibrant/muted)
+ * 1. surface_base = synthesized from dominant hue at calibrated lightness/saturation
  * 2. tone = user preference (required)
  * 3. text_primary = first color with good contrast, or fallback
  * 4. accent_primary = most saturated with harmony bonus
@@ -169,7 +134,7 @@ export function selectThemePalette(
     throw new Error('No colors provided for palette selection');
   }
 
-  const { tonePreference, variantMode = 'faithful' } = options;
+  const { tonePreference, variantMode = 'transparent' } = options;
 
   // 1. Tone: required for surface selection
   // If not provided, derive from most prominent color

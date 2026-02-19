@@ -2,12 +2,11 @@
 export type ThemeTone = 'light' | 'dark';
 
 /**
- * Variant mode controls how the surface color is selected from the image.
- * - 'faithful': Use the most prominent/perceptible color - replicate the image's feel
- * - 'vibrant': Use the most saturated viable color - bold, colorful surfaces
- * - 'muted': Conservative approach - desaturated, safe surfaces (original behavior)
+ * Variant mode controls the saturation of the synthesized surface color.
+ * - 'transparent': Subtle hue tint — professional, clearly image-related (default)
+ * - 'vibrant': Bold, dramatically colored surfaces
  */
-export type VariantMode = 'faithful' | 'vibrant' | 'muted';
+export type VariantMode = 'transparent' | 'vibrant';
 
 /** Contrast level controls the lightness spread between surface colors */
 export type ContrastLevel = 'low' | 'medium' | 'high' | 'very-high';
