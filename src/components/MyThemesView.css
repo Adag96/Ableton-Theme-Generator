@@ -39,11 +39,136 @@
   color: var(--color-text-primary);
 }
 
+.my-themes-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
 .my-themes-title {
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--color-text-primary);
-  margin: 0 0 24px 0;
+  margin: 0;
+}
+
+.my-themes-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Filter Toggle */
+.my-themes-filter-toggle {
+  display: flex;
+  gap: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.filter-toggle-option {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--color-bg-secondary);
+  border: none;
+  border-right: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-toggle-option:last-child {
+  border-right: none;
+}
+
+.filter-toggle-option:hover:not(.filter-toggle-option-active) {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+}
+
+.filter-toggle-option-active {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.filter-toggle-option-active:hover {
+  background: var(--color-accent-hover);
+}
+
+/* Sort Dropdown */
+.my-themes-sort-dropdown {
+  position: relative;
+}
+
+.my-themes-sort-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.my-themes-sort-trigger:hover {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+}
+
+.sort-dropdown-chevron {
+  transition: transform 0.2s ease;
+}
+
+.sort-dropdown-chevron-open {
+  transform: rotate(180deg);
+}
+
+.my-themes-sort-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 100%;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  overflow: hidden;
+}
+
+.my-themes-sort-option {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.my-themes-sort-option:hover {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+}
+
+.my-themes-sort-option-active {
+  color: var(--color-accent);
+}
+
+.my-themes-sort-option-active:hover {
+  color: var(--color-accent);
 }
 
 .my-themes-empty {
