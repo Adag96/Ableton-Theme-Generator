@@ -16,6 +16,7 @@ import {
   adjustSaturation,
   withAlpha,
 } from './color-utils';
+import { adjustForContrast } from './contrast';
 import parameterMap from './parameter-map.json';
 
 /**
@@ -384,7 +385,9 @@ export function generateParameters(
  * Full pipeline: from partial semantic roles to complete theme data.
  */
 export function generateTheme(input: SemanticColorRoles): AbletonThemeData {
-  const roles = resolveRoles(input);
+  const resolved = resolveRoles(input);
+  // Auto-adjust foreground colors to meet contrast requirements
+  const roles = adjustForContrast(resolved);
   const neutralScale = buildNeutralScale(roles);
   const parameters = generateParameters(roles, neutralScale);
   const vuMeters = getVuMeters();

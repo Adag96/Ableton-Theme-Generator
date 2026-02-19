@@ -136,6 +136,10 @@ These numeric values control opacity and color blending. They differ between lig
 
 ## Contrast Requirements
 
+Theme generation validates and automatically corrects contrast issues to ensure readability.
+
+### Required Contrast Ratios
+
 | Foreground | Background | Minimum Ratio | Purpose |
 |------------|-----------|---------------|---------|
 | text_primary | surface_base | 4.5:1 (WCAG AA) | Primary readability |
@@ -143,9 +147,25 @@ These numeric values control opacity and color blending. They differ between lig
 | text_primary | detail_bg | 4.5:1 | Clip editor text |
 | text_primary | control_bg | 4.5:1 | Input field text |
 | text_secondary | surface_base | 3.0:1 | Disabled text legibility |
+| text_secondary | control_bg | 3.0:1 | Disabled text on inputs |
+| text_secondary | surface_highlight | 3.0:1 | Disabled text on selected track |
 | selection_fg | selection_bg | 4.5:1 | Selection text |
 | accent_primary | surface_base | 3.0:1 | Toggle visibility |
 | accent_primary | control_bg | 3.0:1 | Toggle on dark inputs |
+| text_primary | accent_primary | 4.5:1 | Icons on active toggles |
+| text_primary | accent_secondary | 4.5:1 | Icons on secondary accent |
+
+### Auto-Adjustment
+
+When a contrast pair fails validation, the theme engine automatically adjusts one of the colors:
+
+| Pair Type | Adjustment Strategy |
+|-----------|-------------------|
+| Text on surfaces | Nudge **foreground** lightness (lighten on dark bg, darken on light bg) |
+| Accents on surfaces | Nudge **accent** lightness to stand out from surface |
+| Text on accents | Nudge **accent** lightness (not text, to preserve surface compatibility) |
+
+The adjustment uses binary search to find the **minimum lightness change** that achieves the required contrast ratio. This preserves the original hue and saturation, maintaining the theme's color character while ensuring readability.
 
 ---
 
