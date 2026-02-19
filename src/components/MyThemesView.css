@@ -198,6 +198,25 @@
   margin: 0;
 }
 
+.my-themes-section {
+  margin-bottom: 32px;
+}
+
+.my-themes-section:last-child {
+  margin-bottom: 0;
+}
+
+.my-themes-section-header {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border);
+}
+
 .my-themes-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

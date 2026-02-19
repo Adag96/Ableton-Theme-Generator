@@ -19,4 +19,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('copy-theme-to-downloads', sourcePath, fileName),
   renameThemeFile: (oldPath: string, newPath: string) =>
     ipcRenderer.invoke('rename-theme-file', oldPath, newPath),
+  checkFileExists: (filePath: string) =>
+    ipcRenderer.invoke('check-file-exists', filePath),
+  writeThemeFile: (filePath: string, xmlContent: string) =>
+    ipcRenderer.invoke('write-theme-file', filePath, xmlContent),
+  deleteLibraryThemeFile: (filePath: string) =>
+    ipcRenderer.invoke('delete-library-theme-file', filePath),
 });

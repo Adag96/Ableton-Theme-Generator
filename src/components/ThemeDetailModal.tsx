@@ -9,6 +9,8 @@ interface ThemeDetailModalProps {
   onRename: (id: string, newName: string) => Promise<{ success: boolean; error?: string }>;
   onDownload: (theme: SavedTheme) => Promise<void>;
   onDelete: (id: string) => void;
+  onInstall: (id: string) => Promise<{ success: boolean; error?: string }>;
+  onUninstall: (id: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 const CONTRAST_LABELS: Record<string, string> = {
@@ -24,11 +26,15 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
   onRename,
   onDownload,
   onDelete,
+  onInstall,
+  onUninstall,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
   const [renameError, setRenameError] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isInstalling, setIsInstalling] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -37,6 +43,7 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
       setRenameError(null);
     }
     setIsEditing(false);
+    setConfirmDelete(false);
   }, [theme]);
 
   useEffect(() => {
@@ -48,7 +55,9 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
-      if (isEditing) {
+      if (confirmDelete) {
+        setConfirmDelete(false);
+      } else if (isEditing) {
         setIsEditing(false);
         setEditName(theme?.name ?? '');
         setRenameError(null);
@@ -96,10 +105,38 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
     }
   };
 
-  const handleDelete = () => {
+  const handleInstall = async () => {
+    if (!theme || isInstalling) return;
+    setIsInstalling(true);
+    try {
+      await onInstall(theme.id);
+    } finally {
+      setIsInstalling(false);
+    }
+  };
+
+  const handleUninstall = async () => {
+    if (!theme || isInstalling) return;
+    setIsInstalling(true);
+    try {
+      await onUninstall(theme.id);
+    } finally {
+      setIsInstalling(false);
+    }
+  };
+
+  const handleDeleteClick = () => {
+    setConfirmDelete(true);
+  };
+
+  const handleDeleteConfirm = () => {
     if (!theme) return;
     onDelete(theme.id);
     onClose();
+  };
+
+  const handleDeleteCancel = () => {
+    setConfirmDelete(false);
   };
 
   if (!isOpen || !theme) return null;
@@ -225,6 +262,9 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
                 {CONTRAST_LABELS[theme.contrastLevel] ?? theme.contrastLevel} Contrast
               </span>
             )}
+            <span className={`modal-badge ${theme.isInstalled ? 'modal-badge-installed' : 'modal-badge-available'}`}>
+              {theme.isInstalled ? 'Installed' : 'Not Installed'}
+            </span>
           </div>
 
           <div className="modal-swatches">
@@ -251,33 +291,79 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="modal-actions">
-          <button
-            className="modal-action-button"
-            onClick={handleDownload}
-            disabled={isDownloading}
-            title="Download to Downloads folder"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            {isDownloading ? 'Downloading...' : 'Download'}
-          </button>
-          <button
-            className="modal-action-button modal-action-delete"
-            onClick={handleDelete}
-            title="Delete theme"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="3 6 5 6 21 6" />
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-            </svg>
-            Delete
-          </button>
-        </div>
+        {/* Delete confirmation */}
+        {confirmDelete ? (
+          <div className="modal-confirm-delete">
+            <p className="modal-confirm-text">
+              {theme.isInstalled
+                ? 'This will permanently remove the theme from your library and delete the .ask file from Ableton.'
+                : 'This will permanently remove the theme from your library.'}
+            </p>
+            <div className="modal-confirm-actions">
+              <button className="modal-action-button" onClick={handleDeleteCancel}>
+                Cancel
+              </button>
+              <button className="modal-action-button modal-action-confirm-delete" onClick={handleDeleteConfirm}>
+                Delete Theme
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* Actions */
+          <div className="modal-actions">
+            <button
+              className="modal-action-button"
+              onClick={handleDownload}
+              disabled={isDownloading}
+              title="Download to Downloads folder"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              {isDownloading ? 'Downloading...' : 'Download'}
+            </button>
+
+            {theme.isInstalled ? (
+              <button
+                className="modal-action-button modal-action-uninstall"
+                onClick={handleUninstall}
+                disabled={isInstalling}
+                title="Remove from Ableton"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+                {isInstalling ? 'Uninstalling...' : 'Uninstall'}
+              </button>
+            ) : (
+              <button
+                className="modal-action-button modal-action-install"
+                onClick={handleInstall}
+                disabled={isInstalling}
+                title="Install to Ableton"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+                {isInstalling ? 'Installing...' : 'Install'}
+              </button>
+            )}
+
+            <button
+              className="modal-action-button modal-action-delete"
+              onClick={handleDeleteClick}
+              title="Delete theme"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              </svg>
+              Delete
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

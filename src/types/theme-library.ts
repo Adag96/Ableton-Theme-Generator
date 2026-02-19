@@ -16,6 +16,7 @@ export interface SavedTheme {
   contrastLevel?: ContrastLevel;
   previewImage?: string;
   roleLocations?: RoleLocations;
+  isInstalled: boolean; // true = .ask file exists in Ableton themes dir
 }
 
 export interface ThemeLibrary {

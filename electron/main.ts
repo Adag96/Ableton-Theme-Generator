@@ -311,6 +311,60 @@ app.whenReady().then(() => {
     }
   });
 
+  // Check if a file exists
+  ipcMain.handle('check-file-exists', async (_event, filePath: string) => {
+    return fs.existsSync(filePath);
+  });
+
+  // Write theme file directly (for install/regenerate)
+  ipcMain.handle('write-theme-file', async (_event, filePath: string, xmlContent: string) => {
+    try {
+      // Safety check: only write .ask files within the themes directory
+      const themesDir = detectAbletonThemesDirectory();
+      if (!themesDir.found || !themesDir.path) {
+        return { success: false, error: 'Themes directory not found' };
+      }
+      const normalizedPath = path.normalize(filePath);
+      const normalizedThemesDir = path.normalize(themesDir.path);
+      if (!normalizedPath.startsWith(normalizedThemesDir) || !normalizedPath.endsWith('.ask')) {
+        return { success: false, error: 'Invalid file path' };
+      }
+
+      fs.writeFileSync(filePath, xmlContent, 'utf8');
+      return { success: true };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      return { success: false, error: errorMessage };
+    }
+  });
+
+  // Delete theme file from library context (skip signature check for our own themes)
+  ipcMain.handle('delete-library-theme-file', async (_event, filePath: string) => {
+    try {
+      // Safety check: only delete .ask files within the themes directory
+      const themesDir = detectAbletonThemesDirectory();
+      if (!themesDir.found || !themesDir.path) {
+        return { success: false, error: 'Themes directory not found' };
+      }
+      const normalizedPath = path.normalize(filePath);
+      const normalizedThemesDir = path.normalize(themesDir.path);
+      if (!normalizedPath.startsWith(normalizedThemesDir) || !normalizedPath.endsWith('.ask')) {
+        return { success: false, error: 'Invalid file path' };
+      }
+
+      if (!fs.existsSync(filePath)) {
+        // File already doesn't exist, that's fine
+        return { success: true };
+      }
+
+      fs.unlinkSync(filePath);
+      return { success: true };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      return { success: false, error: errorMessage };
+    }
+  });
+
   createWindow();
 });
 

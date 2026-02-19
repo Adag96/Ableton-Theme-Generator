@@ -21,6 +21,8 @@ interface MyThemesViewProps {
   onBack: () => void;
   onDeleteTheme: (id: string) => void;
   onRenameTheme: (id: string, newName: string) => Promise<{ success: boolean; error?: string }>;
+  onInstallTheme: (id: string) => Promise<{ success: boolean; error?: string }>;
+  onUninstallTheme: (id: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 export const MyThemesView: React.FC<MyThemesViewProps> = ({
@@ -28,6 +30,8 @@ export const MyThemesView: React.FC<MyThemesViewProps> = ({
   onBack,
   onDeleteTheme,
   onRenameTheme,
+  onInstallTheme,
+  onUninstallTheme,
 }) => {
   const [filter, setFilter] = useState<ToneFilter>('all');
   const [sortBy, setSortBy] = useState<SortOption>('recent');
@@ -68,36 +72,40 @@ export const MyThemesView: React.FC<MyThemesViewProps> = ({
     }
   }, [dropdownOpen]);
 
-  // Filter and sort themes
-  const filteredAndSortedThemes = useMemo(() => {
-    let result = themes;
+  // Filter and split themes into installed/available
+  const { installedThemes, availableThemes } = useMemo(() => {
+    // Sort function
+    const sortThemes = (themesToSort: SavedTheme[]) => {
+      switch (sortBy) {
+        case 'recent':
+          return [...themesToSort].sort((a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        case 'oldest':
+          return [...themesToSort].sort((a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+        case 'a-z':
+          return [...themesToSort].sort((a, b) =>
+            a.name.localeCompare(b.name));
+        case 'z-a':
+          return [...themesToSort].sort((a, b) =>
+            b.name.localeCompare(a.name));
+        default:
+          return themesToSort;
+      }
+    };
+
+    let filtered = themes;
 
     // Filter by tone
     if (filter !== 'all') {
-      result = result.filter(t => t.tone === filter);
+      filtered = filtered.filter(t => t.tone === filter);
     }
 
-    // Sort
-    switch (sortBy) {
-      case 'recent':
-        result = [...result].sort((a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        break;
-      case 'oldest':
-        result = [...result].sort((a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-        break;
-      case 'a-z':
-        result = [...result].sort((a, b) =>
-          a.name.localeCompare(b.name));
-        break;
-      case 'z-a':
-        result = [...result].sort((a, b) =>
-          b.name.localeCompare(a.name));
-        break;
-    }
+    // Split into installed and available
+    const installed = sortThemes(filtered.filter(t => t.isInstalled));
+    const available = sortThemes(filtered.filter(t => !t.isInstalled));
 
-    return result;
+    return { installedThemes: installed, availableThemes: available };
   }, [themes, filter, sortBy]);
 
   // Contextual empty state message
@@ -105,7 +113,7 @@ export const MyThemesView: React.FC<MyThemesViewProps> = ({
     if (themes.length === 0) {
       return { text: 'No themes saved yet', hint: 'Generate a theme from an image to get started' };
     }
-    if (filteredAndSortedThemes.length === 0) {
+    if (installedThemes.length === 0 && availableThemes.length === 0) {
       if (filter === 'dark') {
         return { text: 'No dark themes yet', hint: 'Generate a dark theme to see it here' };
       }
@@ -114,7 +122,7 @@ export const MyThemesView: React.FC<MyThemesViewProps> = ({
       }
     }
     return null;
-  }, [themes.length, filter, filteredAndSortedThemes.length]);
+  }, [themes.length, filter, installedThemes.length, availableThemes.length]);
 
   const hasThemes = themes.length > 0;
 
@@ -222,16 +230,49 @@ export const MyThemesView: React.FC<MyThemesViewProps> = ({
             <p className="my-themes-empty-hint">{emptyMessage.hint}</p>
           </div>
         ) : (
-          <div className="my-themes-grid">
-            {filteredAndSortedThemes.map((theme) => (
-              <ThemeCard
-                key={theme.id}
-                theme={theme}
-                onDelete={() => onDeleteTheme(theme.id)}
-                onClick={() => setSelectedThemeId(theme.id)}
-              />
-            ))}
-          </div>
+          <>
+            {/* Installed Themes Section */}
+            {installedThemes.length > 0 && (
+              <div className="my-themes-section">
+                <h3 className="my-themes-section-header">
+                  Installed Themes ({installedThemes.length})
+                </h3>
+                <div className="my-themes-grid">
+                  {installedThemes.map((theme) => (
+                    <ThemeCard
+                      key={theme.id}
+                      theme={theme}
+                      onDelete={() => onDeleteTheme(theme.id)}
+                      onClick={() => setSelectedThemeId(theme.id)}
+                      onInstall={() => onInstallTheme(theme.id)}
+                      onUninstall={() => onUninstallTheme(theme.id)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Available Themes Section */}
+            {availableThemes.length > 0 && (
+              <div className="my-themes-section">
+                <h3 className="my-themes-section-header">
+                  Available Themes ({availableThemes.length})
+                </h3>
+                <div className="my-themes-grid">
+                  {availableThemes.map((theme) => (
+                    <ThemeCard
+                      key={theme.id}
+                      theme={theme}
+                      onDelete={() => onDeleteTheme(theme.id)}
+                      onClick={() => setSelectedThemeId(theme.id)}
+                      onInstall={() => onInstallTheme(theme.id)}
+                      onUninstall={() => onUninstallTheme(theme.id)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 
@@ -242,6 +283,8 @@ export const MyThemesView: React.FC<MyThemesViewProps> = ({
         onRename={onRenameTheme}
         onDownload={handleDownload}
         onDelete={onDeleteTheme}
+        onInstall={onInstallTheme}
+        onUninstall={onUninstallTheme}
       />
     </div>
   );

@@ -24,7 +24,15 @@ function App() {
   const [importedImage, setImportedImage] = useState<ImageFileResult | null>(null);
   const [pendingTheme, setPendingTheme] = useState<PendingTheme | null>(null);
   const [showNameDialog, setShowNameDialog] = useState(false);
-  const { library, addTheme, removeTheme, renameTheme } = useThemeLibrary();
+  const {
+    library,
+    addTheme,
+    removeTheme,
+    renameTheme,
+    installTheme,
+    uninstallTheme,
+    syncInstallState,
+  } = useThemeLibrary();
 
   useEffect(() => {
     // Get version and build number from Electron API if available
@@ -41,6 +49,13 @@ function App() {
 
     loadVersionInfo();
   }, []);
+
+  // Sync install state when entering My Themes view
+  useEffect(() => {
+    if (currentView === 'my-themes') {
+      syncInstallState();
+    }
+  }, [currentView, syncInstallState]);
 
   const handleImportImage = () => {
     setCurrentView('import');
@@ -90,7 +105,7 @@ function App() {
       try {
         const result = await window.electronAPI.saveThemeFile(pendingTheme.xmlContent, defaultFileName);
         if (result.success && result.filePath) {
-          // Create saved theme entry
+          // Create saved theme entry with isInstalled: true since file was just created
           const savedTheme: SavedTheme = {
             id: crypto.randomUUID(),
             name,
@@ -106,6 +121,7 @@ function App() {
             contrastLevel: pendingTheme.palette.roles.contrastLevel,
             previewImage: pendingTheme.previewImage,
             roleLocations: pendingTheme.palette.roleLocations,
+            isInstalled: true,
           };
 
           await addTheme(savedTheme);
@@ -152,6 +168,8 @@ function App() {
             onBack={handleBackToLanding}
             onDeleteTheme={removeTheme}
             onRenameTheme={renameTheme}
+            onInstallTheme={installTheme}
+            onUninstallTheme={uninstallTheme}
           />
         ) : (
           <ImageImportView

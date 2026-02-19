@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { SavedTheme } from '../types/theme-library';
 import './ThemeCard.css';
 
@@ -6,12 +6,44 @@ interface ThemeCardProps {
   theme: SavedTheme;
   onDelete: () => void;
   onClick: () => void;
+  onInstall: () => Promise<{ success: boolean; error?: string }>;
+  onUninstall: () => Promise<{ success: boolean; error?: string }>;
 }
 
-export const ThemeCard: React.FC<ThemeCardProps> = ({ theme, onDelete, onClick }) => {
+export const ThemeCard: React.FC<ThemeCardProps> = ({
+  theme,
+  onDelete,
+  onClick,
+  onInstall,
+  onUninstall,
+}) => {
+  const [isWorking, setIsWorking] = useState(false);
+
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onDelete();
+  };
+
+  const handleInstallClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isWorking) return;
+    setIsWorking(true);
+    try {
+      await onInstall();
+    } finally {
+      setIsWorking(false);
+    }
+  };
+
+  const handleUninstallClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isWorking) return;
+    setIsWorking(true);
+    try {
+      await onUninstall();
+    } finally {
+      setIsWorking(false);
+    }
   };
 
   return (
@@ -48,9 +80,31 @@ export const ThemeCard: React.FC<ThemeCardProps> = ({ theme, onDelete, onClick }
           />
         </div>
 
-        <span className={`theme-card-tone theme-card-tone-${theme.tone}`}>
-          {theme.tone === 'dark' ? 'Dark' : 'Light'}
-        </span>
+        <div className="theme-card-footer">
+          <span className={`theme-card-tone theme-card-tone-${theme.tone}`}>
+            {theme.tone === 'dark' ? 'Dark' : 'Light'}
+          </span>
+
+          {theme.isInstalled ? (
+            <button
+              className="theme-card-action theme-card-action-uninstall"
+              onClick={handleUninstallClick}
+              disabled={isWorking}
+              title="Uninstall from Ableton"
+            >
+              {isWorking ? '...' : 'Uninstall'}
+            </button>
+          ) : (
+            <button
+              className="theme-card-action theme-card-action-install"
+              onClick={handleInstallClick}
+              disabled={isWorking}
+              title="Install to Ableton"
+            >
+              {isWorking ? '...' : 'Install'}
+            </button>
+          )}
+        </div>
       </div>
 
       <button className="theme-card-delete" onClick={handleDeleteClick} title="Delete theme">
