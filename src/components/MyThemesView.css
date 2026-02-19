@@ -1,8 +1,22 @@
 .my-themes-view {
   width: 100%;
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.my-themes-header {
+  flex-shrink: 0;
+}
+
+.my-themes-grid-container {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: 12px;
 }
 
 .my-themes-back-button {
@@ -61,6 +75,12 @@
 
 .my-themes-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
+}
+
+@media (min-width: 800px) {
+  .my-themes-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }

@@ -42,7 +42,7 @@
 .app-main {
   flex: 1;
   padding: var(--spacing-xl);
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 .app-footer {

@@ -1,5 +1,9 @@
 # Work Log
 
+## 2026-2-18 20:51
+- Added scroll functionality and card resizing to 'My Themes' view
+
+
 ## 2026-2-17 18:41
 - Built a color extraction system that pulls 4 colors from an imported image and defines light or dark tone convention
 - Uploaded image now shows preview thumbnail, which was broken
