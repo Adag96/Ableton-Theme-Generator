@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { SavedTheme } from '../types/theme-library';
+import { ConfirmationDialog } from './ConfirmationDialog';
 import './ThemeCard.css';
 
 interface ThemeCardProps {
@@ -18,10 +19,20 @@ export const ThemeCard: React.FC<ThemeCardProps> = ({
   onUninstall,
 }) => {
   const [isWorking, setIsWorking] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setShowDeleteConfirm(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    setShowDeleteConfirm(false);
     onDelete();
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteConfirm(false);
   };
 
   const handleInstallClick = async (e: React.MouseEvent) => {
@@ -113,6 +124,20 @@ export const ThemeCard: React.FC<ThemeCardProps> = ({
           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
         </svg>
       </button>
+
+      <ConfirmationDialog
+        isOpen={showDeleteConfirm}
+        title="Delete Theme?"
+        message={
+          theme.isInstalled
+            ? 'This will permanently remove the theme from your library and delete the .ask file from Ableton. This action cannot be undone.'
+            : 'This will permanently remove the theme from your library. This action cannot be undone.'
+        }
+        confirmLabel="Delete"
+        variant="destructive"
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+      />
     </div>
   );
 };

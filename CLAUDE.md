@@ -26,6 +26,7 @@ Desktop application that generates custom Ableton Live 12 themes from images. Us
 | React Components | `src/components/` |
 | Electron Main Process | `electron/` |
 | Styles | `src/styles/` |
+| **Ableton Themes Dir** | `/Applications/Ableton Live 12 Suite.app/Contents/App-Resources/Themes/` |
 
 ## Commands
 - `npm run dev` - Run in development mode

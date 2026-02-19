@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { SavedTheme } from '../types/theme-library';
+import { ConfirmationDialog } from './ConfirmationDialog';
 import './ThemeDetailModal.css';
 
 interface ThemeDetailModalProps {
@@ -131,6 +132,7 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
 
   const handleDeleteConfirm = () => {
     if (!theme) return;
+    setConfirmDelete(false);
     onDelete(theme.id);
     onClose();
   };
@@ -291,79 +293,74 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
           </div>
         </div>
 
-        {/* Delete confirmation */}
-        {confirmDelete ? (
-          <div className="modal-confirm-delete">
-            <p className="modal-confirm-text">
-              {theme.isInstalled
-                ? 'This will permanently remove the theme from your library and delete the .ask file from Ableton.'
-                : 'This will permanently remove the theme from your library.'}
-            </p>
-            <div className="modal-confirm-actions">
-              <button className="modal-action-button" onClick={handleDeleteCancel}>
-                Cancel
-              </button>
-              <button className="modal-action-button modal-action-confirm-delete" onClick={handleDeleteConfirm}>
-                Delete Theme
-              </button>
-            </div>
-          </div>
-        ) : (
-          /* Actions */
-          <div className="modal-actions">
+        {/* Actions */}
+        <div className="modal-actions">
+          <button
+            className="modal-action-button"
+            onClick={handleDownload}
+            disabled={isDownloading}
+            title="Download to Downloads folder"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            {isDownloading ? 'Downloading...' : 'Download'}
+          </button>
+
+          {theme.isInstalled ? (
             <button
-              className="modal-action-button"
-              onClick={handleDownload}
-              disabled={isDownloading}
-              title="Download to Downloads folder"
+              className="modal-action-button modal-action-uninstall"
+              onClick={handleUninstall}
+              disabled={isInstalling}
+              title="Remove from Ableton"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
+                <path d="M18 6L6 18M6 6l12 12" />
               </svg>
-              {isDownloading ? 'Downloading...' : 'Download'}
+              {isInstalling ? 'Uninstalling...' : 'Uninstall'}
             </button>
-
-            {theme.isInstalled ? (
-              <button
-                className="modal-action-button modal-action-uninstall"
-                onClick={handleUninstall}
-                disabled={isInstalling}
-                title="Remove from Ableton"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-                {isInstalling ? 'Uninstalling...' : 'Uninstall'}
-              </button>
-            ) : (
-              <button
-                className="modal-action-button modal-action-install"
-                onClick={handleInstall}
-                disabled={isInstalling}
-                title="Install to Ableton"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
-                {isInstalling ? 'Installing...' : 'Install'}
-              </button>
-            )}
-
+          ) : (
             <button
-              className="modal-action-button modal-action-delete"
-              onClick={handleDeleteClick}
-              title="Delete theme"
+              className="modal-action-button modal-action-install"
+              onClick={handleInstall}
+              disabled={isInstalling}
+              title="Install to Ableton"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="3 6 5 6 21 6" />
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                <path d="M12 5v14M5 12h14" />
               </svg>
-              Delete
+              {isInstalling ? 'Installing...' : 'Install'}
             </button>
-          </div>
-        )}
+          )}
+
+          <button
+            className="modal-action-button modal-action-delete"
+            onClick={handleDeleteClick}
+            title="Delete theme"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            </svg>
+            Delete
+          </button>
+        </div>
+
+        <ConfirmationDialog
+          isOpen={confirmDelete}
+          title="Delete Theme?"
+          message={
+            theme.isInstalled
+              ? 'This will permanently remove the theme from your library and delete the .ask file from Ableton. This action cannot be undone.'
+              : 'This will permanently remove the theme from your library. This action cannot be undone.'
+          }
+          confirmLabel="Delete"
+          variant="destructive"
+          onConfirm={handleDeleteConfirm}
+          onCancel={handleDeleteCancel}
+        />
       </div>
     </div>
   );

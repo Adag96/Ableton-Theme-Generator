@@ -33,4 +33,12 @@ Each lesson follows this structure:
 
 **Root cause**: Typeahead search is name-only. Custom field values require full-text search.
 
-**Rule**: When looking up Asana tickets by a custom field ID (like "ABL-12"), use `asana_search_tasks` with the `text` parameter, not `asana_typeahead_search`. 
+**Rule**: When looking up Asana tickets by a custom field ID (like "ABL-12"), use `asana_search_tasks` with the `text` parameter, not `asana_typeahead_search`.
+
+### 2026-02-19 | Workflow | Test theme output location
+
+**What happened**: Generated A/B comparison themes to a project-local directory (`test-themes/`), then had to manually copy them to Ableton's themes folder for user testing.
+
+**Root cause**: Scripts defaulted to outputting within the project directory rather than where the user actually needs them.
+
+**Rule**: When generating test .ask theme files for evaluation in Ableton Live, always output directly to the Ableton themes directory: `/Applications/Ableton Live 12 Suite.app/Contents/App-Resources/Themes/`. This eliminates the extra step of copying files. 
