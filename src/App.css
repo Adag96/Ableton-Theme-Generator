@@ -83,3 +83,28 @@
   color: var(--color-accent);
   font-weight: 600;
 }
+
+.footer-credit {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.footer-socials {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-left: var(--spacing-xs);
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  transition: color 0.15s ease;
+}
+
+.social-link:hover {
+  color: var(--color-accent);
+}
