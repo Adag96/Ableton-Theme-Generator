@@ -7,7 +7,7 @@ interface AuthContextType {
   profile: Profile | null;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
-  signUp: (email: string, password: string, displayName: string) => Promise<{ error: string | null }>;
+  signUp: (email: string, password: string, displayName: string, consentOptions?: { productUpdates: boolean; marketing: boolean }) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -54,15 +54,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error: error?.message ?? null };
   };
 
-  const signUp = async (email: string, password: string, displayName: string): Promise<{ error: string | null }> => {
+  const signUp = async (
+    email: string,
+    password: string,
+    displayName: string,
+    consentOptions?: { productUpdates: boolean; marketing: boolean }
+  ): Promise<{ error: string | null }> => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { display_name: displayName } },
+      options: {
+        data: {
+          display_name: displayName,
+          consent_product_updates: consentOptions?.productUpdates ?? false,
+          consent_marketing: consentOptions?.marketing ?? false,
+        },
+      },
     });
     if (error) return { error: error.message };
     if (data.user && data.session) {
       // Session exists (email confirmation disabled) — fetch profile created by trigger
+      // Update profile with consent preferences
+      await supabase.from('profiles').update({
+        consent_product_updates: consentOptions?.productUpdates ?? false,
+        consent_marketing: consentOptions?.marketing ?? false,
+        consent_updated_at: new Date().toISOString(),
+      }).eq('id', data.user.id);
       await fetchProfile(data.user.id);
     }
     return { error: null };

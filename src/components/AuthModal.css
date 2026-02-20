@@ -168,3 +168,43 @@
 .auth-modal-switch-button:hover {
   background-color: var(--color-accent-hover);
 }
+
+/* Consent checkboxes */
+.auth-modal-consent {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.auth-modal-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.auth-modal-checkbox input[type="checkbox"] {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
+.auth-modal-checkbox span {
+  user-select: none;
+}
+
+.auth-modal-checkbox a {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+.auth-modal-checkbox a:hover {
+  color: var(--color-accent-hover);
+}

@@ -18,6 +18,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [consentProductUpdates, setConsentProductUpdates] = useState(false);
+  const [consentMarketing, setConsentMarketing] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +41,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
           setError('Display name is required');
           return;
         }
-        const { error: signUpError } = await signUp(email, password, displayName.trim());
+        if (!agreedToTerms) {
+          setError('You must agree to the Privacy Policy and Terms of Service');
+          return;
+        }
+        const { error: signUpError } = await signUp(email, password, displayName.trim(), {
+          productUpdates: consentProductUpdates,
+          marketing: consentMarketing,
+        });
         if (signUpError) {
           setError(signUpError);
         } else {
@@ -126,12 +136,52 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
               />
             </div>
 
+            {mode === 'signup' && (
+              <div className="auth-modal-consent">
+                <label className="auth-modal-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={agreedToTerms}
+                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                  />
+                  <span>
+                    I agree to the{' '}
+                    <a href="https://example.com/privacy" target="_blank" rel="noopener noreferrer">
+                      Privacy Policy
+                    </a>{' '}
+                    and{' '}
+                    <a href="https://example.com/terms" target="_blank" rel="noopener noreferrer">
+                      Terms of Service
+                    </a>
+                  </span>
+                </label>
+
+                <label className="auth-modal-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={consentProductUpdates}
+                    onChange={(e) => setConsentProductUpdates(e.target.checked)}
+                  />
+                  <span>Email me about updates to this app</span>
+                </label>
+
+                <label className="auth-modal-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={consentMarketing}
+                    onChange={(e) => setConsentMarketing(e.target.checked)}
+                  />
+                  <span>Keep me updated about new products and releases</span>
+                </label>
+              </div>
+            )}
+
             {error && <p className="auth-modal-error">{error}</p>}
 
             <button
               className="auth-modal-submit"
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || (mode === 'signup' && !agreedToTerms)}
             >
               {isLoading
                 ? 'Please wait...'

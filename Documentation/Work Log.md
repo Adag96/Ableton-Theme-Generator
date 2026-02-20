@@ -1,5 +1,9 @@
 # Work Log
 
+## 2026-2-20 16:32
+- Added required and optional email preference checkboxes to sign up form
+
+
 ## 2026-2-19 18:54
 - Card previews in 'My Themes' view can now be expanded to show more features (color swatches, download, rename, delete)
 - Implemented a contrast pairing validation check and auto-correct feature for icons and text

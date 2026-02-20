@@ -1,0 +1,206 @@
+.email-prefs-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+}
+
+.email-prefs-content {
+  position: relative;
+  background-color: var(--color-bg-secondary);
+  border-radius: 12px;
+  padding: 32px;
+  width: 420px;
+  max-width: 95vw;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--color-border);
+}
+
+.email-prefs-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background-color: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  transition: all 0.2s ease;
+}
+
+.email-prefs-close:hover {
+  background-color: var(--color-bg-tertiary);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.email-prefs-title {
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 8px 0;
+}
+
+.email-prefs-description {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+}
+
+.email-prefs-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.email-prefs-toggle {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background-color: var(--color-bg-tertiary);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.email-prefs-toggle:hover {
+  background-color: var(--color-bg);
+}
+
+.email-prefs-toggle-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.email-prefs-toggle-label {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.email-prefs-toggle-desc {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.email-prefs-toggle input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.email-prefs-toggle-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background-color: var(--color-border);
+  border-radius: 12px;
+  flex-shrink: 0;
+  transition: background-color 0.2s ease;
+}
+
+.email-prefs-toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+}
+
+.email-prefs-toggle input:checked + .email-prefs-toggle-switch {
+  background-color: var(--color-accent);
+}
+
+.email-prefs-toggle input:checked + .email-prefs-toggle-switch::after {
+  transform: translateX(20px);
+}
+
+.email-prefs-error {
+  font-size: 0.8125rem;
+  color: var(--color-error);
+  margin: 0 0 16px 0;
+}
+
+.email-prefs-actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.email-prefs-cancel {
+  flex: 1;
+  padding: 11px 16px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border-radius: 8px;
+  background-color: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.email-prefs-cancel:hover {
+  color: var(--color-text);
+  border-color: var(--color-text-secondary);
+}
+
+.email-prefs-save {
+  flex: 1;
+  padding: 11px 16px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border-radius: 8px;
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.email-prefs-save:hover:not(:disabled) {
+  background-color: var(--color-accent-hover);
+}
+
+.email-prefs-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.email-prefs-footer {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin: 0;
+}
+
+.email-prefs-footer a {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+.email-prefs-footer a:hover {
+  color: var(--color-accent-hover);
+}

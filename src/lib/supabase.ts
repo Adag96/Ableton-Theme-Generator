@@ -36,4 +36,7 @@ export type Profile = {
     website?: string;
   };
   created_at: string;
+  consent_product_updates?: boolean;
+  consent_marketing?: boolean;
+  consent_updated_at?: string | null;
 };
