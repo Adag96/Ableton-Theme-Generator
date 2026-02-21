@@ -29,7 +29,7 @@ serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: 'noreply@lonebody.io',
+        from: 'noreply@lonebodymusic.com',
         to: NOTIFY_EMAIL,
         subject: `New theme submission: ${record.name}`,
         html: `

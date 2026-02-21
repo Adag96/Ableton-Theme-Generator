@@ -1,5 +1,10 @@
 # Work Log
 
+## 2026-2-21 02:09
+- Fixed email notification for theme submissions
+- Approved theme submissions now show in community page
+
+
 ## 2026-2-20 16:32
 - Added required and optional email preference checkboxes to sign up form
 
