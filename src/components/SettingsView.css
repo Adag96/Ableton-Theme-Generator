@@ -201,3 +201,154 @@
   border-color: var(--accent-solid);
   box-shadow: var(--glow-accent);
 }
+
+/* ---------------------------------------------------------------------------
+   Email Section
+   --------------------------------------------------------------------------- */
+
+.settings-email-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.settings-email-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.settings-email-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settings-email-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.settings-email-value {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+}
+
+.settings-change-email-button {
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  background: var(--surface-recessed);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.settings-change-email-button:hover {
+  color: var(--accent-solid);
+  border-color: var(--accent-solid);
+}
+
+.settings-email-change-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--surface-recessed);
+  border-radius: var(--radius-md);
+}
+
+.settings-email-input {
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  transition: all var(--duration-fast) var(--ease-out);
+  font-family: inherit;
+}
+
+.settings-email-input:focus {
+  outline: none;
+  border-color: var(--accent-solid);
+  box-shadow: var(--glow-accent);
+}
+
+.settings-email-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.settings-input-error {
+  border-color: var(--color-error);
+}
+
+.settings-input-error:focus {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.15);
+}
+
+.settings-error {
+  font-size: var(--font-size-xs);
+  color: var(--color-error);
+}
+
+.settings-success {
+  font-size: var(--font-size-sm);
+  color: var(--color-success);
+  margin: 0;
+}
+
+.settings-email-change-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.settings-email-save-button {
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-on-accent);
+  background: var(--accent-solid);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.settings-email-save-button:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.settings-email-save-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.settings-email-cancel-button {
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.settings-email-cancel-button:hover:not(:disabled) {
+  color: var(--text-primary);
+  border-color: var(--text-tertiary);
+}
+
+.settings-email-cancel-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -9,11 +9,18 @@ interface SettingsViewProps {
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({ onBack }) => {
-  const { user, profile, refreshProfile } = useAuth();
+  const { user, profile, refreshProfile, changeEmail } = useAuth();
   const [themesDir, setThemesDir] = useState<ThemesDirectoryResult | null>(null);
   const [themeFiles, setThemeFiles] = useState<ThemeFileInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [showEmailPrefs, setShowEmailPrefs] = useState(false);
+
+  // Email change state
+  const [showEmailChange, setShowEmailChange] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [emailSuccess, setEmailSuccess] = useState(false);
+  const [isChangingEmail, setIsChangingEmail] = useState(false);
 
   const loadThemeFiles = async (dirPath: string) => {
     const files = await window.electronAPI.listThemeFiles(dirPath);
@@ -59,6 +66,49 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onBack }) => {
     }
   };
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleEmailChange = async () => {
+    setEmailError(null);
+    setEmailSuccess(false);
+
+    if (!newEmail.trim()) {
+      setEmailError('Email is required');
+      return;
+    }
+
+    if (!validateEmail(newEmail)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+
+    if (newEmail === user?.email) {
+      setEmailError('New email must be different from current email');
+      return;
+    }
+
+    setIsChangingEmail(true);
+    const { error } = await changeEmail(newEmail.trim());
+    setIsChangingEmail(false);
+
+    if (error) {
+      setEmailError(error);
+    } else {
+      setEmailSuccess(true);
+      setNewEmail('');
+      setShowEmailChange(false);
+    }
+  };
+
+  const handleCancelEmailChange = () => {
+    setShowEmailChange(false);
+    setNewEmail('');
+    setEmailError(null);
+  };
+
   return (
     <div className="settings-view">
       <button className="settings-back-button" onClick={onBack}>
@@ -73,6 +123,62 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onBack }) => {
       {user && (
         <div className="settings-section">
           <h3 className="settings-section-title">Account</h3>
+
+          {/* Email Display and Change */}
+          <div className="settings-email-section">
+            <div className="settings-email-row">
+              <div className="settings-email-info">
+                <span className="settings-email-label">Email</span>
+                <span className="settings-email-value">{user.email}</span>
+              </div>
+              {!showEmailChange && (
+                <button
+                  className="settings-change-email-button"
+                  onClick={() => setShowEmailChange(true)}
+                >
+                  Change
+                </button>
+              )}
+            </div>
+
+            {showEmailChange && (
+              <div className="settings-email-change-form">
+                <input
+                  type="email"
+                  className={`settings-email-input ${emailError ? 'settings-input-error' : ''}`}
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  placeholder="Enter new email address"
+                />
+                {emailError && (
+                  <span className="settings-error">{emailError}</span>
+                )}
+                <div className="settings-email-change-actions">
+                  <button
+                    className="settings-email-save-button"
+                    onClick={handleEmailChange}
+                    disabled={isChangingEmail}
+                  >
+                    {isChangingEmail ? 'Saving...' : 'Save'}
+                  </button>
+                  <button
+                    className="settings-email-cancel-button"
+                    onClick={handleCancelEmailChange}
+                    disabled={isChangingEmail}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {emailSuccess && (
+              <p className="settings-success">
+                Check your new email to confirm the change.
+              </p>
+            )}
+          </div>
+
           <div className="settings-account-actions">
             <button
               className="settings-email-prefs-button"

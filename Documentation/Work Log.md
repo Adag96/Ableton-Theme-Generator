@@ -1,9 +1,11 @@
 # Work Log
 
-## 2026-2-22 12:37
+## 2026-2-22 17:24
 - Moved user login status and controls to persist within main title bar instead of only Community view
 - Fixed issue where sign-in overlay was not visible as it was positioned within the title bar
 - Moved the community theme section to the home view in carousel format
+- Added a preview overlay when a community card is clicked that contains the Ableton preview image
+- Re-formatted user profile view to include bio, editable display name and social media links
 
 
 ## 2026-2-21 23:42

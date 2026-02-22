@@ -10,6 +10,8 @@ interface AuthContextType {
   signUp: (email: string, password: string, displayName: string, consentOptions?: { productUpdates: boolean; marketing: boolean }) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  updateProfile: (updates: Partial<Omit<Profile, 'id' | 'created_at'>>) => Promise<{ error: string | null }>;
+  changeEmail: (newEmail: string) => Promise<{ error: string | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -93,8 +95,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (user) await fetchProfile(user.id);
   };
 
+  const updateProfile = async (updates: Partial<Omit<Profile, 'id' | 'created_at'>>): Promise<{ error: string | null }> => {
+    if (!user) return { error: 'Not authenticated' };
+
+    const { error } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', user.id);
+
+    if (!error) await fetchProfile(user.id);
+    return { error: error?.message ?? null };
+  };
+
+  const changeEmail = async (newEmail: string): Promise<{ error: string | null }> => {
+    const { error } = await supabase.auth.updateUser({ email: newEmail });
+    return { error: error?.message ?? null };
+  };
+
   return (
-    <AuthContext.Provider value={{ user, profile, isLoading, signIn, signUp, signOut, refreshProfile }}>
+    <AuthContext.Provider value={{ user, profile, isLoading, signIn, signUp, signOut, refreshProfile, updateProfile, changeEmail }}>
       {children}
     </AuthContext.Provider>
   );

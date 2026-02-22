@@ -30,9 +30,13 @@ export type Profile = {
   display_name: string;
   bio: string | null;
   social_links: {
-    soundcloud?: string;
-    bandcamp?: string;
     instagram?: string;
+    youtube?: string;
+    threads?: string;
+    x?: string;
+    soundcloud?: string;
+    spotify?: string;
+    bandcamp?: string;
     website?: string;
   };
   created_at: string;
@@ -40,3 +44,5 @@ export type Profile = {
   consent_marketing?: boolean;
   consent_updated_at?: string | null;
 };
+
+export type SocialPlatform = keyof NonNullable<Profile['social_links']>;
