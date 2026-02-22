@@ -189,6 +189,10 @@ app.whenReady().then(() => {
     return { success: errorMessage === '', error: errorMessage || null };
   });
 
+  ipcMain.handle('open-external', async (_event, url: string) => {
+    await shell.openExternal(url);
+  });
+
   ipcMain.handle('read-image-as-data-url', async (_event, filePath: string) => {
     try {
       const data = fs.readFileSync(filePath);

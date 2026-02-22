@@ -7,6 +7,7 @@ interface CommunityThemeDetailModalProps {
   theme: CommunityTheme | null;
   onClose: () => void;
   onDownload: (theme: CommunityTheme) => Promise<void>;
+  onCreatorClick?: (userId: string) => void;
   showStatus?: boolean;
 }
 
@@ -21,6 +22,7 @@ export const CommunityThemeDetailModal: React.FC<CommunityThemeDetailModalProps>
   theme,
   onClose,
   onDownload,
+  onCreatorClick,
   showStatus = false,
 }) => {
   const [isDownloading, setIsDownloading] = useState(false);
@@ -96,7 +98,22 @@ export const CommunityThemeDetailModal: React.FC<CommunityThemeDetailModalProps>
         {/* Theme Info */}
         <div className="community-modal-info-section">
           <h3 className="community-modal-name">{theme.name}</h3>
-          <p className="community-modal-creator">by {creatorName}</p>
+          <p className="community-modal-creator">
+            by{' '}
+            {theme.user_id && onCreatorClick ? (
+              <button
+                className="community-modal-creator-link"
+                onClick={() => {
+                  onCreatorClick(theme.user_id!);
+                  onClose();
+                }}
+              >
+                {creatorName}
+              </button>
+            ) : (
+              creatorName
+            )}
+          </p>
 
           {theme.description && (
             <p className="community-modal-description">{theme.description}</p>

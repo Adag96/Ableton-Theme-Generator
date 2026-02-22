@@ -42,4 +42,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('delete-source-image', themeId),
   getSourceImageDataUrl: (cachedPath: string) =>
     ipcRenderer.invoke('get-source-image-data-url', cachedPath),
+  openExternal: (url: string) =>
+    ipcRenderer.invoke('open-external', url),
 });

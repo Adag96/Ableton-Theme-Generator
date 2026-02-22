@@ -9,6 +9,7 @@ interface LandingViewProps {
   onBrowseThemes: () => void;
   onCommunity: () => void;
   onSettings: () => void;
+  onViewProfile?: (userId: string) => void;
 }
 
 const CAROUSEL_VISIBLE_COUNT = 4;
@@ -19,6 +20,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
   onBrowseThemes,
   onCommunity,
   onSettings,
+  onViewProfile,
 }) => {
   const [themes, setThemes] = useState<CommunityTheme[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -144,6 +146,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
                   theme={theme}
                   onDownload={handleDownload}
                   onClick={setSelectedTheme}
+                  onCreatorClick={onViewProfile}
                 />
               ))}
             </div>
@@ -203,6 +206,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
         theme={selectedTheme}
         onClose={() => setSelectedTheme(null)}
         onDownload={handleDownload}
+        onCreatorClick={onViewProfile}
       />
     </div>
   );

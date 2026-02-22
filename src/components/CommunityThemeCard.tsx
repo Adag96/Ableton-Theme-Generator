@@ -5,6 +5,7 @@ interface CommunityThemeCardProps {
   theme: CommunityTheme;
   onDownload: (theme: CommunityTheme) => Promise<void>;
   onClick?: (theme: CommunityTheme) => void;
+  onCreatorClick?: (userId: string) => void;
   showStatus?: boolean;
 }
 
@@ -18,6 +19,7 @@ export const CommunityThemeCard: React.FC<CommunityThemeCardProps> = ({
   theme,
   onDownload,
   onClick,
+  onCreatorClick,
   showStatus = false,
 }) => {
   const [isDownloading, setIsDownloading] = useState(false);
@@ -70,7 +72,22 @@ export const CommunityThemeCard: React.FC<CommunityThemeCardProps> = ({
 
       <div className="community-card-info">
         <h4 className="community-card-name">{theme.name}</h4>
-        <p className="community-card-creator">by {creatorName}</p>
+        <p className="community-card-creator">
+          by{' '}
+          {theme.user_id && onCreatorClick ? (
+            <button
+              className="community-card-creator-link"
+              onClick={(e) => {
+                e.stopPropagation();
+                onCreatorClick(theme.user_id!);
+              }}
+            >
+              {creatorName}
+            </button>
+          ) : (
+            creatorName
+          )}
+        </p>
 
         {showStatus && (
           <span className={`community-card-status community-card-status-${theme.status}`}>

@@ -51,6 +51,7 @@ export interface ElectronAPI {
   saveSourceImage: (args: { sourcePath: string; themeId: string }) => Promise<{ success: boolean; cachedPath?: string; error?: string }>;
   deleteSourceImage: (themeId: string) => Promise<{ success: boolean; error?: string }>;
   getSourceImageDataUrl: (cachedPath: string) => Promise<string | null>;
+  openExternal: (url: string) => Promise<void>;
 }
 
 declare global {

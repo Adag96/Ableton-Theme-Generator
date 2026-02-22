@@ -9,9 +9,10 @@ type Tab = 'gallery' | 'submissions';
 
 interface CommunityViewProps {
   onBack: () => void;
+  onViewProfile?: (userId: string) => void;
 }
 
-export const CommunityView: React.FC<CommunityViewProps> = ({ onBack }) => {
+export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProfile }) => {
   const { user } = useAuth();
   const [tab, setTab] = useState<Tab>('gallery');
   const [themes, setThemes] = useState<CommunityTheme[]>([]);
@@ -133,6 +134,7 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack }) => {
                 theme={theme}
                 onDownload={handleDownload}
                 onClick={setSelectedTheme}
+                onCreatorClick={onViewProfile}
                 showStatus={tab === 'submissions'}
               />
             ))}
@@ -145,6 +147,7 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack }) => {
         theme={selectedTheme}
         onClose={() => setSelectedTheme(null)}
         onDownload={handleDownload}
+        onCreatorClick={onViewProfile}
         showStatus={tab === 'submissions'}
       />
     </div>

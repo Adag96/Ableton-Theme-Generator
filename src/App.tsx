@@ -5,6 +5,7 @@ import { ImageImportView } from './components/ImageImportView';
 import { MyThemesView } from './components/MyThemesView';
 import { CommunityView } from './components/CommunityView';
 import { UserProfileView } from './components/UserProfileView';
+import { PublicProfileView } from './components/PublicProfileView';
 import { ThemeNameDialog } from './components/ThemeNameDialog';
 import { TitleBar } from './components/TitleBar';
 import { AuthModal } from './components/AuthModal';
@@ -25,9 +26,13 @@ interface PendingTheme {
   previewImage?: string;
 }
 
+type View = 'landing' | 'settings' | 'import' | 'my-themes' | 'community' | 'profile' | 'public-profile';
+
 function App() {
   const [version, setVersion] = useState('0.0.1');
-  const [currentView, setCurrentView] = useState<'landing' | 'settings' | 'import' | 'my-themes' | 'community' | 'profile'>('landing');
+  const [currentView, setCurrentView] = useState<View>('landing');
+  const [viewingUserId, setViewingUserId] = useState<string | null>(null);
+  const [previousView, setPreviousView] = useState<View>('landing');
   const [importedImage, setImportedImage] = useState<ImageFileResult | null>(null);
   const [pendingTheme, setPendingTheme] = useState<PendingTheme | null>(null);
   const [showNameDialog, setShowNameDialog] = useState(false);
@@ -86,6 +91,17 @@ function App() {
 
   const handleProfile = () => {
     setCurrentView('profile');
+  };
+
+  const handleViewProfile = (userId: string) => {
+    setPreviousView(currentView);
+    setViewingUserId(userId);
+    setCurrentView('public-profile');
+  };
+
+  const handleBackFromPublicProfile = () => {
+    setCurrentView(previousView);
+    setViewingUserId(null);
   };
 
   const handleBackToLanding = () => {
@@ -186,6 +202,7 @@ function App() {
                 onBrowseThemes={handleBrowseThemes}
                 onCommunity={handleCommunity}
                 onSettings={handleSettings}
+                onViewProfile={handleViewProfile}
               />
             ) : currentView === 'settings' ? (
               <SettingsView onBack={handleBackToLanding} />
@@ -199,11 +216,17 @@ function App() {
                 onUninstallTheme={uninstallTheme}
               />
             ) : currentView === 'community' ? (
-              <CommunityView onBack={handleBackToLanding} />
+              <CommunityView onBack={handleBackToLanding} onViewProfile={handleViewProfile} />
             ) : currentView === 'profile' ? (
               <UserProfileView
                 onBack={handleBackToLanding}
                 onSignedOut={handleBackToLanding}
+              />
+            ) : currentView === 'public-profile' && viewingUserId ? (
+              <PublicProfileView
+                userId={viewingUserId}
+                onBack={handleBackFromPublicProfile}
+                onThemeClick={() => {}}
               />
             ) : (
               <ImageImportView

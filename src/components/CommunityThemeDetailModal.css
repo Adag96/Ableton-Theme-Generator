@@ -137,6 +137,21 @@
   color: var(--text-secondary);
 }
 
+.community-modal-creator-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--accent-solid);
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.community-modal-creator-link:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
 .community-modal-description {
   margin: 0 0 var(--space-sm) 0;
   font-size: var(--font-size-sm);
