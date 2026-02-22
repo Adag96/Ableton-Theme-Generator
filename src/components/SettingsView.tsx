@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { ThemesDirectoryResult, ThemeFileInfo } from '../electron';
+import { useAuth } from '../hooks/useAuth';
+import { EmailPreferencesModal } from './EmailPreferencesModal';
 import './SettingsView.css';
 
 interface SettingsViewProps {
@@ -7,9 +9,11 @@ interface SettingsViewProps {
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({ onBack }) => {
+  const { user, profile, refreshProfile } = useAuth();
   const [themesDir, setThemesDir] = useState<ThemesDirectoryResult | null>(null);
   const [themeFiles, setThemeFiles] = useState<ThemeFileInfo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showEmailPrefs, setShowEmailPrefs] = useState(false);
 
   const loadThemeFiles = async (dirPath: string) => {
     const files = await window.electronAPI.listThemeFiles(dirPath);
@@ -66,6 +70,24 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onBack }) => {
 
       <h2 className="settings-title">Settings</h2>
 
+      {user && (
+        <div className="settings-section">
+          <h3 className="settings-section-title">Account</h3>
+          <div className="settings-account-actions">
+            <button
+              className="settings-email-prefs-button"
+              onClick={() => setShowEmailPrefs(true)}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              Email Preferences
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="settings-section">
         <h3 className="settings-section-title">Ableton Themes Directory</h3>
 
@@ -120,6 +142,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onBack }) => {
           </div>
         )}
       </div>
+
+      {showEmailPrefs && profile && (
+        <EmailPreferencesModal
+          profile={profile}
+          onClose={() => setShowEmailPrefs(false)}
+          onUpdate={refreshProfile}
+        />
+      )}
     </div>
   );
 };

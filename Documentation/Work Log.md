@@ -1,5 +1,10 @@
 # Work Log
 
+## 2026-2-22 00:27
+- Moved user login status and controls to persist within main title bar instead of only Community view
+- Fixed issue where sign-in overlay was not visible as it was positioned within the title bar
+
+
 ## 2026-2-21 23:42
 - Fixed email notification for theme submissions
 - Approved theme submissions now show in community page

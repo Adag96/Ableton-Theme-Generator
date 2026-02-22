@@ -113,6 +113,71 @@
 }
 
 /* ---------------------------------------------------------------------------
+   User Info Area
+   --------------------------------------------------------------------------- */
+
+.titlebar-user-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.titlebar-username {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.titlebar-icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.titlebar-icon-button:hover {
+  color: var(--accent-solid);
+  border-color: var(--accent-solid);
+  box-shadow: var(--glow-accent);
+}
+
+.titlebar-icon-button:active {
+  transform: scale(0.95);
+}
+
+.titlebar-sign-in {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-inverse);
+  background: var(--accent-solid);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--space-xs) var(--space-md);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  box-shadow: var(--glow-accent);
+}
+
+.titlebar-sign-in:hover {
+  background: var(--accent-solid-hover);
+  box-shadow: var(--glow-accent-strong);
+}
+
+.titlebar-sign-in:active {
+  transform: scale(0.98);
+}
+
+/* ---------------------------------------------------------------------------
    Window Controls (Windows/Linux)
    --------------------------------------------------------------------------- */
 

@@ -1,17 +1,24 @@
 import { useState, useEffect } from 'react';
 import { useAppTheme } from '../hooks/useAppTheme';
+import { useAuth } from '../hooks/useAuth';
+import { MessageTray } from './MessageTray';
 import './TitleBar.css';
 
 interface TitleBarProps {
   title?: string;
+  onNavigateToProfile?: () => void;
+  onSignInClick?: () => void;
 }
 
 export const TitleBar: React.FC<TitleBarProps> = ({
-  title = 'Live 12 Theme Generator'
+  title = 'Live 12 Theme Generator',
+  onNavigateToProfile,
+  onSignInClick,
 }) => {
   const [platform, setPlatform] = useState<'darwin' | 'win32' | 'linux'>('darwin');
   const [isMaximized, setIsMaximized] = useState(false);
   const { mode, toggleMode } = useAppTheme();
+  const { user, profile, isLoading } = useAuth();
 
   useEffect(() => {
     const init = async () => {
@@ -50,8 +57,37 @@ export const TitleBar: React.FC<TitleBarProps> = ({
         <span className="titlebar-title-text">{title}</span>
       </div>
 
-      {/* Theme toggle - positioned on right side */}
+      {/* User info and actions - positioned on right side */}
       <div className="titlebar-actions">
+        {/* User info area */}
+        {!isLoading && (
+          user ? (
+            <div className="titlebar-user-info">
+              <span className="titlebar-username">{profile?.display_name ?? user.email}</span>
+              <button
+                className="titlebar-icon-button"
+                onClick={onNavigateToProfile}
+                aria-label="Profile"
+                title="Profile"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </button>
+              <MessageTray />
+            </div>
+          ) : (
+            <button
+              className="titlebar-sign-in"
+              onClick={onSignInClick}
+            >
+              Sign In
+            </button>
+          )
+        )}
+
+        {/* Theme toggle */}
         <button
           className="titlebar-theme-toggle"
           onClick={toggleMode}
@@ -59,12 +95,10 @@ export const TitleBar: React.FC<TitleBarProps> = ({
           title={`Switch to ${mode === 'light' ? 'dark' : 'light'} mode`}
         >
           {mode === 'light' ? (
-            // Moon icon for switching to dark
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
             </svg>
           ) : (
-            // Sun icon for switching to light
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="5"/>
               <line x1="12" y1="1" x2="12" y2="3"/>

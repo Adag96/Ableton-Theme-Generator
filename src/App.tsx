@@ -4,8 +4,10 @@ import { SettingsView } from './components/SettingsView';
 import { ImageImportView } from './components/ImageImportView';
 import { MyThemesView } from './components/MyThemesView';
 import { CommunityView } from './components/CommunityView';
+import { UserProfileView } from './components/UserProfileView';
 import { ThemeNameDialog } from './components/ThemeNameDialog';
 import { TitleBar } from './components/TitleBar';
+import { AuthModal } from './components/AuthModal';
 import { AuthProvider } from './hooks/useAuth';
 import { AccentProvider } from './hooks/useAccentColors';
 import { AppThemeProvider } from './hooks/useAppTheme';
@@ -25,10 +27,11 @@ interface PendingTheme {
 
 function App() {
   const [version, setVersion] = useState('0.0.1');
-  const [currentView, setCurrentView] = useState<'landing' | 'settings' | 'import' | 'my-themes' | 'community'>('landing');
+  const [currentView, setCurrentView] = useState<'landing' | 'settings' | 'import' | 'my-themes' | 'community' | 'profile'>('landing');
   const [importedImage, setImportedImage] = useState<ImageFileResult | null>(null);
   const [pendingTheme, setPendingTheme] = useState<PendingTheme | null>(null);
   const [showNameDialog, setShowNameDialog] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const {
     library,
     addTheme,
@@ -79,6 +82,10 @@ function App() {
 
   const handleSettings = () => {
     setCurrentView('settings');
+  };
+
+  const handleProfile = () => {
+    setCurrentView('profile');
   };
 
   const handleBackToLanding = () => {
@@ -152,7 +159,10 @@ function App() {
       <AuthProvider>
         <AccentProvider>
           <div className="app">
-          <TitleBar />
+          <TitleBar
+            onNavigateToProfile={handleProfile}
+            onSignInClick={() => setShowAuthModal(true)}
+          />
 
           <main className="app-main">
             {currentView === 'landing' ? (
@@ -175,6 +185,11 @@ function App() {
               />
             ) : currentView === 'community' ? (
               <CommunityView onBack={handleBackToLanding} />
+            ) : currentView === 'profile' ? (
+              <UserProfileView
+                onBack={handleBackToLanding}
+                onSignedOut={handleBackToLanding}
+              />
             ) : (
               <ImageImportView
                 image={importedImage}
@@ -191,6 +206,13 @@ function App() {
             onConfirm={handleThemeNameConfirm}
             onCancel={handleNameDialogCancel}
           />
+
+          {showAuthModal && (
+            <AuthModal
+              onClose={() => setShowAuthModal(false)}
+              onSuccess={() => setShowAuthModal(false)}
+            />
+          )}
 
           <footer className="app-footer">
             <p className="footer-credit">

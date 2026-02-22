@@ -2,8 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { supabase, type CommunityTheme } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { CommunityThemeCard } from './CommunityThemeCard';
-import { AuthModal } from './AuthModal';
-import { EmailPreferencesModal } from './EmailPreferencesModal';
 import './CommunityView.css';
 
 type Tab = 'gallery' | 'submissions';
@@ -13,13 +11,11 @@ interface CommunityViewProps {
 }
 
 export const CommunityView: React.FC<CommunityViewProps> = ({ onBack }) => {
-  const { user, profile, signOut, refreshProfile } = useAuth();
+  const { user } = useAuth();
   const [tab, setTab] = useState<Tab>('gallery');
   const [themes, setThemes] = useState<CommunityTheme[]>([]);
   const [mySubmissions, setMySubmissions] = useState<CommunityTheme[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showEmailPrefs, setShowEmailPrefs] = useState(false);
 
   const fetchGallery = useCallback(async () => {
     setIsLoading(true);
@@ -89,30 +85,8 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack }) => {
 
         <h2 className="community-title">Community Gallery</h2>
 
-        <div className="community-auth-area">
-          {user ? (
-            <div className="community-user-info">
-              <span className="community-username">{profile?.display_name ?? user.email}</span>
-              <button
-                className="community-email-prefs"
-                onClick={() => setShowEmailPrefs(true)}
-                title="Email Preferences"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                  <polyline points="22,6 12,13 2,6"/>
-                </svg>
-              </button>
-              <button className="community-sign-out" onClick={signOut}>
-                Sign Out
-              </button>
-            </div>
-          ) : (
-            <button className="community-sign-in-button" onClick={() => setShowAuthModal(true)}>
-              Sign In
-            </button>
-          )}
-        </div>
+        {/* Spacer for layout balance */}
+        <div className="community-header-spacer" />
       </div>
 
       {user && (
@@ -163,20 +137,6 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack }) => {
         )}
       </div>
 
-      {showAuthModal && (
-        <AuthModal
-          onClose={() => setShowAuthModal(false)}
-          onSuccess={() => setShowAuthModal(false)}
-        />
-      )}
-
-      {showEmailPrefs && profile && (
-        <EmailPreferencesModal
-          profile={profile}
-          onClose={() => setShowEmailPrefs(false)}
-          onUpdate={refreshProfile}
-        />
-      )}
-    </div>
+          </div>
   );
 };
