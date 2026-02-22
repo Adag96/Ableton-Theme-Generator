@@ -1,8 +1,9 @@
 # Work Log
 
-## 2026-2-22 00:27
+## 2026-2-22 12:37
 - Moved user login status and controls to persist within main title bar instead of only Community view
 - Fixed issue where sign-in overlay was not visible as it was positioned within the title bar
+- Moved the community theme section to the home view in carousel format
 
 
 ## 2026-2-21 23:42

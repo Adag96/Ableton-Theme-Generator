@@ -36,4 +36,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('read-theme-file-as-text', filePath),
   downloadCommunityTheme: (args: { url: string; name: string }) =>
     ipcRenderer.invoke('download-community-theme', args),
+  saveSourceImage: (args: { sourcePath: string; themeId: string }) =>
+    ipcRenderer.invoke('save-source-image', args),
+  deleteSourceImage: (themeId: string) =>
+    ipcRenderer.invoke('delete-source-image', themeId),
+  getSourceImageDataUrl: (cachedPath: string) =>
+    ipcRenderer.invoke('get-source-image-data-url', cachedPath),
 });

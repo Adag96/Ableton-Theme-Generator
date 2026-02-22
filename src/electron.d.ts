@@ -48,6 +48,9 @@ export interface ElectronAPI {
   deleteLibraryThemeFile: (filePath: string) => Promise<{ success: boolean; error?: string }>;
   readThemeFileAsText: (filePath: string) => Promise<{ success: boolean; content?: string; error?: string }>;
   downloadCommunityTheme: (args: { url: string; name: string }) => Promise<{ success: boolean; filePath?: string; error?: string }>;
+  saveSourceImage: (args: { sourcePath: string; themeId: string }) => Promise<{ success: boolean; cachedPath?: string; error?: string }>;
+  deleteSourceImage: (themeId: string) => Promise<{ success: boolean; error?: string }>;
+  getSourceImageDataUrl: (cachedPath: string) => Promise<string | null>;
 }
 
 declare global {

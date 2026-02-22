@@ -43,9 +43,9 @@ export const CommunityThemeCard: React.FC<CommunityThemeCardProps> = ({
   return (
     <div className="community-card">
       <div className="community-card-preview">
-        {theme.preview_image_url ? (
+        {theme.source_image_url ? (
           <img
-            src={theme.preview_image_url}
+            src={theme.source_image_url}
             alt={theme.name}
             className="community-card-image"
           />

@@ -52,10 +52,41 @@ export const SubmitThemeModal: React.FC<SubmitThemeModalProps> = ({ theme, onClo
         return;
       }
 
-      // Get the public URL
+      // Get the public URL for .ask file
       const { data: { publicUrl } } = supabase.storage
         .from('theme-files')
         .getPublicUrl(`${user.id}/${themeId}.ask`);
+
+      // Upload source image if available
+      let sourceImageUrl: string | null = null;
+      if (theme.sourceImagePath) {
+        const imageDataUrl = await window.electronAPI.getSourceImageDataUrl(theme.sourceImagePath);
+        if (imageDataUrl) {
+          // Convert data URL to blob
+          const [header, base64Data] = imageDataUrl.split(',');
+          const mimeMatch = header.match(/data:([^;]+)/);
+          const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+          const ext = mimeType === 'image/png' ? 'png' : 'jpg';
+
+          const byteString = atob(base64Data);
+          const byteArray = new Uint8Array(byteString.length);
+          for (let i = 0; i < byteString.length; i++) {
+            byteArray[i] = byteString.charCodeAt(i);
+          }
+          const imageBlob = new Blob([byteArray], { type: mimeType });
+
+          const { error: imageUploadError } = await supabase.storage
+            .from('theme-previews')
+            .upload(`${user.id}/${themeId}-source.${ext}`, imageBlob);
+
+          if (!imageUploadError) {
+            const { data: { publicUrl: imageUrl } } = supabase.storage
+              .from('theme-previews')
+              .getPublicUrl(`${user.id}/${themeId}-source.${ext}`);
+            sourceImageUrl = imageUrl;
+          }
+        }
+      }
 
       // Insert community_themes row
       const { error: insertError } = await supabase.from('community_themes').insert({
@@ -65,6 +96,7 @@ export const SubmitThemeModal: React.FC<SubmitThemeModalProps> = ({ theme, onClo
         description: description.trim() || null,
         ask_file_url: publicUrl,
         swatch_colors: swatchColors,
+        source_image_url: sourceImageUrl,
         variant_mode: null,
       });
 

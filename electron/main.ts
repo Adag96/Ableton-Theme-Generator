@@ -384,6 +384,59 @@ app.whenReady().then(() => {
     }
   });
 
+  // Source image caching for community gallery submissions
+  const sourceImagesDir = path.join(app.getPath('userData'), 'source-images');
+
+  // Ensure source-images directory exists
+  if (!fs.existsSync(sourceImagesDir)) {
+    fs.mkdirSync(sourceImagesDir, { recursive: true });
+  }
+
+  ipcMain.handle('save-source-image', async (_event, { sourcePath, themeId }: { sourcePath: string; themeId: string }) => {
+    try {
+      if (!fs.existsSync(sourcePath)) {
+        return { success: false, error: 'Source image not found' };
+      }
+      const ext = path.extname(sourcePath).toLowerCase();
+      const destPath = path.join(sourceImagesDir, `${themeId}${ext}`);
+      fs.copyFileSync(sourcePath, destPath);
+      return { success: true, cachedPath: destPath };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      return { success: false, error: errorMessage };
+    }
+  });
+
+  ipcMain.handle('delete-source-image', async (_event, themeId: string) => {
+    try {
+      // Check for any extension
+      const files = fs.readdirSync(sourceImagesDir);
+      const match = files.find(f => f.startsWith(themeId + '.'));
+      if (match) {
+        fs.unlinkSync(path.join(sourceImagesDir, match));
+      }
+      return { success: true };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      return { success: false, error: errorMessage };
+    }
+  });
+
+  ipcMain.handle('get-source-image-data-url', async (_event, cachedPath: string) => {
+    try {
+      if (!cachedPath || !fs.existsSync(cachedPath)) {
+        return null;
+      }
+      const data = fs.readFileSync(cachedPath);
+      const ext = path.extname(cachedPath).toLowerCase();
+      const mimeType = ext === '.png' ? 'image/png' : 'image/jpeg';
+      return `data:${mimeType};base64,${data.toString('base64')}`;
+    } catch (error) {
+      console.error('Error reading cached source image:', error);
+      return null;
+    }
+  });
+
   // Download a community theme from a URL and write it to the Ableton themes directory
   ipcMain.handle('download-community-theme', async (_event, { url, name }: { url: string; name: string }) => {
     try {

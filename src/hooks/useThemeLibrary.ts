@@ -28,9 +28,14 @@ export function useThemeLibrary() {
   const removeTheme = useCallback(async (id: string) => {
     const theme = library.themes.find(t => t.id === id);
 
-    // Delete .ask file if theme is installed
-    if (theme?.isInstalled && window.electronAPI) {
-      await window.electronAPI.deleteLibraryThemeFile(theme.filePath);
+    if (theme && window.electronAPI) {
+      // Delete .ask file if theme is installed
+      if (theme.isInstalled) {
+        await window.electronAPI.deleteLibraryThemeFile(theme.filePath);
+      }
+
+      // Delete cached source image if it exists
+      await window.electronAPI.deleteSourceImage(theme.id);
     }
 
     const updated = { ...library, themes: library.themes.filter(t => t.id !== id) };

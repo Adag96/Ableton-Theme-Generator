@@ -117,8 +117,22 @@ function App() {
       try {
         const result = await window.electronAPI.saveThemeFile(pendingTheme.xmlContent, defaultFileName);
         if (result.success && result.filePath) {
+          const themeId = crypto.randomUUID();
+
+          // Cache source image for potential community gallery submission
+          let sourceImagePath: string | undefined;
+          if (importedImage?.filePath) {
+            const cacheResult = await window.electronAPI.saveSourceImage({
+              sourcePath: importedImage.filePath,
+              themeId,
+            });
+            if (cacheResult.success && cacheResult.cachedPath) {
+              sourceImagePath = cacheResult.cachedPath;
+            }
+          }
+
           const savedTheme: SavedTheme = {
-            id: crypto.randomUUID(),
+            id: themeId,
             name,
             createdAt: new Date().toISOString(),
             filePath: result.filePath,
@@ -132,6 +146,7 @@ function App() {
             contrastLevel: pendingTheme.palette.roles.contrastLevel,
             previewImage: pendingTheme.previewImage,
             roleLocations: pendingTheme.palette.roleLocations,
+            sourceImagePath,
             isInstalled: true,
           };
 

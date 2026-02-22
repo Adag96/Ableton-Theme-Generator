@@ -16,6 +16,7 @@ export interface SavedTheme {
   contrastLevel?: ContrastLevel;
   previewImage?: string;
   roleLocations?: RoleLocations;
+  sourceImagePath?: string; // Cached source image in app data directory
   isInstalled: boolean; // true = .ask file exists in Ableton themes dir
 }
 

@@ -1,22 +1,160 @@
 /* =============================================================================
-   LandingView - Equal-Focus Card Grid
+   LandingView - Carousel + 3-Column Layout
    ============================================================================= */
 
 .landing-view {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
   width: 100%;
   height: 100%;
   padding: var(--space-xl);
+  gap: var(--space-xl);
+  overflow-y: auto;
 }
+
+/* =============================================================================
+   Carousel Section
+   ============================================================================= */
+
+.landing-carousel-section {
+  width: 100%;
+  max-width: 1000px;
+}
+
+.landing-carousel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+}
+
+.landing-carousel-header h2 {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.landing-browse-button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  background: transparent;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.landing-browse-button:hover {
+  background: var(--surface-elevated);
+  border-color: var(--accent-solid);
+  color: var(--text-primary);
+}
+
+/* ---------------------------------------------------------------------------
+   Carousel Loading & Empty States
+   --------------------------------------------------------------------------- */
+
+.landing-carousel-loading,
+.landing-carousel-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  padding: var(--space-xxl) var(--space-xl);
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-xl);
+  color: var(--text-secondary);
+  min-height: 200px;
+}
+
+.landing-carousel-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--surface-border);
+  border-top-color: var(--accent-solid);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.landing-carousel-empty p {
+  margin: 0;
+  font-size: var(--font-size-base);
+}
+
+/* ---------------------------------------------------------------------------
+   Carousel Track & Navigation
+   --------------------------------------------------------------------------- */
+
+.landing-carousel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.carousel-track {
+  display: flex;
+  gap: var(--space-md);
+  flex: 1;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.carousel-track .community-card {
+  flex: 0 0 auto;
+  width: 200px;
+  min-width: 0;
+}
+
+.carousel-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-border);
+  border-radius: 50%;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  flex-shrink: 0;
+}
+
+.carousel-arrow:hover {
+  background: var(--surface-recessed);
+  border-color: var(--accent-solid);
+  color: var(--text-primary);
+}
+
+.carousel-arrow:active {
+  transform: scale(0.95);
+}
+
+/* =============================================================================
+   3-Column Button Grid
+   ============================================================================= */
 
 .landing-buttons {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--space-lg);
   width: 100%;
-  max-width: 800px;
+  max-width: 1000px;
 }
 
 /* ---------------------------------------------------------------------------
@@ -38,7 +176,7 @@
   border-radius: var(--radius-xl);
   cursor: pointer;
   transition: all var(--duration-normal) var(--ease-out);
-  min-height: 220px;
+  min-height: 200px;
   text-align: center;
   gap: var(--space-md);
   overflow: hidden;
@@ -111,20 +249,54 @@
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
   line-height: var(--line-height-relaxed);
-  max-width: 240px;
+  max-width: 220px;
 }
 
 /* ---------------------------------------------------------------------------
    Responsive
    --------------------------------------------------------------------------- */
 
+@media (max-width: 900px) {
+  .landing-buttons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .landing-buttons .landing-button:last-child {
+    grid-column: 1 / -1;
+    max-width: 50%;
+    justify-self: center;
+  }
+}
+
 @media (max-width: 700px) {
+  .landing-view {
+    padding: var(--space-lg);
+  }
+
+  .landing-carousel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+
+  .carousel-track {
+    flex-direction: column;
+  }
+
+  .carousel-arrow {
+    display: none;
+  }
+
   .landing-buttons {
     grid-template-columns: 1fr;
     max-width: 400px;
   }
 
+  .landing-buttons .landing-button:last-child {
+    max-width: 100%;
+  }
+
   .landing-button {
-    min-height: 180px;
+    min-height: 160px;
   }
 }
