@@ -1,104 +1,114 @@
+/* =============================================================================
+   EmailPreferencesModal - Frosted Artifact Aesthetic
+   ============================================================================= */
+
 .email-prefs-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: var(--blur-overlay);
+  -webkit-backdrop-filter: var(--blur-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
-  backdrop-filter: blur(4px);
+  z-index: var(--z-modal);
+  animation: fade-in var(--duration-fast) var(--ease-out);
 }
 
 .email-prefs-content {
   position: relative;
-  background-color: var(--color-bg-secondary);
-  border-radius: 12px;
-  padding: 32px;
+  background: var(--surface-base);
+  backdrop-filter: var(--blur-surface);
+  -webkit-backdrop-filter: var(--blur-surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
   width: 420px;
   max-width: 95vw;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-elevated);
+  border: 1px solid var(--surface-border);
+  animation: modal-enter var(--duration-normal) var(--ease-spring);
 }
 
 .email-prefs-close {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: var(--space-md);
+  right: var(--space-md);
   width: 32px;
   height: 32px;
-  border-radius: 6px;
-  background-color: transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
   border: 1px solid transparent;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-secondary);
-  transition: all 0.2s ease;
+  color: var(--text-secondary);
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
 .email-prefs-close:hover {
-  background-color: var(--color-bg-tertiary);
-  border-color: var(--color-border);
-  color: var(--color-text);
+  background: var(--surface-elevated);
+  border-color: var(--surface-border);
+  color: var(--text-primary);
 }
 
 .email-prefs-title {
-  font-size: 1.375rem;
-  font-weight: 600;
-  color: var(--color-text);
-  margin: 0 0 8px 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0 0 var(--space-sm) 0;
 }
 
 .email-prefs-description {
-  font-size: 0.875rem;
-  color: var(--color-text-secondary);
-  margin: 0 0 24px 0;
-  line-height: 1.5;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-lg) 0;
+  line-height: var(--line-height-relaxed);
 }
 
 .email-prefs-options {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-bottom: 20px;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 
 .email-prefs-toggle {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px;
-  background-color: var(--color-bg-tertiary);
-  border-radius: 10px;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--surface-elevated);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
 .email-prefs-toggle:hover {
-  background-color: var(--color-bg);
+  background: var(--surface-base);
+  box-shadow: var(--glow-accent);
 }
 
 .email-prefs-toggle-info {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-xs);
 }
 
 .email-prefs-toggle-label {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
 }
 
 .email-prefs-toggle-desc {
-  font-size: 0.8125rem;
-  color: var(--color-text-secondary);
-  line-height: 1.4;
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  line-height: var(--line-height-normal);
 }
 
 .email-prefs-toggle input[type="checkbox"] {
@@ -111,10 +121,10 @@
   position: relative;
   width: 44px;
   height: 24px;
-  background-color: var(--color-border);
-  border-radius: 12px;
+  background: var(--surface-border);
+  border-radius: var(--radius-pill);
   flex-shrink: 0;
-  transition: background-color 0.2s ease;
+  transition: background-color var(--duration-fast) var(--ease-out);
 }
 
 .email-prefs-toggle-switch::after {
@@ -124,13 +134,15 @@
   left: 2px;
   width: 20px;
   height: 20px;
-  background-color: white;
+  background: white;
   border-radius: 50%;
-  transition: transform 0.2s ease;
+  transition: transform var(--duration-fast) var(--ease-out);
+  box-shadow: var(--shadow-soft);
 }
 
 .email-prefs-toggle input:checked + .email-prefs-toggle-switch {
-  background-color: var(--color-accent);
+  background: var(--accent-solid);
+  box-shadow: var(--glow-accent);
 }
 
 .email-prefs-toggle input:checked + .email-prefs-toggle-switch::after {
@@ -138,50 +150,52 @@
 }
 
 .email-prefs-error {
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs);
   color: var(--color-error);
-  margin: 0 0 16px 0;
+  margin: 0 0 var(--space-md) 0;
 }
 
 .email-prefs-actions {
   display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
 }
 
 .email-prefs-cancel {
   flex: 1;
-  padding: 11px 16px;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  border-radius: 8px;
-  background-color: transparent;
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--surface-border);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
 .email-prefs-cancel:hover {
-  color: var(--color-text);
-  border-color: var(--color-text-secondary);
+  color: var(--text-primary);
+  border-color: var(--accent-solid);
 }
 
 .email-prefs-save {
   flex: 1;
-  padding: 11px 16px;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  border-radius: 8px;
-  background-color: var(--color-accent);
-  color: var(--color-bg);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-md);
+  background: var(--accent-solid);
+  color: var(--text-inverse);
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
+  box-shadow: var(--glow-accent);
 }
 
 .email-prefs-save:hover:not(:disabled) {
-  background-color: var(--color-accent-hover);
+  background: var(--accent-solid-hover);
+  box-shadow: var(--glow-accent-strong);
 }
 
 .email-prefs-save:disabled {
@@ -190,17 +204,17 @@
 }
 
 .email-prefs-footer {
-  font-size: 0.75rem;
-  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
   text-align: center;
   margin: 0;
 }
 
 .email-prefs-footer a {
-  color: var(--color-accent);
+  color: var(--accent-solid);
   text-decoration: underline;
 }
 
 .email-prefs-footer a:hover {
-  color: var(--color-accent-hover);
+  color: var(--accent-solid-hover);
 }

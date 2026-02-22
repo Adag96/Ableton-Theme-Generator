@@ -1,116 +1,126 @@
+/* =============================================================================
+   SubmitThemeModal - Frosted Artifact Aesthetic
+   ============================================================================= */
+
 .submit-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: var(--blur-overlay);
+  -webkit-backdrop-filter: var(--blur-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
-  backdrop-filter: blur(4px);
+  z-index: var(--z-modal);
+  animation: fade-in var(--duration-fast) var(--ease-out);
 }
 
 .submit-modal-content {
   position: relative;
-  background-color: var(--color-bg-secondary);
-  border-radius: 12px;
-  padding: 32px;
+  background: var(--surface-base);
+  backdrop-filter: var(--blur-surface);
+  -webkit-backdrop-filter: var(--blur-surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
   width: 420px;
   max-width: 95vw;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-elevated);
+  border: 1px solid var(--surface-border);
+  animation: modal-enter var(--duration-normal) var(--ease-spring);
 }
 
 .submit-modal-close {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: var(--space-md);
+  right: var(--space-md);
   width: 32px;
   height: 32px;
-  border-radius: 6px;
-  background-color: transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
   border: 1px solid transparent;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-secondary);
-  transition: all 0.2s ease;
+  color: var(--text-secondary);
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
 .submit-modal-close:hover {
-  background-color: var(--color-bg-tertiary);
-  border-color: var(--color-border);
-  color: var(--color-text);
+  background: var(--surface-elevated);
+  border-color: var(--surface-border);
+  color: var(--text-primary);
 }
 
 .submit-modal-title {
-  font-size: 1.375rem;
-  font-weight: 600;
-  color: var(--color-text);
-  margin: 0 0 20px 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0 0 var(--space-lg) 0;
 }
 
 .submit-modal-swatches {
   display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
 }
 
 .submit-modal-swatch {
   flex: 1;
   height: 36px;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--shadow-soft);
 }
 
 .submit-modal-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-md);
 }
 
 .submit-modal-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-xs);
 }
 
 .submit-modal-label {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: var(--letter-spacing-wide);
 }
 
 .submit-modal-optional {
-  font-size: 0.75rem;
-  color: var(--color-text-secondary);
-  opacity: 0.6;
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
   text-transform: none;
-  font-weight: 400;
-  letter-spacing: 0;
+  font-weight: var(--font-weight-normal);
+  letter-spacing: var(--letter-spacing-normal);
 }
 
 .submit-modal-input,
 .submit-modal-textarea {
-  padding: 10px 12px;
-  font-size: 0.9375rem;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  background-color: var(--color-bg-tertiary);
-  color: var(--color-text);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-sm);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-elevated);
+  color: var(--text-primary);
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
   font-family: inherit;
 }
 
 .submit-modal-input:focus,
 .submit-modal-textarea:focus {
-  border-color: var(--color-accent);
+  border-color: var(--accent-solid);
+  box-shadow: var(--glow-accent);
 }
 
 .submit-modal-textarea {
@@ -119,41 +129,40 @@
 }
 
 .submit-modal-note {
-  font-size: 0.8125rem;
-  color: var(--color-text-secondary);
-  opacity: 0.7;
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
   margin: 0;
-  line-height: 1.4;
+  line-height: var(--line-height-normal);
 }
 
 .submit-modal-error {
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs);
   color: var(--color-error);
   margin: 0;
 }
 
 .submit-modal-actions {
   display: flex;
-  gap: 10px;
+  gap: var(--space-sm);
   justify-content: flex-end;
-  padding-top: 4px;
+  padding-top: var(--space-xs);
 }
 
 .submit-modal-cancel {
-  padding: 10px 20px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  border-radius: 8px;
-  background-color: var(--color-bg-tertiary);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-md);
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-border);
+  color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
 .submit-modal-cancel:hover:not(:disabled) {
-  color: var(--color-text);
-  border-color: var(--color-text-secondary);
+  color: var(--text-primary);
+  border-color: var(--accent-solid);
 }
 
 .submit-modal-cancel:disabled {
@@ -162,19 +171,21 @@
 }
 
 .submit-modal-submit {
-  padding: 10px 24px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  border-radius: 8px;
-  background-color: var(--color-accent);
-  color: var(--color-bg);
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-md);
+  background: var(--accent-solid);
+  color: var(--text-inverse);
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
+  box-shadow: var(--glow-accent);
 }
 
 .submit-modal-submit:hover:not(:disabled) {
-  background-color: var(--color-accent-hover);
+  background: var(--accent-solid-hover);
+  box-shadow: var(--glow-accent-strong);
 }
 
 .submit-modal-submit:disabled {
@@ -186,30 +197,32 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
-  padding: 16px 0;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
   text-align: center;
   color: var(--color-success);
 }
 
 .submit-modal-success p {
-  font-size: 1rem;
-  color: var(--color-text-secondary);
-  line-height: 1.5;
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  line-height: var(--line-height-relaxed);
 }
 
 .submit-modal-done {
-  padding: 10px 32px;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  border-radius: 8px;
-  background-color: var(--color-accent);
-  color: var(--color-bg);
+  padding: var(--space-sm) var(--space-xl);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-md);
+  background: var(--accent-solid);
+  color: var(--text-inverse);
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
+  box-shadow: var(--glow-accent);
 }
 
 .submit-modal-done:hover {
-  background-color: var(--color-accent-hover);
+  background: var(--accent-solid-hover);
+  box-shadow: var(--glow-accent-strong);
 }

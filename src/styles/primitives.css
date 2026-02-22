@@ -1,0 +1,382 @@
+/* =============================================================================
+   Component Primitives - Base Building Blocks
+   Frosted surfaces, glowing accents, elegant interactions
+   ============================================================================= */
+
+/* ---------------------------------------------------------------------------
+   Surface Primitives
+   Frosted acrylic panels with varying elevation
+   --------------------------------------------------------------------------- */
+
+.surface {
+  background: var(--surface-base);
+  backdrop-filter: var(--blur-surface);
+  -webkit-backdrop-filter: var(--blur-surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
+}
+
+.surface-elevated {
+  background: var(--surface-elevated);
+  backdrop-filter: var(--blur-surface);
+  -webkit-backdrop-filter: var(--blur-surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-elevated);
+}
+
+.surface-recessed {
+  background: var(--surface-recessed);
+  backdrop-filter: var(--blur-subtle);
+  -webkit-backdrop-filter: var(--blur-subtle);
+  border: 1px solid var(--surface-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-inset);
+}
+
+/* ---------------------------------------------------------------------------
+   Button Primitives
+   --------------------------------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  user-select: none;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--accent-solid);
+  color: var(--text-inverse);
+  box-shadow: var(--glow-accent);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-solid-hover);
+  box-shadow: var(--glow-accent-strong);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background: var(--surface-elevated);
+  backdrop-filter: var(--blur-subtle);
+  -webkit-backdrop-filter: var(--blur-subtle);
+  color: var(--text-primary);
+  border: 1px solid var(--surface-border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--surface-base);
+  border-color: var(--accent-solid);
+  box-shadow: var(--glow-accent);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  padding: var(--space-sm);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  color: var(--text-primary);
+  background: var(--surface-elevated);
+}
+
+.btn-sm {
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--font-size-xs);
+  border-radius: var(--radius-sm);
+}
+
+.btn-lg {
+  padding: var(--space-md) var(--space-xl);
+  font-size: var(--font-size-base);
+  border-radius: var(--radius-lg);
+}
+
+.btn-pill {
+  border-radius: var(--radius-pill);
+}
+
+/* Icon-only button */
+.btn-icon {
+  padding: var(--space-sm);
+  aspect-ratio: 1;
+}
+
+/* ---------------------------------------------------------------------------
+   Input Primitives
+   --------------------------------------------------------------------------- */
+
+.input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  background: var(--surface-elevated);
+  backdrop-filter: var(--blur-subtle);
+  -webkit-backdrop-filter: var(--blur-subtle);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.input:hover {
+  border-color: var(--surface-border);
+  background: var(--surface-base);
+}
+
+.input:focus {
+  border-color: var(--accent-solid);
+  box-shadow: var(--glow-accent);
+}
+
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---------------------------------------------------------------------------
+   Glow Effects
+   Internal illumination characteristic of the brand
+   --------------------------------------------------------------------------- */
+
+.glow-accent {
+  box-shadow: var(--glow-inner);
+}
+
+.glow-accent-outer {
+  box-shadow: var(--glow-accent);
+}
+
+.glow-accent-strong {
+  box-shadow: var(--glow-accent-strong);
+}
+
+.glow-pulse {
+  animation: glow-pulse 3s var(--ease-in-out) infinite;
+}
+
+.glow-pulse-fast {
+  animation: glow-pulse 1.5s var(--ease-in-out) infinite;
+}
+
+/* ---------------------------------------------------------------------------
+   Typography Primitives
+   --------------------------------------------------------------------------- */
+
+.text-xs { font-size: var(--font-size-xs); }
+.text-sm { font-size: var(--font-size-sm); }
+.text-base { font-size: var(--font-size-base); }
+.text-lg { font-size: var(--font-size-lg); }
+.text-xl { font-size: var(--font-size-xl); }
+.text-2xl { font-size: var(--font-size-2xl); }
+.text-3xl { font-size: var(--font-size-3xl); }
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-tertiary { color: var(--text-tertiary); }
+.text-accent { color: var(--accent-solid); }
+
+.font-normal { font-weight: var(--font-weight-normal); }
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+
+/* ---------------------------------------------------------------------------
+   Layout Primitives
+   --------------------------------------------------------------------------- */
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-center { align-items: center; justify-content: center; }
+.flex-between { align-items: center; justify-content: space-between; }
+
+.gap-xs { gap: var(--space-xs); }
+.gap-sm { gap: var(--space-sm); }
+.gap-md { gap: var(--space-md); }
+.gap-lg { gap: var(--space-lg); }
+.gap-xl { gap: var(--space-xl); }
+
+/* ---------------------------------------------------------------------------
+   Interactive States
+   --------------------------------------------------------------------------- */
+
+.interactive {
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.interactive:hover {
+  transform: translateY(-2px);
+}
+
+.interactive:active {
+  transform: translateY(0);
+}
+
+/* Focus ring for accessibility */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--accent-solid);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+   Pill Navigation
+   --------------------------------------------------------------------------- */
+
+.nav-pills {
+  display: flex;
+  gap: var(--space-sm);
+  padding: var(--space-xs);
+  background: var(--surface-recessed);
+  border-radius: var(--radius-pill);
+}
+
+.nav-pill {
+  padding: var(--space-sm) var(--space-lg);
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.nav-pill:hover {
+  color: var(--text-primary);
+  background: var(--surface-elevated);
+}
+
+.nav-pill.active {
+  color: var(--text-inverse);
+  background: var(--accent-solid);
+  box-shadow: var(--glow-accent);
+}
+
+/* ---------------------------------------------------------------------------
+   Card Primitive
+   --------------------------------------------------------------------------- */
+
+.card {
+  background: var(--surface-elevated);
+  backdrop-filter: var(--blur-surface);
+  -webkit-backdrop-filter: var(--blur-surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-elevated);
+  border-color: var(--accent-solid);
+}
+
+.card-interactive:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-elevated), var(--glow-accent);
+}
+
+/* ---------------------------------------------------------------------------
+   Badge Primitive
+   --------------------------------------------------------------------------- */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-pill);
+  background: var(--surface-recessed);
+  color: var(--text-secondary);
+}
+
+.badge-accent {
+  background: var(--accent-solid);
+  color: var(--text-inverse);
+}
+
+/* ---------------------------------------------------------------------------
+   Divider
+   --------------------------------------------------------------------------- */
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background: var(--surface-border);
+  margin: var(--space-lg) 0;
+}
+
+.divider-vertical {
+  width: 1px;
+  height: 100%;
+  background: var(--surface-border);
+  margin: 0 var(--space-md);
+}
+
+/* ---------------------------------------------------------------------------
+   Overlay / Backdrop
+   --------------------------------------------------------------------------- */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: var(--blur-overlay);
+  -webkit-backdrop-filter: var(--blur-overlay);
+  z-index: var(--z-modal-backdrop);
+}
+
+/* ---------------------------------------------------------------------------
+   Scrollbar Styling (Light Theme)
+   --------------------------------------------------------------------------- */
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--surface-recessed);
+  border-radius: var(--radius-pill);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--surface-border);
+  border-radius: var(--radius-pill);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}

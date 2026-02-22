@@ -5,6 +5,13 @@ import { contextBridge, ipcRenderer } from 'electron';
 contextBridge.exposeInMainWorld('electronAPI', {
   getVersion: () => ipcRenderer.invoke('get-version'),
   getBuildNumber: () => ipcRenderer.invoke('get-build-number'),
+  getPlatform: () => ipcRenderer.invoke('get-platform'),
+
+  // Window controls
+  windowMinimize: () => ipcRenderer.invoke('window-minimize'),
+  windowMaximize: () => ipcRenderer.invoke('window-maximize'),
+  windowClose: () => ipcRenderer.invoke('window-close'),
+  windowIsMaximized: () => ipcRenderer.invoke('window-is-maximized'),
   detectThemesDirectory: () => ipcRenderer.invoke('detect-themes-directory'),
   listThemeFiles: (dirPath: string) => ipcRenderer.invoke('list-theme-files', dirPath),
   deleteThemeFile: (filePath: string) => ipcRenderer.invoke('delete-theme-file', filePath),

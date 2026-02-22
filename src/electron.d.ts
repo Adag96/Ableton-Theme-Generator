@@ -25,6 +25,13 @@ export interface ThemeFileInfo {
 export interface ElectronAPI {
   getVersion: () => Promise<string>;
   getBuildNumber: () => Promise<string>;
+  getPlatform: () => Promise<'darwin' | 'win32' | 'linux'>;
+
+  // Window controls
+  windowMinimize: () => Promise<void>;
+  windowMaximize: () => Promise<void>;
+  windowClose: () => Promise<void>;
+  windowIsMaximized: () => Promise<boolean>;
   detectThemesDirectory: () => Promise<ThemesDirectoryResult>;
   listThemeFiles: (dirPath: string) => Promise<ThemeFileInfo[]>;
   deleteThemeFile: (filePath: string) => Promise<{ success: boolean; error?: string }>;

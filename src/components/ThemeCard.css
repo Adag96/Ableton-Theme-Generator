@@ -1,15 +1,22 @@
+/* =============================================================================
+   ThemeCard - Frosted Artifact Aesthetic
+   ============================================================================= */
+
 .theme-card {
-  background-color: var(--color-bg-secondary);
-  border-radius: 12px;
+  background: var(--surface-elevated);
+  backdrop-filter: var(--blur-surface);
+  -webkit-backdrop-filter: var(--blur-surface);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  border: 1px solid var(--color-border);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid var(--surface-border);
+  transition: all var(--duration-normal) var(--ease-out);
   position: relative;
 }
 
 .theme-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-elevated), var(--glow-accent);
+  border-color: var(--accent-solid);
 }
 
 .theme-card-preview {
@@ -18,7 +25,7 @@
   padding-bottom: 56.25%;
   position: relative;
   overflow: hidden;
-  background-color: var(--color-bg-primary);
+  background: var(--surface-recessed);
 }
 
 .theme-card-preview img {
@@ -31,58 +38,70 @@
 }
 
 .theme-card-content {
-  padding: 16px;
+  padding: var(--space-md);
 }
 
 .theme-card-name {
-  margin: 0 0 12px 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
+  margin: 0 0 var(--space-sm) 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding-right: 24px;
+  padding-right: var(--space-lg);
 }
 
 .theme-card-swatches {
   display: flex;
-  gap: 6px;
-  margin-bottom: 12px;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-sm);
 }
 
 .theme-swatch {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--shadow-soft);
 }
 
 .theme-card-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
 .theme-card-tone {
   display: inline-block;
-  padding: 4px 10px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  border-radius: 4px;
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-sm);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.theme-card-tone-dark {
+  background: rgba(30, 30, 30, 0.8);
+  color: rgba(170, 170, 170, 1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.theme-card-tone-light {
+  background: rgba(245, 245, 250, 0.9);
+  color: rgba(80, 80, 90, 1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .theme-card-action {
-  padding: 4px 10px;
-  font-size: 0.7rem;
-  font-weight: 500;
-  border-radius: 4px;
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all var(--duration-fast) var(--ease-out);
   border: none;
 }
 
@@ -92,52 +111,45 @@
 }
 
 .theme-card-action-install {
-  background-color: var(--color-accent);
-  color: var(--color-bg);
+  background: var(--accent-solid);
+  color: var(--text-inverse);
+  box-shadow: var(--glow-accent);
 }
 
 .theme-card-action-install:hover:not(:disabled) {
-  background-color: var(--color-accent-hover);
+  background: var(--accent-solid-hover);
+  box-shadow: var(--glow-accent-strong);
 }
 
 .theme-card-action-uninstall {
-  background-color: transparent;
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--surface-border);
 }
 
 .theme-card-action-uninstall:hover:not(:disabled) {
-  background-color: var(--color-bg-hover);
-  color: var(--color-text-primary);
-}
-
-.theme-card-tone-dark {
-  background-color: rgba(30, 30, 30, 0.8);
-  color: #aaa;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.theme-card-tone-light {
-  background-color: rgba(240, 240, 240, 0.9);
-  color: #555;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: var(--surface-base);
+  color: var(--text-primary);
+  border-color: var(--text-tertiary);
 }
 
 .theme-card-delete {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: var(--space-sm);
+  right: var(--space-sm);
   width: 28px;
   height: 28px;
-  border-radius: 6px;
-  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: var(--blur-subtle);
+  -webkit-backdrop-filter: var(--blur-subtle);
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.2s ease, background-color 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
   color: white;
 }
 
@@ -146,5 +158,5 @@
 }
 
 .theme-card-delete:hover {
-  background-color: rgba(200, 50, 50, 0.8);
+  background: var(--color-error);
 }

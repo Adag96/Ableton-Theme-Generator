@@ -1,0 +1,164 @@
+/* =============================================================================
+   TitleBar - Custom Frameless Window Title Bar
+   ============================================================================= */
+
+.titlebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--titlebar-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-base);
+  backdrop-filter: var(--blur-surface);
+  -webkit-backdrop-filter: var(--blur-surface);
+  border-bottom: 1px solid var(--surface-border);
+  z-index: var(--z-titlebar);
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+/* ---------------------------------------------------------------------------
+   macOS Specific
+   Native traffic lights are positioned via Electron config
+   --------------------------------------------------------------------------- */
+
+.titlebar-mac {
+  padding-left: 80px; /* Space for native traffic lights */
+  padding-right: var(--space-md);
+}
+
+.titlebar-drag-region-mac {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Windows/Linux Specific
+   --------------------------------------------------------------------------- */
+
+.titlebar-win {
+  padding-left: var(--space-lg);
+  padding-right: 0;
+  justify-content: space-between;
+}
+
+/* ---------------------------------------------------------------------------
+   Title
+   --------------------------------------------------------------------------- */
+
+.titlebar-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex: 1;
+  justify-content: center;
+}
+
+.titlebar-title-text {
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+/* ---------------------------------------------------------------------------
+   Actions (Theme Toggle)
+   --------------------------------------------------------------------------- */
+
+.titlebar-actions {
+  position: absolute;
+  right: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  -webkit-app-region: no-drag;
+}
+
+/* On Windows, position actions before window controls */
+.titlebar-win .titlebar-actions {
+  position: relative;
+  right: auto;
+  margin-right: var(--space-sm);
+}
+
+.titlebar-theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.titlebar-theme-toggle:hover {
+  color: var(--accent-solid);
+  border-color: var(--accent-solid);
+  box-shadow: var(--glow-accent);
+}
+
+.titlebar-theme-toggle:active {
+  transform: scale(0.95);
+}
+
+/* ---------------------------------------------------------------------------
+   Window Controls (Windows/Linux)
+   --------------------------------------------------------------------------- */
+
+.titlebar-controls {
+  display: flex;
+  height: 100%;
+  -webkit-app-region: no-drag;
+}
+
+.titlebar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.titlebar-btn:hover {
+  background: var(--surface-recessed);
+  color: var(--text-primary);
+}
+
+.titlebar-btn:active {
+  background: var(--surface-border);
+}
+
+.titlebar-btn-close:hover {
+  background: var(--color-error);
+  color: white;
+}
+
+.titlebar-btn-close:active {
+  background: #cc2f26;
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive: Hide title on very narrow windows
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 500px) {
+  .titlebar-title-text {
+    display: none;
+  }
+}

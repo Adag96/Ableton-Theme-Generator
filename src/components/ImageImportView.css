@@ -1,32 +1,42 @@
+/* =============================================================================
+   ImageImportView - Frosted Artifact Aesthetic
+   ============================================================================= */
+
 .import-view {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
-  padding: var(--spacing-lg);
-  gap: var(--spacing-lg);
+  gap: var(--space-lg);
 }
 
 .import-back-button {
   display: inline-flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  background: none;
-  border: none;
-  color: var(--color-text-secondary);
-  font-size: 14px;
+  gap: var(--space-sm);
+  background: var(--surface-elevated);
+  backdrop-filter: var(--blur-subtle);
+  -webkit-backdrop-filter: var(--blur-subtle);
+  border: 1px solid var(--surface-border);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: 6px;
-  transition: color 0.2s ease;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  transition: all var(--duration-fast) var(--ease-out);
   align-self: flex-start;
 }
 
 .import-back-button:hover {
-  color: var(--color-accent);
+  color: var(--accent-solid);
+  border-color: var(--accent-solid);
+  box-shadow: var(--glow-accent);
 }
 
-/* Drop zone - empty state */
+/* ---------------------------------------------------------------------------
+   Drop Zone - Empty State
+   --------------------------------------------------------------------------- */
 
 .import-dropzone {
   display: flex;
@@ -34,24 +44,49 @@
   align-items: center;
   justify-content: center;
   flex: 1;
-  border: 2px dashed var(--color-border);
-  border-radius: var(--border-radius);
-  background-color: var(--color-bg-secondary);
+  border: 2px dashed var(--surface-border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-elevated);
+  backdrop-filter: var(--blur-surface);
+  -webkit-backdrop-filter: var(--blur-surface);
   cursor: pointer;
-  transition: all 0.3s ease;
-  gap: var(--spacing-md);
-  padding: var(--spacing-xl);
+  transition: all var(--duration-normal) var(--ease-out);
+  gap: var(--space-lg);
+  padding: var(--space-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.import-dropzone::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: var(--glow-inner-subtle);
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--ease-out);
+  pointer-events: none;
 }
 
 .import-dropzone:hover {
-  border-color: var(--color-accent);
-  background-color: var(--color-bg-tertiary);
+  border-color: var(--accent-solid);
+  transform: translateY(-2px);
+}
+
+.import-dropzone:hover::before {
+  opacity: 1;
 }
 
 .import-dropzone-active {
-  border-color: var(--color-accent);
-  background-color: var(--color-bg-tertiary);
-  box-shadow: inset 0 0 30px rgba(0, 212, 170, 0.05);
+  border-color: var(--accent-solid);
+  border-style: solid;
+  background: rgba(0, 212, 170, 0.05);
+}
+
+.import-dropzone-active::before {
+  opacity: 1;
+  box-shadow: var(--glow-inner);
+  animation: glow-pulse 1.5s var(--ease-in-out) infinite;
 }
 
 .import-dropzone-icon {
@@ -61,54 +96,56 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background-color: var(--color-bg-tertiary);
-  color: var(--color-accent);
-  transition: all 0.3s ease;
+  background: var(--surface-recessed);
+  color: var(--text-tertiary);
+  transition: all var(--duration-normal) var(--ease-out);
 }
 
 .import-dropzone:hover .import-dropzone-icon,
 .import-dropzone-active .import-dropzone-icon {
-  background-color: var(--color-accent);
-  color: var(--color-bg);
+  background: var(--accent-solid);
+  color: var(--text-inverse);
   transform: scale(1.1);
+  box-shadow: var(--glow-accent);
 }
 
 .import-dropzone-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--color-text);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
   margin: 0;
 }
 
 .import-dropzone-subtitle {
-  font-size: 14px;
-  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
   margin: 0;
 }
 
 .import-dropzone-filetypes {
-  font-size: 12px;
-  color: var(--color-text-secondary);
-  opacity: 0.6;
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
   margin: 0;
 }
 
 .import-error {
-  font-size: 13px;
+  font-size: var(--font-size-sm);
   color: var(--color-error);
   text-align: center;
   margin: 0;
 }
 
-/* Confirmation state - image loaded */
+/* ---------------------------------------------------------------------------
+   Confirmation State - Image Loaded
+   --------------------------------------------------------------------------- */
 
 .import-confirmation {
   display: flex;
   flex-direction: column;
   align-items: center;
   flex: 1;
-  gap: var(--spacing-lg);
-  padding: var(--spacing-lg) 0;
+  gap: var(--space-lg);
+  padding: var(--space-lg) 0;
   overflow-y: auto;
   min-height: 0;
 }
@@ -133,8 +170,9 @@
   max-width: 100%;
   max-height: 40vh;
   object-fit: contain;
-  border-radius: var(--border-radius);
-  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--shadow-elevated);
 }
 
 /* Color location markers */
@@ -164,29 +202,29 @@
   justify-content: center;
   width: 150px;
   height: 100px;
-  background-color: var(--color-bg-secondary);
-  border-radius: var(--border-radius);
-  border: 1px solid var(--color-border);
+  background: var(--surface-elevated);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--surface-border);
 }
 
 .import-details {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: var(--space-xs);
 }
 
 .import-file-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--color-text);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
   margin: 0;
 }
 
 .import-file-path {
-  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
-  font-size: 12px;
-  color: var(--color-text-secondary);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
   margin: 0;
   word-break: break-all;
   text-align: center;
@@ -195,38 +233,44 @@
 
 .import-actions {
   display: flex;
-  gap: var(--spacing-md);
+  gap: var(--space-md);
 }
 
 .import-action-button {
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
 .import-change-button {
-  background: none;
-  border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
+  background: var(--surface-elevated);
+  backdrop-filter: var(--blur-subtle);
+  -webkit-backdrop-filter: var(--blur-subtle);
+  border: 1px solid var(--surface-border);
+  color: var(--text-secondary);
 }
 
 .import-change-button:hover {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+  border-color: var(--accent-solid);
+  color: var(--accent-solid);
+  box-shadow: var(--glow-accent);
 }
 
 .import-continue-button {
-  background-color: var(--color-accent);
-  border: 1px solid var(--color-accent);
-  color: var(--color-bg);
+  background: var(--accent-solid);
+  border: 1px solid var(--accent-solid);
+  color: var(--text-inverse);
+  box-shadow: var(--glow-accent);
 }
 
 .import-continue-button:hover:not(:disabled) {
-  background-color: var(--color-accent-hover);
-  border-color: var(--color-accent-hover);
+  background: var(--accent-solid-hover);
+  border-color: var(--accent-solid-hover);
+  box-shadow: var(--glow-accent-strong);
+  transform: translateY(-1px);
 }
 
 .import-continue-button:disabled {
@@ -234,53 +278,52 @@
   cursor: not-allowed;
 }
 
-/* Extraction status */
+/* ---------------------------------------------------------------------------
+   Extraction Status
+   --------------------------------------------------------------------------- */
 
 .import-extraction-status {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  color: var(--color-text-secondary);
-  font-size: 14px;
+  gap: var(--space-sm);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
 }
 
 .import-spinner {
   width: 18px;
   height: 18px;
-  border: 2px solid var(--color-border);
-  border-top-color: var(--color-accent);
+  border: 2px solid var(--surface-border);
+  border-top-color: var(--accent-solid);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Color palette display */
+/* ---------------------------------------------------------------------------
+   Color Palette Display
+   --------------------------------------------------------------------------- */
 
 .import-palette {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: var(--space-sm);
 }
 
 .import-palette-swatches {
   display: flex;
-  gap: var(--spacing-sm);
+  gap: var(--space-sm);
 }
 
 .import-swatch {
   position: relative;
   width: 56px;
   height: 56px;
-  border-radius: 8px;
-  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--surface-border);
   cursor: default;
-  transition: transform 0.15s ease;
+  transition: transform var(--duration-fast) var(--ease-out);
+  box-shadow: var(--shadow-soft);
 }
 
 .import-swatch:hover {
@@ -292,16 +335,18 @@
   bottom: -20px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 10px;
-  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
   white-space: nowrap;
 }
 
-/* Theme options section */
+/* ---------------------------------------------------------------------------
+   Theme Options Section
+   --------------------------------------------------------------------------- */
 
 .import-options-section {
   display: flex;
-  gap: var(--spacing-xl);
+  gap: var(--space-xl);
   align-items: flex-start;
 }
 
@@ -309,130 +354,67 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: var(--space-xs);
 }
 
 .import-option-label {
-  font-size: 12px;
-  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
   margin: 0;
 }
 
-/* Tone toggle */
+/* ---------------------------------------------------------------------------
+   Toggle Buttons (Shared)
+   --------------------------------------------------------------------------- */
 
-.import-tone-toggle {
-  display: flex;
-  gap: 0;
-  border-radius: 6px;
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-}
-
-.tone-toggle-option {
-  padding: var(--spacing-xs) var(--spacing-md);
-  font-size: 12px;
-  font-weight: 500;
-  background: var(--color-bg-secondary);
-  border: none;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.tone-toggle-option:first-child {
-  border-right: 1px solid var(--color-border);
-}
-
-.tone-toggle-option:hover:not(.tone-toggle-option-active) {
-  background: var(--color-bg-tertiary);
-  color: var(--color-text);
-}
-
-.tone-toggle-option-active {
-  background: var(--color-accent);
-  color: var(--color-bg);
-}
-
-.tone-toggle-option-active:hover {
-  background: var(--color-accent-hover);
-}
-
-/* Contrast toggle */
-
-.import-contrast-toggle {
-  display: flex;
-  gap: 0;
-  border-radius: 6px;
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-}
-
-.contrast-toggle-option {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  font-size: 12px;
-  font-weight: 500;
-  background: var(--color-bg-secondary);
-  border: none;
-  border-right: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.contrast-toggle-option:last-child {
-  border-right: none;
-}
-
-.contrast-toggle-option:hover:not(.contrast-toggle-option-active) {
-  background: var(--color-bg-tertiary);
-  color: var(--color-text);
-}
-
-.contrast-toggle-option-active {
-  background: var(--color-accent);
-  color: var(--color-bg);
-}
-
-.contrast-toggle-option-active:hover {
-  background: var(--color-accent-hover);
-}
-
-/* Variant mode tabs */
-
+.import-tone-toggle,
+.import-contrast-toggle,
 .import-variant-tabs {
   display: flex;
   gap: 0;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--surface-border);
+  background: var(--surface-recessed);
 }
 
+.tone-toggle-option,
+.contrast-toggle-option,
 .variant-tab {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  font-size: 12px;
-  font-weight: 500;
-  background: var(--color-bg-secondary);
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  background: transparent;
   border: none;
-  border-right: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
+  border-right: 1px solid var(--surface-border);
+  color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
+.tone-toggle-option:last-child,
+.contrast-toggle-option:last-child,
 .variant-tab:last-child {
   border-right: none;
 }
 
+.tone-toggle-option:hover:not(.tone-toggle-option-active),
+.contrast-toggle-option:hover:not(.contrast-toggle-option-active),
 .variant-tab:hover:not(.variant-tab-active) {
-  background: var(--color-bg-tertiary);
-  color: var(--color-text);
+  background: var(--surface-elevated);
+  color: var(--text-primary);
 }
 
+.tone-toggle-option-active,
+.contrast-toggle-option-active,
 .variant-tab-active {
-  background: var(--color-accent);
-  color: var(--color-bg);
+  background: var(--accent-solid);
+  color: var(--text-inverse);
+  box-shadow: var(--glow-accent);
 }
 
+.tone-toggle-option-active:hover,
+.contrast-toggle-option-active:hover,
 .variant-tab-active:hover {
-  background: var(--color-accent-hover);
+  background: var(--accent-solid-hover);
 }

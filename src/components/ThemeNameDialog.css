@@ -1,90 +1,103 @@
+/* =============================================================================
+   ThemeNameDialog - Frosted Artifact Aesthetic
+   ============================================================================= */
+
 .dialog-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: var(--blur-overlay);
+  -webkit-backdrop-filter: var(--blur-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  backdrop-filter: blur(4px);
+  z-index: var(--z-modal-backdrop);
+  animation: fade-in var(--duration-fast) var(--ease-out);
 }
 
 .dialog-content {
-  background-color: var(--color-bg-secondary);
-  border-radius: 12px;
-  padding: 24px;
+  background: var(--surface-base);
+  backdrop-filter: var(--blur-surface);
+  -webkit-backdrop-filter: var(--blur-surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
   min-width: 360px;
   max-width: 480px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-elevated);
+  border: 1px solid var(--surface-border);
+  animation: modal-enter var(--duration-normal) var(--ease-spring);
 }
 
 .dialog-title {
-  margin: 0 0 16px 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
+  margin: 0 0 var(--space-md) 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
 }
 
 .dialog-input {
   width: 100%;
-  padding: 12px 16px;
-  font-size: 1rem;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  background-color: var(--color-bg-primary);
-  color: var(--color-text-primary);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-base);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-elevated);
+  color: var(--text-primary);
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
   box-sizing: border-box;
 }
 
 .dialog-input:focus {
-  border-color: var(--color-accent);
+  border-color: var(--accent-solid);
+  box-shadow: var(--glow-accent);
 }
 
 .dialog-input::placeholder {
-  color: var(--color-text-secondary);
+  color: var(--text-tertiary);
 }
 
 .dialog-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  margin-top: 20px;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
 }
 
 .dialog-button {
-  padding: 10px 20px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  border-radius: 8px;
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
   border: none;
 }
 
 .dialog-button-cancel {
-  background-color: transparent;
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
+  background: var(--surface-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--surface-border);
 }
 
 .dialog-button-cancel:hover {
-  background-color: var(--color-bg-hover);
-  color: var(--color-text-primary);
+  background: var(--surface-base);
+  color: var(--text-primary);
+  border-color: var(--accent-solid);
 }
 
 .dialog-button-confirm {
-  background-color: var(--color-accent);
-  color: white;
+  background: var(--accent-solid);
+  color: var(--text-inverse);
+  box-shadow: var(--glow-accent);
 }
 
 .dialog-button-confirm:hover:not(:disabled) {
-  opacity: 0.9;
+  background: var(--accent-solid-hover);
+  box-shadow: var(--glow-accent-strong);
 }
 
 .dialog-button-confirm:disabled {

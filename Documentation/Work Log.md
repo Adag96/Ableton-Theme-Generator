@@ -1,8 +1,10 @@
 # Work Log
 
-## 2026-2-21 02:09
+## 2026-2-21 23:42
 - Fixed email notification for theme submissions
 - Approved theme submissions now show in community page
+- Changed design aesthetic to be a bit lighter and more sleek
+- Added dark/light app theme toggle
 
 
 ## 2026-2-20 16:32

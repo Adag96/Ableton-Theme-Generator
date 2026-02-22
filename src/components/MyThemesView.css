@@ -1,8 +1,11 @@
+/* =============================================================================
+   MyThemesView - Frosted Artifact Aesthetic
+   ============================================================================= */
+
 .my-themes-view {
   width: 100%;
-  max-width: 1200px;
+  max-width: var(--content-max-width);
   margin: 0 auto;
-  padding: 24px;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -16,68 +19,76 @@
   flex: 1;
   overflow-y: auto;
   min-height: 0;
-  padding-right: 12px;
+  padding-right: var(--space-sm);
 }
 
 .my-themes-back-button {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: transparent;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  color: var(--color-text-secondary);
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface-elevated);
+  backdrop-filter: var(--blur-subtle);
+  -webkit-backdrop-filter: var(--blur-subtle);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
   cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-  margin-bottom: 24px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--duration-fast) var(--ease-out);
+  margin-bottom: var(--space-lg);
 }
 
 .my-themes-back-button:hover {
-  background-color: var(--color-bg-hover);
-  color: var(--color-text-primary);
+  color: var(--accent-solid);
+  border-color: var(--accent-solid);
+  box-shadow: var(--glow-accent);
 }
 
 .my-themes-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin-bottom: var(--space-lg);
 }
 
 .my-themes-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
   margin: 0;
 }
 
 .my-themes-controls {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-md);
 }
 
-/* Filter Toggle */
+/* ---------------------------------------------------------------------------
+   Filter Toggle
+   --------------------------------------------------------------------------- */
+
 .my-themes-filter-toggle {
   display: flex;
   gap: 0;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--surface-border);
+  background: var(--surface-recessed);
 }
 
 .filter-toggle-option {
-  padding: 6px 12px;
-  font-size: 12px;
-  font-weight: 500;
-  background: var(--color-bg-secondary);
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  background: transparent;
   border: none;
-  border-right: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
+  border-right: 1px solid var(--surface-border);
+  color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
 .filter-toggle-option:last-child {
@@ -85,20 +96,23 @@
 }
 
 .filter-toggle-option:hover:not(.filter-toggle-option-active) {
-  background: var(--color-bg-tertiary);
-  color: var(--color-text-primary);
+  background: var(--surface-elevated);
+  color: var(--text-primary);
 }
 
 .filter-toggle-option-active {
-  background: var(--color-accent);
-  color: var(--color-bg);
+  background: var(--accent-solid);
+  color: var(--text-inverse);
 }
 
 .filter-toggle-option-active:hover {
-  background: var(--color-accent-hover);
+  background: var(--accent-solid-hover);
 }
 
-/* Sort Dropdown */
+/* ---------------------------------------------------------------------------
+   Sort Dropdown
+   --------------------------------------------------------------------------- */
+
 .my-themes-sort-dropdown {
   position: relative;
 }
@@ -106,25 +120,28 @@
 .my-themes-sort-trigger {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  font-size: 12px;
-  font-weight: 500;
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  color: var(--color-text-secondary);
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  background: var(--surface-elevated);
+  backdrop-filter: var(--blur-subtle);
+  -webkit-backdrop-filter: var(--blur-subtle);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
 .my-themes-sort-trigger:hover {
-  background: var(--color-bg-tertiary);
-  color: var(--color-text-primary);
+  background: var(--surface-base);
+  color: var(--text-primary);
+  border-color: var(--accent-solid);
 }
 
 .sort-dropdown-chevron {
-  transition: transform 0.2s ease;
+  transition: transform var(--duration-fast) var(--ease-out);
 }
 
 .sort-dropdown-chevron-open {
@@ -133,73 +150,80 @@
 
 .my-themes-sort-menu {
   position: absolute;
-  top: calc(100% + 4px);
+  top: calc(100% + var(--space-xs));
   right: 0;
   min-width: 100%;
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 100;
+  background: var(--surface-elevated);
+  backdrop-filter: var(--blur-surface);
+  -webkit-backdrop-filter: var(--blur-surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-elevated);
+  z-index: var(--z-dropdown);
   overflow: hidden;
+  animation: slide-down var(--duration-fast) var(--ease-out);
 }
 
 .my-themes-sort-option {
   display: block;
   width: 100%;
-  padding: 8px 12px;
-  font-size: 12px;
-  font-weight: 500;
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
   background: transparent;
   border: none;
-  color: var(--color-text-secondary);
+  color: var(--text-secondary);
   cursor: pointer;
   text-align: left;
-  transition: all 0.15s ease;
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
 .my-themes-sort-option:hover {
-  background: var(--color-bg-tertiary);
-  color: var(--color-text-primary);
+  background: var(--surface-base);
+  color: var(--text-primary);
 }
 
 .my-themes-sort-option-active {
-  color: var(--color-accent);
+  color: var(--accent-solid);
 }
 
-.my-themes-sort-option-active:hover {
-  color: var(--color-accent);
-}
+/* ---------------------------------------------------------------------------
+   Empty State
+   --------------------------------------------------------------------------- */
 
 .my-themes-empty {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 64px 24px;
+  padding: var(--space-3xl) var(--space-lg);
   text-align: center;
 }
 
 .my-themes-empty-icon {
-  color: var(--color-text-secondary);
-  opacity: 0.5;
-  margin-bottom: 16px;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-md);
 }
 
 .my-themes-empty-text {
-  font-size: 1.1rem;
-  color: var(--color-text-primary);
-  margin: 0 0 8px 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  margin: 0 0 var(--space-sm) 0;
 }
 
 .my-themes-empty-hint {
-  font-size: 0.9rem;
-  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
   margin: 0;
 }
 
+/* ---------------------------------------------------------------------------
+   Sections
+   --------------------------------------------------------------------------- */
+
 .my-themes-section {
-  margin-bottom: 32px;
+  margin-bottom: var(--space-xl);
 }
 
 .my-themes-section:last-child {
@@ -207,24 +231,34 @@
 }
 
 .my-themes-section-header {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin: 0 0 16px 0;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--color-border);
+  letter-spacing: var(--letter-spacing-wide);
+  margin: 0 0 var(--space-md) 0;
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--surface-border);
 }
+
+/* ---------------------------------------------------------------------------
+   Grid
+   --------------------------------------------------------------------------- */
 
 .my-themes-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: var(--space-lg);
 }
 
-@media (min-width: 800px) {
+@media (min-width: 900px) {
   .my-themes-grid {
     grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .my-themes-grid {
+    grid-template-columns: repeat(5, 1fr);
   }
 }

@@ -1,114 +1,126 @@
+/* =============================================================================
+   AuthModal - Frosted Artifact Aesthetic
+   ============================================================================= */
+
 .auth-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: var(--blur-overlay);
+  -webkit-backdrop-filter: var(--blur-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
-  backdrop-filter: blur(4px);
+  z-index: var(--z-modal);
+  animation: fade-in var(--duration-fast) var(--ease-out);
 }
 
 .auth-modal-content {
   position: relative;
-  background-color: var(--color-bg-secondary);
-  border-radius: 12px;
-  padding: 32px;
+  background: var(--surface-base);
+  backdrop-filter: var(--blur-surface);
+  -webkit-backdrop-filter: var(--blur-surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
   width: 380px;
   max-width: 95vw;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-elevated);
+  border: 1px solid var(--surface-border);
+  animation: modal-enter var(--duration-normal) var(--ease-spring);
 }
 
 .auth-modal-close {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: var(--space-md);
+  right: var(--space-md);
   width: 32px;
   height: 32px;
-  border-radius: 6px;
-  background-color: transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
   border: 1px solid transparent;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-secondary);
-  transition: all 0.2s ease;
+  color: var(--text-secondary);
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
 .auth-modal-close:hover {
-  background-color: var(--color-bg-tertiary);
-  border-color: var(--color-border);
-  color: var(--color-text);
+  background: var(--surface-elevated);
+  border-color: var(--surface-border);
+  color: var(--text-primary);
 }
 
 .auth-modal-title {
-  font-size: 1.375rem;
-  font-weight: 600;
-  color: var(--color-text);
-  margin: 0 0 24px 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0 0 var(--space-lg) 0;
 }
 
 .auth-modal-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-md);
 }
 
 .auth-modal-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-xs);
 }
 
 .auth-modal-label {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: var(--letter-spacing-wide);
 }
 
 .auth-modal-input {
-  padding: 10px 12px;
-  font-size: 0.9375rem;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  background-color: var(--color-bg-tertiary);
-  color: var(--color-text);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-sm);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-elevated);
+  color: var(--text-primary);
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
 .auth-modal-input:focus {
-  border-color: var(--color-accent);
+  border-color: var(--accent-solid);
+  box-shadow: var(--glow-accent);
 }
 
 .auth-modal-error {
-  font-size: 0.8125rem;
+  font-size: var(--font-size-xs);
   color: var(--color-error);
   margin: 0;
 }
 
 .auth-modal-submit {
-  margin-top: 4px;
-  padding: 11px 16px;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  border-radius: 8px;
-  background-color: var(--color-accent);
-  color: var(--color-bg);
+  margin-top: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-md);
+  background: var(--accent-solid);
+  color: var(--text-inverse);
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
+  box-shadow: var(--glow-accent);
 }
 
 .auth-modal-submit:hover:not(:disabled) {
-  background-color: var(--color-accent-hover);
+  background: var(--accent-solid-hover);
+  box-shadow: var(--glow-accent-strong);
 }
 
 .auth-modal-submit:disabled {
@@ -117,74 +129,79 @@
 }
 
 .auth-modal-switch {
-  margin: 20px 0 0 0;
-  font-size: 0.875rem;
-  color: var(--color-text-secondary);
+  margin: var(--space-lg) 0 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
   text-align: center;
 }
 
 .auth-modal-switch-link {
   background: none;
   border: none;
-  color: var(--color-accent);
-  font-size: 0.875rem;
+  color: var(--accent-solid);
+  font-size: var(--font-size-sm);
   cursor: pointer;
   padding: 0;
   text-decoration: underline;
 }
 
 .auth-modal-switch-link:hover {
-  color: var(--color-accent-hover);
+  color: var(--accent-solid-hover);
 }
 
 .auth-modal-success {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
-  padding: 16px 0;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
   color: var(--color-success);
   text-align: center;
 }
 
 .auth-modal-success p {
-  font-size: 0.9375rem;
-  color: var(--color-text-secondary);
-  line-height: 1.5;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: var(--line-height-relaxed);
 }
 
 .auth-modal-switch-button {
-  padding: 10px 24px;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  border-radius: 8px;
-  background-color: var(--color-accent);
-  color: var(--color-bg);
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-md);
+  background: var(--accent-solid);
+  color: var(--text-inverse);
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
+  box-shadow: var(--glow-accent);
 }
 
 .auth-modal-switch-button:hover {
-  background-color: var(--color-accent-hover);
+  background: var(--accent-solid-hover);
+  box-shadow: var(--glow-accent-strong);
 }
 
-/* Consent checkboxes */
+/* ---------------------------------------------------------------------------
+   Consent Checkboxes
+   --------------------------------------------------------------------------- */
+
 .auth-modal-consent {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 4px;
+  gap: var(--space-md);
+  margin-top: var(--space-xs);
 }
 
 .auth-modal-checkbox {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  font-size: 0.8125rem;
-  color: var(--color-text-secondary);
+  gap: var(--space-sm);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
   cursor: pointer;
-  line-height: 1.4;
+  line-height: var(--line-height-normal);
 }
 
 .auth-modal-checkbox input[type="checkbox"] {
@@ -192,7 +209,7 @@
   width: 16px;
   height: 16px;
   margin-top: 2px;
-  accent-color: var(--color-accent);
+  accent-color: var(--accent-solid);
   cursor: pointer;
 }
 
@@ -201,10 +218,10 @@
 }
 
 .auth-modal-checkbox a {
-  color: var(--color-accent);
+  color: var(--accent-solid);
   text-decoration: underline;
 }
 
 .auth-modal-checkbox a:hover {
-  color: var(--color-accent-hover);
+  color: var(--accent-solid-hover);
 }

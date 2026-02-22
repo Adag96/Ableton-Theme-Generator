@@ -1,47 +1,79 @@
+/* =============================================================================
+   LandingView - Equal-Focus Card Grid
+   ============================================================================= */
+
 .landing-view {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: 100%;
-  padding: var(--spacing-xl);
+  padding: var(--space-xl);
 }
 
 .landing-buttons {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--spacing-xl);
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
   width: 100%;
-  max-width: 1200px;
+  max-width: 800px;
 }
 
+/* ---------------------------------------------------------------------------
+   Landing Button Cards
+   Frosted glass cards with inner glow on hover
+   --------------------------------------------------------------------------- */
+
 .landing-button {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-xl);
-  background-color: var(--color-bg-secondary);
-  border: 2px solid var(--color-border);
-  border-radius: 12px;
+  padding: var(--space-xl);
+  background: var(--surface-elevated);
+  backdrop-filter: var(--blur-surface);
+  -webkit-backdrop-filter: var(--blur-surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-xl);
   cursor: pointer;
-  transition: all 0.3s ease;
-  min-height: 280px;
+  transition: all var(--duration-normal) var(--ease-out);
+  min-height: 220px;
   text-align: center;
-  gap: var(--spacing-md);
+  gap: var(--space-md);
+  overflow: hidden;
+}
+
+/* Inner glow overlay */
+.landing-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: var(--glow-inner-subtle);
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--ease-out);
+  pointer-events: none;
 }
 
 .landing-button:hover {
-  border-color: var(--color-accent);
-  background-color: var(--color-bg-tertiary);
+  border-color: var(--accent-solid);
   transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-elevated);
+}
+
+.landing-button:hover::before {
+  opacity: 1;
+  box-shadow: var(--glow-inner);
 }
 
 .landing-button:active {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
+
+/* ---------------------------------------------------------------------------
+   Icon
+   --------------------------------------------------------------------------- */
 
 .landing-button-icon {
   display: flex;
@@ -50,41 +82,49 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background-color: var(--color-bg-tertiary);
-  color: var(--color-accent);
-  margin-bottom: var(--spacing-sm);
-  transition: all 0.3s ease;
+  background: var(--surface-recessed);
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-sm);
+  transition: all var(--duration-normal) var(--ease-out);
 }
 
 .landing-button:hover .landing-button-icon {
-  background-color: var(--color-accent);
-  color: var(--color-bg);
+  background: var(--accent-solid);
+  color: var(--text-inverse);
   transform: scale(1.1);
+  box-shadow: var(--glow-accent);
 }
+
+/* ---------------------------------------------------------------------------
+   Text
+   --------------------------------------------------------------------------- */
 
 .landing-button h3 {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--color-text);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
 }
 
 .landing-button p {
   margin: 0;
-  font-size: 13px;
-  color: var(--color-text-secondary);
-  line-height: 1.5;
-  max-width: 280px;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: var(--line-height-relaxed);
+  max-width: 240px;
 }
 
-/* Responsive layout for smaller screens */
-@media (max-width: 1024px) {
+/* ---------------------------------------------------------------------------
+   Responsive
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 700px) {
   .landing-buttons {
     grid-template-columns: 1fr;
     max-width: 400px;
   }
 
   .landing-button {
-    min-height: 200px;
+    min-height: 180px;
   }
 }

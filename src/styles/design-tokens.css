@@ -1,0 +1,198 @@
+/* =============================================================================
+   Design Tokens - Frosted Artifact Aesthetic
+   Lonebody Brand: frosted acrylic, internal glow, divine otherworldly engineering
+   ============================================================================= */
+
+:root {
+  /* ---------------------------------------------------------------------------
+     Surface Colors - Frosted Acrylic
+     Semi-transparent surfaces that allow background to show through
+     --------------------------------------------------------------------------- */
+  --surface-base: rgba(255, 255, 255, 0.7);
+  --surface-elevated: rgba(255, 255, 255, 0.5);
+  --surface-recessed: rgba(200, 200, 210, 0.4);
+  --surface-border: rgba(255, 255, 255, 0.5);
+  --surface-border-subtle: rgba(255, 255, 255, 0.3);
+
+  /* ---------------------------------------------------------------------------
+     Text Colors
+     Dark text on light frosted surfaces
+     --------------------------------------------------------------------------- */
+  --text-primary: rgba(30, 30, 35, 0.9);
+  --text-secondary: rgba(80, 80, 90, 0.75);
+  --text-tertiary: rgba(120, 120, 130, 0.6);
+  --text-inverse: rgba(255, 255, 255, 0.95);
+
+  /* ---------------------------------------------------------------------------
+     Theme-Reactive Accents
+     Defaults - overridden dynamically by JS based on active theme palette
+     --------------------------------------------------------------------------- */
+  --accent-glow: rgba(0, 212, 170, 0.6);
+  --accent-glow-secondary: rgba(255, 120, 100, 0.5);
+  --accent-solid: #00d4aa;
+  --accent-solid-hover: #00f5c4;
+  --accent-solid-secondary: #ff7864;
+
+  /* ---------------------------------------------------------------------------
+     Semantic Colors
+     --------------------------------------------------------------------------- */
+  --color-success: #34c759;
+  --color-warning: #ff9500;
+  --color-error: #ff3b30;
+  --color-info: #007aff;
+
+  /* ---------------------------------------------------------------------------
+     Shadows & Glow
+     Soft shadows for depth, glows for accent elements
+     --------------------------------------------------------------------------- */
+  --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.08);
+  --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --shadow-inset: inset 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  --glow-accent: 0 0 20px var(--accent-glow);
+  --glow-accent-strong: 0 0 30px var(--accent-glow), 0 0 60px var(--accent-glow);
+  --glow-inner: inset 0 0 30px var(--accent-glow);
+  --glow-inner-subtle: inset 0 0 20px rgba(0, 212, 170, 0.15);
+
+  /* ---------------------------------------------------------------------------
+     Blur
+     Frosted glass effects using backdrop-filter
+     --------------------------------------------------------------------------- */
+  --blur-surface: blur(24px) saturate(180%);
+  --blur-overlay: blur(16px) saturate(150%);
+  --blur-subtle: blur(12px) saturate(120%);
+
+  /* ---------------------------------------------------------------------------
+     Spacing Scale
+     Consistent spacing based on 4px grid
+     --------------------------------------------------------------------------- */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* ---------------------------------------------------------------------------
+     Border Radii
+     Soft, rounded forms characteristic of the brand
+     --------------------------------------------------------------------------- */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-pill: 9999px;
+
+  /* ---------------------------------------------------------------------------
+     Typography
+     Clean geometric sans-serif
+     --------------------------------------------------------------------------- */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+  --font-family-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+
+  --font-size-xs: 11px;
+  --font-size-sm: 13px;
+  --font-size-base: 15px;
+  --font-size-lg: 18px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 32px;
+  --font-size-3xl: 40px;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.7;
+
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.02em;
+
+  /* ---------------------------------------------------------------------------
+     Animation
+     Smooth, elegant motion
+     --------------------------------------------------------------------------- */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --duration-instant: 100ms;
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+  --duration-slower: 600ms;
+
+  /* ---------------------------------------------------------------------------
+     Z-Index Scale
+     Layering system
+     --------------------------------------------------------------------------- */
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal-backdrop: 300;
+  --z-modal: 400;
+  --z-tooltip: 500;
+  --z-titlebar: 600;
+
+  /* ---------------------------------------------------------------------------
+     Layout
+     --------------------------------------------------------------------------- */
+  --titlebar-height: 52px;
+  --content-max-width: 1400px;
+
+  /* ---------------------------------------------------------------------------
+     Background (for body gradient)
+     --------------------------------------------------------------------------- */
+  --bg-gradient-base: rgb(235, 235, 240);
+  --bg-gradient-mid: rgb(225, 225, 232);
+  --bg-gradient-end: rgb(215, 215, 225);
+  --bg-accent-1: rgba(0, 212, 170, 0.08);
+  --bg-accent-2: rgba(255, 120, 100, 0.06);
+  --bg-accent-3: rgba(100, 100, 255, 0.04);
+}
+
+/* =============================================================================
+   Dark Mode
+   ============================================================================= */
+
+[data-theme="dark"] {
+  /* ---------------------------------------------------------------------------
+     Surface Colors - Dark Frosted Acrylic
+     --------------------------------------------------------------------------- */
+  --surface-base: rgba(30, 30, 35, 0.8);
+  --surface-elevated: rgba(45, 45, 52, 0.7);
+  --surface-recessed: rgba(20, 20, 24, 0.6);
+  --surface-border: rgba(255, 255, 255, 0.1);
+  --surface-border-subtle: rgba(255, 255, 255, 0.05);
+
+  /* ---------------------------------------------------------------------------
+     Text Colors - Light text on dark surfaces
+     --------------------------------------------------------------------------- */
+  --text-primary: rgba(255, 255, 255, 0.92);
+  --text-secondary: rgba(255, 255, 255, 0.65);
+  --text-tertiary: rgba(255, 255, 255, 0.4);
+  --text-inverse: rgba(20, 20, 25, 0.95);
+
+  /* ---------------------------------------------------------------------------
+     Shadows & Glow - More pronounced in dark mode
+     --------------------------------------------------------------------------- */
+  --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.3);
+  --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-inset: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+
+  --glow-inner-subtle: inset 0 0 20px rgba(0, 212, 170, 0.2);
+
+  /* ---------------------------------------------------------------------------
+     Background
+     --------------------------------------------------------------------------- */
+  --bg-gradient-base: rgb(18, 18, 22);
+  --bg-gradient-mid: rgb(25, 25, 30);
+  --bg-gradient-end: rgb(20, 20, 26);
+  --bg-accent-1: rgba(0, 212, 170, 0.12);
+  --bg-accent-2: rgba(255, 120, 100, 0.08);
+  --bg-accent-3: rgba(100, 100, 255, 0.06);
+}

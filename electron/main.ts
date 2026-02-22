@@ -1,6 +1,7 @@
-import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, shell, nativeTheme } from 'electron';
 import path from 'path';
 import fs from 'fs';
+import os from 'os';
 
 const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
 
@@ -53,12 +54,21 @@ function detectAbletonThemesDirectory(): ThemesDirectoryResult {
 }
 
 function createWindow() {
+  const isMac = process.platform === 'darwin';
+  const isWin = process.platform === 'win32';
+
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    minWidth: 800,
-    minHeight: 600,
-    titleBarStyle: 'hiddenInset',
+    minWidth: 900,
+    minHeight: 650,
+    frame: false,
+    transparent: isMac, // Only on macOS for proper vibrancy
+    backgroundColor: isWin ? '#f0f0f5' : undefined, // Fallback for Windows
+    vibrancy: isMac ? 'under-window' : undefined, // macOS frosted effect
+    visualEffectState: isMac ? 'active' : undefined,
+    titleBarStyle: 'hidden',
+    trafficLightPosition: isMac ? { x: 16, y: 18 } : undefined,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -84,6 +94,28 @@ app.whenReady().then(() => {
   // Set up IPC handlers
   ipcMain.handle('get-version', () => app.getVersion());
   ipcMain.handle('get-build-number', () => buildNumber);
+  ipcMain.handle('get-platform', () => process.platform);
+
+  // Window control handlers
+  ipcMain.handle('window-minimize', () => {
+    mainWindow?.minimize();
+  });
+
+  ipcMain.handle('window-maximize', () => {
+    if (mainWindow?.isMaximized()) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow?.maximize();
+    }
+  });
+
+  ipcMain.handle('window-close', () => {
+    mainWindow?.close();
+  });
+
+  ipcMain.handle('window-is-maximized', () => {
+    return mainWindow?.isMaximized() ?? false;
+  });
 
   ipcMain.handle('detect-themes-directory', () => {
     return detectAbletonThemesDirectory();

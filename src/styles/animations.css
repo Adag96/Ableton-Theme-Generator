@@ -1,0 +1,265 @@
+/* =============================================================================
+   Animations - Subtle, Elegant Motion
+   ============================================================================= */
+
+/* ---------------------------------------------------------------------------
+   Glow Pulse
+   Subtle breathing animation for accent glow elements
+   --------------------------------------------------------------------------- */
+
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.6;
+    box-shadow: var(--glow-inner-subtle);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: var(--glow-inner);
+  }
+}
+
+@keyframes glow-pulse-outer {
+  0%, 100% {
+    box-shadow: 0 0 15px var(--accent-glow);
+  }
+  50% {
+    box-shadow: 0 0 25px var(--accent-glow), 0 0 50px var(--accent-glow);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Fade In/Out
+   --------------------------------------------------------------------------- */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in var(--duration-normal) var(--ease-out);
+}
+
+/* ---------------------------------------------------------------------------
+   Slide Animations
+   --------------------------------------------------------------------------- */
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up var(--duration-normal) var(--ease-out);
+}
+
+.animate-slide-down {
+  animation: slide-down var(--duration-normal) var(--ease-out);
+}
+
+/* ---------------------------------------------------------------------------
+   Scale Animations
+   --------------------------------------------------------------------------- */
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scale-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in var(--duration-normal) var(--ease-out);
+}
+
+/* ---------------------------------------------------------------------------
+   Modal Animation
+   --------------------------------------------------------------------------- */
+
+@keyframes modal-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes modal-exit {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+}
+
+.animate-modal-enter {
+  animation: modal-enter var(--duration-normal) var(--ease-spring);
+}
+
+/* ---------------------------------------------------------------------------
+   Shimmer / Loading
+   --------------------------------------------------------------------------- */
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--surface-recessed) 25%,
+    var(--surface-elevated) 50%,
+    var(--surface-recessed) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s var(--ease-in-out) infinite;
+}
+
+/* ---------------------------------------------------------------------------
+   Spin
+   --------------------------------------------------------------------------- */
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* ---------------------------------------------------------------------------
+   Bounce
+   --------------------------------------------------------------------------- */
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-bounce {
+  animation: bounce 0.6s var(--ease-out) infinite;
+}
+
+/* ---------------------------------------------------------------------------
+   Stagger Animation Delays
+   For animating lists of items
+   --------------------------------------------------------------------------- */
+
+.stagger-1 { animation-delay: 50ms; }
+.stagger-2 { animation-delay: 100ms; }
+.stagger-3 { animation-delay: 150ms; }
+.stagger-4 { animation-delay: 200ms; }
+.stagger-5 { animation-delay: 250ms; }
+.stagger-6 { animation-delay: 300ms; }
+.stagger-7 { animation-delay: 350ms; }
+.stagger-8 { animation-delay: 400ms; }
+
+/* ---------------------------------------------------------------------------
+   Reduced Motion
+   Respect user preference for reduced motion
+   --------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .glow-pulse,
+  .glow-pulse-fast,
+  .animate-shimmer,
+  .animate-spin,
+  .animate-bounce {
+    animation: none;
+  }
+}
