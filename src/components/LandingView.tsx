@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { supabase, type CommunityTheme } from '../lib/supabase';
 import { CommunityThemeCard } from './CommunityThemeCard';
+import { CommunityThemeDetailModal } from './CommunityThemeDetailModal';
 import './LandingView.css';
 
 interface LandingViewProps {
@@ -23,6 +24,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState<CommunityTheme | null>(null);
 
   const fetchFeaturedThemes = useCallback(async () => {
     setIsLoading(true);
@@ -141,6 +143,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
                   key={theme.id}
                   theme={theme}
                   onDownload={handleDownload}
+                  onClick={setSelectedTheme}
                 />
               ))}
             </div>
@@ -194,6 +197,13 @@ export const LandingView: React.FC<LandingViewProps> = ({
           <p>Configure theme generation preferences and Ableton directory</p>
         </button>
       </div>
+
+      <CommunityThemeDetailModal
+        isOpen={selectedTheme !== null}
+        theme={selectedTheme}
+        onClose={() => setSelectedTheme(null)}
+        onDownload={handleDownload}
+      />
     </div>
   );
 };

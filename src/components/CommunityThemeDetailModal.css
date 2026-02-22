@@ -1,0 +1,281 @@
+/* =============================================================================
+   CommunityThemeDetailModal - Community Theme Detail View
+   ============================================================================= */
+
+.community-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: var(--blur-overlay);
+  -webkit-backdrop-filter: var(--blur-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal-backdrop);
+  animation: fade-in var(--duration-fast) var(--ease-out);
+}
+
+.community-modal-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-base);
+  backdrop-filter: var(--blur-surface);
+  -webkit-backdrop-filter: var(--blur-surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  width: min(90vw, 680px);
+  max-height: calc(100vh - 80px);
+  overflow: hidden;
+  box-shadow: var(--shadow-elevated);
+  border: 1px solid var(--surface-border);
+  animation: modal-enter var(--duration-normal) var(--ease-spring);
+}
+
+/* Responsive width adjustments */
+@media (min-width: 900px) {
+  .community-modal-content {
+    width: min(70vw, 750px);
+  }
+}
+
+@media (min-width: 1200px) {
+  .community-modal-content {
+    width: min(60vw, 850px);
+  }
+}
+
+.community-modal-close {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-border);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: all var(--duration-fast) var(--ease-out);
+  z-index: 100;
+}
+
+.community-modal-close:hover {
+  background: var(--surface-base);
+  color: var(--text-primary);
+  border-color: var(--accent-solid);
+  box-shadow: var(--glow-accent);
+}
+
+/* ---------------------------------------------------------------------------
+   Image Section - Ableton Preview
+   --------------------------------------------------------------------------- */
+
+.community-modal-image-section {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-md);
+}
+
+.community-modal-preview-image {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  background: var(--surface-recessed);
+}
+
+.community-modal-no-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  width: 100%;
+  height: 100%;
+  min-height: 120px;
+  background: var(--surface-recessed);
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.community-modal-no-preview svg {
+  opacity: 0.5;
+}
+
+/* ---------------------------------------------------------------------------
+   Info Section
+   --------------------------------------------------------------------------- */
+
+.community-modal-info-section {
+  flex-shrink: 0;
+  margin-bottom: var(--space-sm);
+}
+
+.community-modal-name {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.community-modal-creator {
+  margin: 0 0 var(--space-sm) 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.community-modal-description {
+  margin: 0 0 var(--space-sm) 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  line-height: var(--line-height-normal);
+}
+
+.community-modal-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.community-modal-status {
+  display: inline-block;
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.community-modal-status-pending {
+  background: rgba(255, 204, 0, 0.15);
+  color: #b8860b;
+  border: 1px solid rgba(255, 204, 0, 0.3);
+}
+
+.community-modal-status-approved {
+  background: rgba(52, 199, 89, 0.15);
+  color: var(--color-success);
+  border: 1px solid rgba(52, 199, 89, 0.3);
+}
+
+.community-modal-status-rejected {
+  background: rgba(255, 59, 48, 0.15);
+  color: var(--color-error);
+  border: 1px solid rgba(255, 59, 48, 0.3);
+}
+
+.community-modal-downloads {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+/* ---------------------------------------------------------------------------
+   Swatches
+   --------------------------------------------------------------------------- */
+
+.community-modal-swatches {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.community-modal-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--shadow-soft);
+}
+
+/* ---------------------------------------------------------------------------
+   Actions
+   --------------------------------------------------------------------------- */
+
+.community-modal-actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--surface-border);
+}
+
+.community-modal-error {
+  font-size: var(--font-size-sm);
+  color: var(--color-error);
+}
+
+.community-modal-install {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  background: var(--accent-solid);
+  color: var(--text-inverse);
+  border: 1px solid var(--accent-solid);
+  box-shadow: var(--glow-accent);
+  margin-left: auto;
+}
+
+.community-modal-install:hover:not(:disabled) {
+  background: var(--accent-solid-hover);
+  border-color: var(--accent-solid-hover);
+  box-shadow: var(--glow-accent-strong);
+}
+
+.community-modal-install:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.community-modal-install-done {
+  background: var(--color-success);
+  border-color: var(--color-success);
+  box-shadow: 0 0 12px rgba(52, 199, 89, 0.4);
+}
+
+.community-modal-install-done:hover:not(:disabled) {
+  background: var(--color-success);
+  border-color: var(--color-success);
+}
+
+/* ---------------------------------------------------------------------------
+   Rejection Reason
+   --------------------------------------------------------------------------- */
+
+.community-modal-rejection {
+  flex-shrink: 0;
+  padding: var(--space-sm) var(--space-md);
+  margin-top: var(--space-sm);
+  background: rgba(255, 59, 48, 0.1);
+  border: 1px solid rgba(255, 59, 48, 0.3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+}
+
+.community-modal-rejection strong {
+  color: var(--color-error);
+}

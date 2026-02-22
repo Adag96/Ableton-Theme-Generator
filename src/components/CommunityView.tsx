@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { supabase, type CommunityTheme } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { CommunityThemeCard } from './CommunityThemeCard';
+import { CommunityThemeDetailModal } from './CommunityThemeDetailModal';
 import './CommunityView.css';
 
 type Tab = 'gallery' | 'submissions';
@@ -16,6 +17,7 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack }) => {
   const [themes, setThemes] = useState<CommunityTheme[]>([]);
   const [mySubmissions, setMySubmissions] = useState<CommunityTheme[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedTheme, setSelectedTheme] = useState<CommunityTheme | null>(null);
 
   const fetchGallery = useCallback(async () => {
     setIsLoading(true);
@@ -130,6 +132,7 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack }) => {
                 key={theme.id}
                 theme={theme}
                 onDownload={handleDownload}
+                onClick={setSelectedTheme}
                 showStatus={tab === 'submissions'}
               />
             ))}
@@ -137,6 +140,13 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack }) => {
         )}
       </div>
 
-          </div>
+      <CommunityThemeDetailModal
+        isOpen={selectedTheme !== null}
+        theme={selectedTheme}
+        onClose={() => setSelectedTheme(null)}
+        onDownload={handleDownload}
+        showStatus={tab === 'submissions'}
+      />
+    </div>
   );
 };

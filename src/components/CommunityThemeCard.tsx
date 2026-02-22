@@ -4,6 +4,7 @@ import type { CommunityTheme } from '../lib/supabase';
 interface CommunityThemeCardProps {
   theme: CommunityTheme;
   onDownload: (theme: CommunityTheme) => Promise<void>;
+  onClick?: (theme: CommunityTheme) => void;
   showStatus?: boolean;
 }
 
@@ -16,6 +17,7 @@ const STATUS_LABELS: Record<string, string> = {
 export const CommunityThemeCard: React.FC<CommunityThemeCardProps> = ({
   theme,
   onDownload,
+  onClick,
   showStatus = false,
 }) => {
   const [isDownloading, setIsDownloading] = useState(false);
@@ -40,8 +42,12 @@ export const CommunityThemeCard: React.FC<CommunityThemeCardProps> = ({
     }
   };
 
+  const handleCardClick = () => {
+    onClick?.(theme);
+  };
+
   return (
-    <div className="community-card">
+    <div className="community-card" onClick={handleCardClick}>
       <div className="community-card-preview">
         {theme.source_image_url ? (
           <img
