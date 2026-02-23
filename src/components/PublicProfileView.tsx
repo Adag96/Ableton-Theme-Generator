@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { supabase, type Profile, type CommunityTheme } from '../lib/supabase';
 import { SOCIAL_PLATFORMS, SOCIAL_ICONS } from '../lib/social-platforms';
+import { useCommunityInstallState } from '../hooks/useCommunityInstallState';
 import { CommunityThemeCard } from './CommunityThemeCard';
 import { CommunityThemeDetailModal } from './CommunityThemeDetailModal';
 import './PublicProfileView.css';
@@ -16,6 +17,7 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
   onBack,
   onThemeClick,
 }) => {
+  const { isInstalled, markInstalled, markUninstalled, getFilePath, syncWithFilesystem } = useCommunityInstallState();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [themes, setThemes] = useState<CommunityTheme[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,15 +49,22 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
 
   useEffect(() => {
     fetchProfileAndThemes();
-  }, [fetchProfileAndThemes]);
+    syncWithFilesystem();
+  }, [fetchProfileAndThemes, syncWithFilesystem]);
 
   const handleDownload = async (theme: CommunityTheme) => {
+    // Prevent duplicate downloads
+    if (isInstalled(theme.id)) {
+      return;
+    }
+
     const result = await window.electronAPI.downloadCommunityTheme({
       url: theme.ask_file_url,
       name: theme.name,
     });
 
-    if (result.success) {
+    if (result.success && result.filePath) {
+      await markInstalled(theme.id, result.filePath);
       await supabase.rpc('increment_download_count', { theme_id: theme.id });
       setThemes((prev) =>
         prev.map((t) =>
@@ -64,6 +73,18 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
       );
     } else {
       throw new Error(result.error ?? 'Install failed');
+    }
+  };
+
+  const handleUninstall = async (theme: CommunityTheme) => {
+    const filePath = getFilePath(theme.id);
+    if (!filePath) return;
+
+    const result = await window.electronAPI.deleteLibraryThemeFile(filePath);
+    if (result.success) {
+      await markUninstalled(theme.id);
+    } else {
+      throw new Error(result.error ?? 'Uninstall failed');
     }
   };
 
@@ -169,10 +190,12 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
                 key={theme.id}
                 theme={theme}
                 onDownload={handleDownload}
+                onUninstall={handleUninstall}
                 onClick={(t) => {
                   setSelectedTheme(t);
                   onThemeClick(t);
                 }}
+                isInstalled={isInstalled(theme.id)}
               />
             ))}
           </div>
@@ -184,6 +207,8 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
         theme={selectedTheme}
         onClose={() => setSelectedTheme(null)}
         onDownload={handleDownload}
+        onUninstall={handleUninstall}
+        isInstalled={selectedTheme ? isInstalled(selectedTheme.id) : false}
       />
     </div>
   );

@@ -1,4 +1,5 @@
 import type { ThemeLibrary } from './types/theme-library';
+import type { CommunityInstallState } from './types/community-install-state';
 
 export interface ThemesDirectoryResult {
   found: boolean;
@@ -52,6 +53,8 @@ export interface ElectronAPI {
   deleteSourceImage: (themeId: string) => Promise<{ success: boolean; error?: string }>;
   getSourceImageDataUrl: (cachedPath: string) => Promise<string | null>;
   openExternal: (url: string) => Promise<void>;
+  loadCommunityInstallState: () => Promise<CommunityInstallState>;
+  saveCommunityInstallState: (state: CommunityInstallState) => Promise<{ success: boolean; error?: string }>;
 }
 
 declare global {

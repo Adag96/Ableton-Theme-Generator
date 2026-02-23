@@ -44,4 +44,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('get-source-image-data-url', cachedPath),
   openExternal: (url: string) =>
     ipcRenderer.invoke('open-external', url),
+  loadCommunityInstallState: () =>
+    ipcRenderer.invoke('load-community-install-state'),
+  saveCommunityInstallState: (state: unknown) =>
+    ipcRenderer.invoke('save-community-install-state', state),
 });

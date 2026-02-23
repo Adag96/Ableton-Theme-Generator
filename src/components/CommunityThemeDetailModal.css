@@ -265,15 +265,18 @@
   cursor: not-allowed;
 }
 
-.community-modal-install-done {
-  background: var(--color-success);
-  border-color: var(--color-success);
-  box-shadow: 0 0 12px rgba(52, 199, 89, 0.4);
+.community-modal-uninstall {
+  background: var(--surface-elevated);
+  color: var(--text-secondary);
+  border-color: var(--surface-border);
+  box-shadow: none;
 }
 
-.community-modal-install-done:hover:not(:disabled) {
-  background: var(--color-success);
-  border-color: var(--color-success);
+.community-modal-uninstall:hover:not(:disabled) {
+  background: var(--surface-elevated);
+  color: var(--color-error);
+  border-color: var(--color-error);
+  box-shadow: none;
 }
 
 /* ---------------------------------------------------------------------------

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { supabase, type CommunityTheme } from '../lib/supabase';
+import { useCommunityInstallState } from '../hooks/useCommunityInstallState';
 import { CommunityThemeCard } from './CommunityThemeCard';
 import { CommunityThemeDetailModal } from './CommunityThemeDetailModal';
 import './LandingView.css';
@@ -22,6 +23,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
   onSettings,
   onViewProfile,
 }) => {
+  const { isInstalled, markInstalled, markUninstalled, getFilePath, syncWithFilesystem } = useCommunityInstallState();
   const [themes, setThemes] = useState<CommunityTheme[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -42,7 +44,8 @@ export const LandingView: React.FC<LandingViewProps> = ({
 
   useEffect(() => {
     fetchFeaturedThemes();
-  }, [fetchFeaturedThemes]);
+    syncWithFilesystem();
+  }, [fetchFeaturedThemes, syncWithFilesystem]);
 
   // Auto-cycle carousel
   useEffect(() => {
@@ -75,12 +78,18 @@ export const LandingView: React.FC<LandingViewProps> = ({
   };
 
   const handleDownload = async (theme: CommunityTheme) => {
+    // Prevent duplicate downloads
+    if (isInstalled(theme.id)) {
+      return;
+    }
+
     const result = await window.electronAPI.downloadCommunityTheme({
       url: theme.ask_file_url,
       name: theme.name,
     });
 
-    if (result.success) {
+    if (result.success && result.filePath) {
+      await markInstalled(theme.id, result.filePath);
       // Increment download count in DB (fire-and-forget)
       await supabase.rpc('increment_download_count', { theme_id: theme.id });
       // Optimistically update the count in state
@@ -91,6 +100,18 @@ export const LandingView: React.FC<LandingViewProps> = ({
       );
     } else {
       throw new Error(result.error ?? 'Install failed');
+    }
+  };
+
+  const handleUninstall = async (theme: CommunityTheme) => {
+    const filePath = getFilePath(theme.id);
+    if (!filePath) return;
+
+    const result = await window.electronAPI.deleteLibraryThemeFile(filePath);
+    if (result.success) {
+      await markUninstalled(theme.id);
+    } else {
+      throw new Error(result.error ?? 'Uninstall failed');
     }
   };
 
@@ -145,8 +166,10 @@ export const LandingView: React.FC<LandingViewProps> = ({
                   key={theme.id}
                   theme={theme}
                   onDownload={handleDownload}
+                  onUninstall={handleUninstall}
                   onClick={setSelectedTheme}
                   onCreatorClick={onViewProfile}
+                  isInstalled={isInstalled(theme.id)}
                 />
               ))}
             </div>
@@ -206,7 +229,9 @@ export const LandingView: React.FC<LandingViewProps> = ({
         theme={selectedTheme}
         onClose={() => setSelectedTheme(null)}
         onDownload={handleDownload}
+        onUninstall={handleUninstall}
         onCreatorClick={onViewProfile}
+        isInstalled={selectedTheme ? isInstalled(selectedTheme.id) : false}
       />
     </div>
   );

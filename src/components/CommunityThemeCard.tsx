@@ -8,7 +8,9 @@ interface CommunityThemeCardProps {
   onClick?: (theme: CommunityTheme) => void;
   onCreatorClick?: (userId: string) => void;
   onDelete?: () => void;
+  onUninstall?: (theme: CommunityTheme) => Promise<void>;
   showStatus?: boolean;
+  isInstalled?: boolean;
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -23,10 +25,12 @@ export const CommunityThemeCard: React.FC<CommunityThemeCardProps> = ({
   onClick,
   onCreatorClick,
   onDelete,
+  onUninstall,
   showStatus = false,
+  isInstalled = false,
 }) => {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [downloadDone, setDownloadDone] = useState(false);
+  const [isUninstalling, setIsUninstalling] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -39,12 +43,23 @@ export const CommunityThemeCard: React.FC<CommunityThemeCardProps> = ({
     setIsDownloading(true);
     try {
       await onDownload(theme);
-      setDownloadDone(true);
-      setTimeout(() => setDownloadDone(false), 3000);
     } catch {
       setDownloadError('Install failed');
     } finally {
       setIsDownloading(false);
+    }
+  };
+
+  const handleUninstall = async () => {
+    if (isUninstalling || !onUninstall) return;
+    setDownloadError(null);
+    setIsUninstalling(true);
+    try {
+      await onUninstall(theme);
+    } catch {
+      setDownloadError('Uninstall failed');
+    } finally {
+      setIsUninstalling(false);
     }
   };
 
@@ -133,13 +148,23 @@ export const CommunityThemeCard: React.FC<CommunityThemeCardProps> = ({
       {theme.status === 'approved' && (
         <div className="community-card-footer">
           {downloadError && <span className="community-card-error">{downloadError}</span>}
-          <button
-            className={`community-card-install ${downloadDone ? 'community-card-install-done' : ''}`}
-            onClick={handleDownload}
-            disabled={isDownloading}
-          >
-            {isDownloading ? 'Installing...' : downloadDone ? 'Installed!' : 'Install'}
-          </button>
+          {isInstalled ? (
+            <button
+              className="community-card-install community-card-uninstall"
+              onClick={handleUninstall}
+              disabled={isUninstalling}
+            >
+              {isUninstalling ? 'Removing...' : 'Uninstall'}
+            </button>
+          ) : (
+            <button
+              className="community-card-install"
+              onClick={handleDownload}
+              disabled={isDownloading}
+            >
+              {isDownloading ? 'Installing...' : 'Install'}
+            </button>
+          )}
         </div>
       )}
 

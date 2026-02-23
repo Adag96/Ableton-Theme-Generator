@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { supabase, type CommunityTheme } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
+import { useCommunityInstallState } from '../hooks/useCommunityInstallState';
 import { CommunityThemeCard } from './CommunityThemeCard';
 import { CommunityThemeDetailModal } from './CommunityThemeDetailModal';
 import './CommunityView.css';
@@ -14,6 +15,7 @@ interface CommunityViewProps {
 
 export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProfile }) => {
   const { user } = useAuth();
+  const { isInstalled, markInstalled, markUninstalled, getFilePath, syncWithFilesystem } = useCommunityInstallState();
   const [tab, setTab] = useState<Tab>('gallery');
   const [themes, setThemes] = useState<CommunityTheme[]>([]);
   const [mySubmissions, setMySubmissions] = useState<CommunityTheme[]>([]);
@@ -43,7 +45,8 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProf
 
   useEffect(() => {
     fetchGallery();
-  }, [fetchGallery]);
+    syncWithFilesystem();
+  }, [fetchGallery, syncWithFilesystem]);
 
   useEffect(() => {
     if (user) {
@@ -55,12 +58,19 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProf
   }, [user, fetchMySubmissions, tab]);
 
   const handleDownload = async (theme: CommunityTheme) => {
+    // Prevent duplicate downloads - if already installed, skip
+    if (isInstalled(theme.id)) {
+      return;
+    }
+
     const result = await window.electronAPI.downloadCommunityTheme({
       url: theme.ask_file_url,
       name: theme.name,
     });
 
-    if (result.success) {
+    if (result.success && result.filePath) {
+      // Track installation state
+      await markInstalled(theme.id, result.filePath);
       // Increment download count in DB (fire-and-forget)
       await supabase.rpc('increment_download_count', { theme_id: theme.id });
       // Optimistically update the count in state
@@ -71,6 +81,18 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProf
       );
     } else {
       throw new Error(result.error ?? 'Install failed');
+    }
+  };
+
+  const handleUninstall = async (theme: CommunityTheme) => {
+    const filePath = getFilePath(theme.id);
+    if (!filePath) return;
+
+    const result = await window.electronAPI.deleteLibraryThemeFile(filePath);
+    if (result.success) {
+      await markUninstalled(theme.id);
+    } else {
+      throw new Error(result.error ?? 'Uninstall failed');
     }
   };
 
@@ -148,8 +170,10 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProf
                   key={theme.id}
                   theme={theme}
                   onDownload={handleDownload}
+                  onUninstall={handleUninstall}
                   onClick={setSelectedTheme}
                   onCreatorClick={onViewProfile}
+                  isInstalled={isInstalled(theme.id)}
                 />
               ))}
             </div>
@@ -174,8 +198,10 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProf
                         key={theme.id}
                         theme={theme}
                         onDownload={handleDownload}
+                        onUninstall={handleUninstall}
                         onClick={setSelectedTheme}
                         onCreatorClick={onViewProfile}
+                        isInstalled={isInstalled(theme.id)}
                         showStatus
                       />
                     ))}
@@ -211,8 +237,10 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProf
         theme={selectedTheme}
         onClose={() => setSelectedTheme(null)}
         onDownload={handleDownload}
+        onUninstall={handleUninstall}
         onCreatorClick={onViewProfile}
         showStatus={tab === 'submissions'}
+        isInstalled={selectedTheme ? isInstalled(selectedTheme.id) : false}
       />
     </div>
   );

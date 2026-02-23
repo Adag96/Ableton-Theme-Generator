@@ -332,13 +332,18 @@
   cursor: not-allowed;
 }
 
-.community-card-install-done {
-  background: var(--color-success);
+.community-card-uninstall {
+  background: var(--surface-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--surface-border);
   box-shadow: none;
 }
 
-.community-card-install-done:hover:not(:disabled) {
-  background: var(--color-success);
+.community-card-uninstall:hover:not(:disabled) {
+  background: var(--surface-elevated);
+  color: var(--color-error);
+  border-color: var(--color-error);
+  box-shadow: none;
 }
 
 /* ---------------------------------------------------------------------------

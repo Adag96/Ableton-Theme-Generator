@@ -7,8 +7,10 @@ interface CommunityThemeDetailModalProps {
   theme: CommunityTheme | null;
   onClose: () => void;
   onDownload: (theme: CommunityTheme) => Promise<void>;
+  onUninstall?: (theme: CommunityTheme) => Promise<void>;
   onCreatorClick?: (userId: string) => void;
   showStatus?: boolean;
+  isInstalled?: boolean;
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -22,15 +24,16 @@ export const CommunityThemeDetailModal: React.FC<CommunityThemeDetailModalProps>
   theme,
   onClose,
   onDownload,
+  onUninstall,
   onCreatorClick,
   showStatus = false,
+  isInstalled = false,
 }) => {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [downloadDone, setDownloadDone] = useState(false);
+  const [isUninstalling, setIsUninstalling] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
 
   useEffect(() => {
-    setDownloadDone(false);
     setDownloadError(null);
   }, [theme]);
 
@@ -46,12 +49,23 @@ export const CommunityThemeDetailModal: React.FC<CommunityThemeDetailModalProps>
     setIsDownloading(true);
     try {
       await onDownload(theme);
-      setDownloadDone(true);
-      setTimeout(() => setDownloadDone(false), 3000);
     } catch {
       setDownloadError('Install failed');
     } finally {
       setIsDownloading(false);
+    }
+  };
+
+  const handleUninstall = async () => {
+    if (!theme || isUninstalling || !onUninstall) return;
+    setDownloadError(null);
+    setIsUninstalling(true);
+    try {
+      await onUninstall(theme);
+    } catch {
+      setDownloadError('Uninstall failed');
+    } finally {
+      setIsUninstalling(false);
     }
   };
 
@@ -157,18 +171,32 @@ export const CommunityThemeDetailModal: React.FC<CommunityThemeDetailModalProps>
             {downloadError && (
               <span className="community-modal-error">{downloadError}</span>
             )}
-            <button
-              className={`community-modal-install ${downloadDone ? 'community-modal-install-done' : ''}`}
-              onClick={handleDownload}
-              disabled={isDownloading}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-              {isDownloading ? 'Installing...' : downloadDone ? 'Installed!' : 'Install Theme'}
-            </button>
+            {isInstalled ? (
+              <button
+                className="community-modal-install community-modal-uninstall"
+                onClick={handleUninstall}
+                disabled={isUninstalling}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+                {isUninstalling ? 'Removing...' : 'Uninstall Theme'}
+              </button>
+            ) : (
+              <button
+                className="community-modal-install"
+                onClick={handleDownload}
+                disabled={isDownloading}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                {isDownloading ? 'Installing...' : 'Install Theme'}
+              </button>
+            )}
           </div>
         )}
 
