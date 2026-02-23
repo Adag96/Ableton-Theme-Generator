@@ -250,7 +250,7 @@
   box-shadow: var(--shadow-elevated);
 }
 
-/* Color location markers */
+/* Color location markers - draggable */
 .color-marker {
   position: absolute;
   width: 20px;
@@ -259,8 +259,23 @@
   border: 2px solid white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   transform: translate(-50%, -50%);
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: grab;
   z-index: 10;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.color-marker:hover {
+  transform: translate(-50%, -50%) scale(1.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.color-marker-dragging {
+  cursor: grabbing;
+  transform: translate(-50%, -50%) scale(1.3);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  transition: none;
 }
 
 .color-marker::after {

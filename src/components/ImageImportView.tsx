@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import type { ImageFileResult } from '../electron';
 import { useColorExtraction } from '../hooks/useColorExtraction';
 import type { PaletteSelectionResult } from '../extraction';
@@ -6,6 +6,8 @@ import type { ThemeTone, ContrastLevel, VariantMode } from '../theme/types';
 import { hexToHsl, hslToHex } from '../theme/color-utils';
 import { generateRandomPalette } from '../theme/random-palette';
 import { ColorPickerPopover } from './ColorPickerPopover';
+import { DraggableColorMarker } from './DraggableColorMarker';
+import { createColorSampler, type ColorSampler } from '../utils/color-sampler';
 import './ImageImportView.css';
 
 interface ImageImportViewProps {
@@ -89,6 +91,11 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
   // Option C: Random palette (bypasses image extraction)
   const [randomPalette, setRandomPalette] = useState<PaletteSelectionResult | null>(null);
 
+  // Draggable marker state
+  const imageRef = useRef<HTMLImageElement>(null);
+  const [colorSampler, setColorSampler] = useState<ColorSampler | null>(null);
+  const [markerPositions, setMarkerPositions] = useState<Partial<Record<ColorRole, { x: number; y: number }>>>({});
+
   // Reset state when image changes
   useEffect(() => {
     setSelectedTone(null);
@@ -96,6 +103,7 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
     setActivePickerRole(null);
     setMood(DEFAULT_MOOD);
     setRandomPalette(null);
+    setMarkerPositions({});
   }, [image?.filePath]);
 
   // Load image as data URL for preview
@@ -109,6 +117,33 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
       setImageDataUrl(dataUrl);
     });
   }, [image?.filePath]);
+
+  // Create color sampler when image data URL is available
+  useEffect(() => {
+    if (!imageDataUrl) {
+      setColorSampler(null);
+      return;
+    }
+
+    let disposed = false;
+    let sampler: ColorSampler | null = null;
+
+    createColorSampler(imageDataUrl).then((s) => {
+      if (!disposed) {
+        sampler = s;
+        setColorSampler(s);
+      } else {
+        s.dispose();
+      }
+    }).catch((err) => {
+      console.error('Failed to create color sampler:', err);
+    });
+
+    return () => {
+      disposed = true;
+      sampler?.dispose();
+    };
+  }, [imageDataUrl]);
 
   // Extraction runs only when both image and tone are selected
   const { palette: extractedPalette, isExtracting, error: extractionError } = useColorExtraction(
@@ -231,10 +266,56 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
     setMood(DEFAULT_MOOD);
   }, []);
 
-  // Reset color overrides
+  // Reset color overrides and marker positions
   const handleResetColors = useCallback(() => {
     setColorOverrides({});
+    setMarkerPositions({});
   }, []);
+
+  // Helper: Calculate the actual rendered image bounds within the <img> element
+  // (accounts for object-fit: contain letterboxing)
+  const getRenderedImageBounds = useCallback((img: HTMLImageElement) => {
+    const rect = img.getBoundingClientRect();
+    const { naturalWidth, naturalHeight } = img;
+
+    if (!naturalWidth || !naturalHeight) {
+      return { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
+    }
+
+    const scale = Math.min(rect.width / naturalWidth, rect.height / naturalHeight);
+    const renderedWidth = naturalWidth * scale;
+    const renderedHeight = naturalHeight * scale;
+
+    return {
+      left: rect.left + (rect.width - renderedWidth) / 2,
+      top: rect.top + (rect.height - renderedHeight) / 2,
+      width: renderedWidth,
+      height: renderedHeight,
+    };
+  }, []);
+
+  // Handle marker drag - sample color at cursor position
+  const handleMarkerDrag = useCallback((role: string, clientX: number, clientY: number) => {
+    const img = imageRef.current;
+    if (!img || !colorSampler) return;
+
+    const bounds = getRenderedImageBounds(img);
+
+    // Clamp cursor to image bounds
+    const clampedX = Math.max(bounds.left, Math.min(bounds.left + bounds.width, clientX));
+    const clampedY = Math.max(bounds.top, Math.min(bounds.top + bounds.height, clientY));
+
+    // Convert to normalized coordinates (0-1)
+    const normX = (clampedX - bounds.left) / bounds.width;
+    const normY = (clampedY - bounds.top) / bounds.height;
+
+    // Sample color with 3x3 averaging
+    const sampledColor = colorSampler.sampleAt(normX, normY, 3);
+
+    // Update both marker position and color override
+    setMarkerPositions(prev => ({ ...prev, [role]: { x: normX, y: normY } }));
+    setColorOverrides(prev => ({ ...prev, [role as ColorRole]: sampledColor }));
+  }, [colorSampler, getRenderedImageBounds]);
 
   // Option C: Random palette handler
   const handleRandomPalette = useCallback(() => {
@@ -308,55 +389,31 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
               {imageDataUrl ? (
                 <div className="import-preview-container">
                   <img
+                    ref={imageRef}
                     src={imageDataUrl}
                     alt={image.fileName}
                     className="import-preview-image"
                   />
-                  {/* Color location markers - only show after extraction, for non-overridden colors */}
-                  {effectivePalette?.roleLocations && (
-                    <>
-                      {effectivePalette.roleLocations.surface_base && (
-                        <div
-                          className="color-marker"
-                          style={{
-                            backgroundColor: effectivePalette.roles.surface_base,
-                            left: `${effectivePalette.roleLocations.surface_base.x * 100}%`,
-                            top: `${effectivePalette.roleLocations.surface_base.y * 100}%`,
-                          }}
-                        />
-                      )}
-                      {effectivePalette.roleLocations.text_primary && (
-                        <div
-                          className="color-marker"
-                          style={{
-                            backgroundColor: effectivePalette.roles.text_primary,
-                            left: `${effectivePalette.roleLocations.text_primary.x * 100}%`,
-                            top: `${effectivePalette.roleLocations.text_primary.y * 100}%`,
-                          }}
-                        />
-                      )}
-                      {effectivePalette.roleLocations.accent_primary && (
-                        <div
-                          className="color-marker"
-                          style={{
-                            backgroundColor: effectivePalette.roles.accent_primary,
-                            left: `${effectivePalette.roleLocations.accent_primary.x * 100}%`,
-                            top: `${effectivePalette.roleLocations.accent_primary.y * 100}%`,
-                          }}
-                        />
-                      )}
-                      {effectivePalette.roleLocations.accent_secondary && (
-                        <div
-                          className="color-marker"
-                          style={{
-                            backgroundColor: effectivePalette.roles.accent_secondary,
-                            left: `${effectivePalette.roleLocations.accent_secondary.x * 100}%`,
-                            top: `${effectivePalette.roleLocations.accent_secondary.y * 100}%`,
-                          }}
-                        />
-                      )}
-                    </>
-                  )}
+                  {/* Draggable color markers - show for colors with original locations or dragged positions */}
+                  {basePalette?.roleLocations && ROLES.map(role => {
+                    // Use dragged position if available, otherwise original location
+                    const originalLocation = basePalette.roleLocations?.[role];
+                    const draggedPosition = markerPositions[role];
+                    const position = draggedPosition ?? originalLocation;
+
+                    // Don't render marker if no position available (synthetic colors)
+                    if (!position) return null;
+
+                    return (
+                      <DraggableColorMarker
+                        key={role}
+                        role={role}
+                        color={effectivePalette?.roles[role] ?? basePalette.roles[role]}
+                        position={position}
+                        onDrag={handleMarkerDrag}
+                      />
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="import-preview-loading">
