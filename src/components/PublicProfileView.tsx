@@ -49,8 +49,13 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
 
   useEffect(() => {
     fetchProfileAndThemes();
+  }, [fetchProfileAndThemes]);
+
+  // Sync install state with filesystem once on mount
+  useEffect(() => {
     syncWithFilesystem();
-  }, [fetchProfileAndThemes, syncWithFilesystem]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleDownload = async (theme: CommunityTheme) => {
     // Prevent duplicate downloads

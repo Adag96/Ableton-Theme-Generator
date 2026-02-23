@@ -37,7 +37,8 @@ export const CommunityThemeCard: React.FC<CommunityThemeCardProps> = ({
   const creatorName = theme.profiles?.display_name ?? 'Unknown';
   const swatchColors = theme.swatch_colors ?? [];
 
-  const handleDownload = async () => {
+  const handleDownload = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (isDownloading) return;
     setDownloadError(null);
     setIsDownloading(true);
@@ -50,7 +51,8 @@ export const CommunityThemeCard: React.FC<CommunityThemeCardProps> = ({
     }
   };
 
-  const handleUninstall = async () => {
+  const handleUninstall = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (isUninstalling || !onUninstall) return;
     setDownloadError(null);
     setIsUninstalling(true);

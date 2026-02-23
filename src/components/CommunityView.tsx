@@ -45,8 +45,13 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProf
 
   useEffect(() => {
     fetchGallery();
+  }, [fetchGallery]);
+
+  // Sync install state with filesystem once on mount
+  useEffect(() => {
     syncWithFilesystem();
-  }, [fetchGallery, syncWithFilesystem]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (user) {

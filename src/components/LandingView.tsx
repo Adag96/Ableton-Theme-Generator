@@ -44,8 +44,13 @@ export const LandingView: React.FC<LandingViewProps> = ({
 
   useEffect(() => {
     fetchFeaturedThemes();
+  }, [fetchFeaturedThemes]);
+
+  // Sync install state with filesystem once on mount
+  useEffect(() => {
     syncWithFilesystem();
-  }, [fetchFeaturedThemes, syncWithFilesystem]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Auto-cycle carousel
   useEffect(() => {
