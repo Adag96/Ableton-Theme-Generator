@@ -3,6 +3,7 @@ import type { ImageFileResult } from '../electron';
 import { useColorExtraction } from '../hooks/useColorExtraction';
 import type { PaletteSelectionResult } from '../extraction';
 import type { ThemeTone, ContrastLevel, VariantMode } from '../theme/types';
+import type { SavedTheme } from '../types/theme-library';
 import { hexToHsl, hslToHex } from '../theme/color-utils';
 import { generateRandomPalette } from '../theme/random-palette';
 import { ColorPickerPopover } from './ColorPickerPopover';
@@ -15,6 +16,7 @@ interface ImageImportViewProps {
   onImageLoaded: (image: ImageFileResult) => void;
   onContinue: (palette: PaletteSelectionResult) => void;
   onBack: () => void;
+  editingTheme?: SavedTheme | null;
 }
 
 type ColorRole = 'surface_base' | 'text_primary' | 'accent_primary' | 'accent_secondary';
@@ -73,6 +75,7 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
   onImageLoaded,
   onContinue,
   onBack,
+  editingTheme,
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -96,15 +99,36 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
   const [colorSampler, setColorSampler] = useState<ColorSampler | null>(null);
   const [markerPositions, setMarkerPositions] = useState<Partial<Record<ColorRole, { x: number; y: number }>>>({});
 
-  // Reset state when image changes
+  // Reset state when image changes (but not when editing)
   useEffect(() => {
+    if (editingTheme) return; // Skip reset when editing
     setSelectedTone(null);
     setColorOverrides({});
     setActivePickerRole(null);
     setMood(DEFAULT_MOOD);
     setRandomPalette(null);
     setMarkerPositions({});
-  }, [image?.filePath]);
+  }, [image?.filePath, editingTheme]);
+
+  // Pre-populate state when editing an existing theme
+  useEffect(() => {
+    if (!editingTheme) return;
+
+    setSelectedTone(editingTheme.tone);
+    setContrastLevel(editingTheme.contrastLevel ?? 'medium');
+    setColorOverrides({
+      surface_base: editingTheme.colors.surface_base,
+      text_primary: editingTheme.colors.text_primary,
+      accent_primary: editingTheme.colors.accent_primary,
+      accent_secondary: editingTheme.colors.accent_secondary,
+    });
+    if (editingTheme.roleLocations) {
+      setMarkerPositions(editingTheme.roleLocations);
+    }
+    setMood(DEFAULT_MOOD);
+    setRandomPalette(null);
+    setActivePickerRole(null);
+  }, [editingTheme]);
 
   // Load image as data URL for preview
   useEffect(() => {
@@ -152,15 +176,32 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
     variantMode
   );
 
-  // Base palette: either from extraction or random generation
-  const basePalette = randomPalette ?? extractedPalette;
+  // Create synthetic palette from editingTheme when editing without an image
+  const editingPalette = useMemo((): PaletteSelectionResult | null => {
+    if (!editingTheme || image) return null; // Only use when editing without image
+    return {
+      roles: {
+        tone: editingTheme.tone,
+        surface_base: editingTheme.colors.surface_base,
+        text_primary: editingTheme.colors.text_primary,
+        accent_primary: editingTheme.colors.accent_primary,
+        accent_secondary: editingTheme.colors.accent_secondary,
+        contrastLevel: editingTheme.contrastLevel ?? 'medium',
+      },
+      roleLocations: editingTheme.roleLocations ?? {},
+      extractedColors: [], // No extracted colors for color-only editing
+    };
+  }, [editingTheme, image]);
+
+  // Base palette: from extraction, random generation, or editing
+  const basePalette = randomPalette ?? extractedPalette ?? editingPalette;
 
   // Effective palette: base + color overrides + mood adjustments
   const effectivePalette = useMemo(() => {
     if (!basePalette) return null;
 
     const baseRoles = basePalette.roles;
-    let roles = { ...baseRoles };
+    const roles = { ...baseRoles };
 
     // Apply color overrides first
     for (const role of ROLES) {
@@ -339,7 +380,7 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
         Back
       </button>
 
-      {!image && !randomPalette ? (
+      {!image && !randomPalette && !editingTheme ? (
         <>
           <div
             className={`import-dropzone ${isDragOver ? 'import-dropzone-active' : ''}`}
@@ -428,6 +469,14 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
             <div className="import-random-header">
               <h3 className="import-random-title">Random Palette</h3>
               <p className="import-random-subtitle">Tweak colors or re-roll below</p>
+            </div>
+          )}
+
+          {/* Header for editing mode without image */}
+          {!image && !randomPalette && editingTheme && (
+            <div className="import-random-header">
+              <h3 className="import-random-title">Edit Theme: {editingTheme.name}</h3>
+              <p className="import-random-subtitle">Adjust colors using the swatches below</p>
             </div>
           )}
 
@@ -648,7 +697,7 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
                 roles: { ...effectivePalette.roles, contrastLevel },
               })}
             >
-              {isExtracting ? 'Extracting...' : 'Generate Theme'}
+              {isExtracting ? 'Extracting...' : editingTheme ? 'Save Changes' : 'Generate Theme'}
             </button>
           </div>
         </div>

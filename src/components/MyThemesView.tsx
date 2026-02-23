@@ -23,6 +23,7 @@ interface MyThemesViewProps {
   onRenameTheme: (id: string, newName: string) => Promise<{ success: boolean; error?: string }>;
   onInstallTheme: (id: string) => Promise<{ success: boolean; error?: string }>;
   onUninstallTheme: (id: string) => Promise<{ success: boolean; error?: string }>;
+  onEditTheme: (theme: SavedTheme) => void;
 }
 
 export const MyThemesView: React.FC<MyThemesViewProps> = ({
@@ -32,6 +33,7 @@ export const MyThemesView: React.FC<MyThemesViewProps> = ({
   onRenameTheme,
   onInstallTheme,
   onUninstallTheme,
+  onEditTheme,
 }) => {
   const [filter, setFilter] = useState<ToneFilter>('all');
   const [sortBy, setSortBy] = useState<SortOption>('recent');
@@ -285,6 +287,10 @@ export const MyThemesView: React.FC<MyThemesViewProps> = ({
         onDelete={onDeleteTheme}
         onInstall={onInstallTheme}
         onUninstall={onUninstallTheme}
+        onEdit={(theme) => {
+          setSelectedThemeId(null);
+          onEditTheme(theme);
+        }}
       />
     </div>
   );

@@ -16,6 +16,7 @@ interface ThemeDetailModalProps {
   onDelete: (id: string) => void;
   onInstall: (id: string) => Promise<{ success: boolean; error?: string }>;
   onUninstall: (id: string) => Promise<{ success: boolean; error?: string }>;
+  onEdit: (theme: SavedTheme) => void;
 }
 
 const CONTRAST_LABELS: Record<string, string> = {
@@ -33,6 +34,7 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
   onDelete,
   onInstall,
   onUninstall,
+  onEdit,
 }) => {
   const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
@@ -285,27 +287,48 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
             </span>
           </div>
 
-          <div className="modal-swatches">
-            <div
-              className="modal-swatch"
-              style={{ backgroundColor: theme.colors.surface_base }}
-              title="Surface"
-            />
-            <div
-              className="modal-swatch"
-              style={{ backgroundColor: theme.colors.text_primary }}
-              title="Text"
-            />
-            <div
-              className="modal-swatch"
-              style={{ backgroundColor: theme.colors.accent_primary }}
-              title="Accent 1"
-            />
-            <div
-              className="modal-swatch"
-              style={{ backgroundColor: theme.colors.accent_secondary }}
-              title="Accent 2"
-            />
+          <div className="modal-swatches-row">
+            <div className="modal-swatches">
+              <div
+                className="modal-swatch"
+                style={{ backgroundColor: theme.colors.surface_base }}
+                title="Surface"
+              />
+              <div
+                className="modal-swatch"
+                style={{ backgroundColor: theme.colors.text_primary }}
+                title="Text"
+              />
+              <div
+                className="modal-swatch"
+                style={{ backgroundColor: theme.colors.accent_primary }}
+                title="Accent 1"
+              />
+              <div
+                className="modal-swatch"
+                style={{ backgroundColor: theme.colors.accent_secondary }}
+                title="Accent 2"
+              />
+            </div>
+            <button
+              className="modal-edit-button"
+              onClick={() => onEdit(theme)}
+              title="Edit theme"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+              </svg>
+              Edit Theme
+            </button>
           </div>
         </div>
 
@@ -322,7 +345,7 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
               <polyline points="7 10 12 15 17 10" />
               <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
-            {isDownloading ? 'Downloading...' : 'Download'}
+            {isDownloading ? 'Downloading...' : 'Download .ask'}
           </button>
 
           {theme.isInstalled ? (

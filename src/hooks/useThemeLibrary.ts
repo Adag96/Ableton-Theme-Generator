@@ -43,6 +43,51 @@ export function useThemeLibrary() {
     await window.electronAPI?.saveThemeLibrary(updated);
   }, [library]);
 
+  const updateTheme = useCallback(async (
+    id: string,
+    updates: Partial<Pick<SavedTheme, 'colors' | 'tone' | 'contrastLevel' | 'previewImage' | 'roleLocations'>>
+  ): Promise<{ success: boolean; error?: string }> => {
+    const theme = library.themes.find(t => t.id === id);
+    if (!theme) return { success: false, error: 'Theme not found' };
+
+    // Merge updates into theme
+    const updatedTheme: SavedTheme = {
+      ...theme,
+      ...updates,
+      colors: updates.colors ?? theme.colors,
+    };
+
+    // Regenerate and write .ask file if theme is installed
+    if (updatedTheme.isInstalled) {
+      const roles: SemanticColorRoles = {
+        tone: updatedTheme.tone,
+        surface_base: updatedTheme.colors.surface_base,
+        text_primary: updatedTheme.colors.text_primary,
+        accent_primary: updatedTheme.colors.accent_primary,
+        accent_secondary: updatedTheme.colors.accent_secondary,
+        contrastLevel: updatedTheme.contrastLevel,
+      };
+
+      const themeData = generateTheme(roles);
+      const xmlContent = generateAskXml(themeData);
+
+      const result = await window.electronAPI?.writeThemeFile(updatedTheme.filePath, xmlContent);
+      if (!result?.success) {
+        return { success: false, error: result?.error ?? 'Failed to write theme file' };
+      }
+    }
+
+    // Update library
+    const updated = {
+      ...library,
+      themes: library.themes.map(t => t.id === id ? updatedTheme : t),
+    };
+    setLibrary(updated);
+    await window.electronAPI?.saveThemeLibrary(updated);
+
+    return { success: true };
+  }, [library]);
+
   const renameTheme = useCallback(async (id: string, newName: string): Promise<{ success: boolean; error?: string }> => {
     const theme = library.themes.find(t => t.id === id);
     if (!theme) return { success: false, error: 'Theme not found' };
@@ -182,6 +227,7 @@ export function useThemeLibrary() {
     isLoading,
     addTheme,
     removeTheme,
+    updateTheme,
     renameTheme,
     installTheme,
     uninstallTheme,

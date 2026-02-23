@@ -35,6 +35,7 @@ function AppContent() {
   const [previousView, setPreviousView] = useState<View>('landing');
   const [importedImage, setImportedImage] = useState<ImageFileResult | null>(null);
   const [pendingTheme, setPendingTheme] = useState<PendingTheme | null>(null);
+  const [editingTheme, setEditingTheme] = useState<SavedTheme | null>(null);
   const [showNameDialog, setShowNameDialog] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { user } = useAuth();
@@ -43,6 +44,7 @@ function AppContent() {
     addTheme,
     removeTheme,
     renameTheme,
+    updateTheme,
     installTheme,
     uninstallTheme,
     syncInstallState,
@@ -119,7 +121,29 @@ function AppContent() {
     setCurrentView('landing');
     setImportedImage(null);
     setPendingTheme(null);
+    setEditingTheme(null);
     setShowNameDialog(false);
+  };
+
+  const handleEditTheme = async (theme: SavedTheme) => {
+    setEditingTheme(theme);
+
+    // Try to load the source image if it exists
+    if (theme.sourceImagePath && window.electronAPI) {
+      const exists = await window.electronAPI.checkFileExists(theme.sourceImagePath);
+      if (exists) {
+        // Extract filename from path
+        const lastSlash = Math.max(theme.sourceImagePath.lastIndexOf('/'), theme.sourceImagePath.lastIndexOf('\\'));
+        const fileName = lastSlash >= 0 ? theme.sourceImagePath.substring(lastSlash + 1) : theme.sourceImagePath;
+        setImportedImage({ filePath: theme.sourceImagePath, fileName });
+      } else {
+        setImportedImage(null); // Source image missing, will use color-only mode
+      }
+    } else {
+      setImportedImage(null);
+    }
+
+    setCurrentView('import');
   };
 
   const handlePaletteReady = async (palette: PaletteSelectionResult) => {
@@ -129,6 +153,31 @@ function AppContent() {
     let previewImage: string | undefined;
     if (importedImage?.filePath && window.electronAPI) {
       previewImage = (await window.electronAPI.readImageAsDataUrl(importedImage.filePath)) ?? undefined;
+    }
+
+    // When editing, skip the name dialog and update the theme directly
+    if (editingTheme) {
+      const result = await updateTheme(editingTheme.id, {
+        colors: {
+          surface_base: palette.roles.surface_base,
+          text_primary: palette.roles.text_primary,
+          accent_primary: palette.roles.accent_primary,
+          accent_secondary: palette.roles.accent_secondary,
+        },
+        tone: palette.roles.tone,
+        contrastLevel: palette.roles.contrastLevel,
+        previewImage: previewImage ?? editingTheme.previewImage,
+        roleLocations: palette.roleLocations,
+      });
+
+      if (result.success) {
+        setEditingTheme(null);
+        setImportedImage(null);
+        setCurrentView('my-themes');
+      } else {
+        console.error('Failed to update theme:', result.error);
+      }
+      return;
     }
 
     setPendingTheme({ palette, xmlContent, previewImage });
@@ -223,6 +272,7 @@ function AppContent() {
             onRenameTheme={renameTheme}
             onInstallTheme={installTheme}
             onUninstallTheme={uninstallTheme}
+            onEditTheme={handleEditTheme}
           />
         ) : currentView === 'community' ? (
           <CommunityView onBack={handleBackToLanding} onViewProfile={handleViewProfile} />
@@ -243,6 +293,7 @@ function AppContent() {
             onImageLoaded={handleImageLoaded}
             onContinue={handlePaletteReady}
             onBack={handleBackToLanding}
+            editingTheme={editingTheme}
           />
         )}
       </main>
