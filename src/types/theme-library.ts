@@ -5,6 +5,7 @@ export interface SavedTheme {
   id: string;
   name: string;
   createdAt: string;
+  createdBy?: string; // User ID of the creator (for user-specific theme filtering)
   filePath: string;
   tone: 'light' | 'dark';
   colors: {
