@@ -33,6 +33,7 @@ export const CommunityThemeCard: React.FC<CommunityThemeCardProps> = ({
   const [isUninstalling, setIsUninstalling] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isUninstallHovering, setIsUninstallHovering] = useState(false);
 
   const creatorName = theme.profiles?.display_name ?? 'Unknown';
   const swatchColors = theme.swatch_colors ?? [];
@@ -152,11 +153,31 @@ export const CommunityThemeCard: React.FC<CommunityThemeCardProps> = ({
           {downloadError && <span className="community-card-error">{downloadError}</span>}
           {isInstalled ? (
             <button
-              className="community-card-install community-card-uninstall"
+              className={`community-card-install ${isUninstallHovering ? 'community-card-uninstall' : 'community-card-installed'}`}
               onClick={handleUninstall}
+              onMouseEnter={() => setIsUninstallHovering(true)}
+              onMouseLeave={() => setIsUninstallHovering(false)}
               disabled={isUninstalling}
             >
-              {isUninstalling ? 'Removing...' : 'Uninstall'}
+              {isUninstalling ? 'Removing...' : (
+                <span className="community-card-button-content">
+                  {isUninstallHovering ? (
+                    <>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                      </svg>
+                      Uninstall
+                    </>
+                  ) : (
+                    <>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                      Installed
+                    </>
+                  )}
+                </span>
+              )}
             </button>
           ) : (
             <button

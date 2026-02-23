@@ -121,6 +121,24 @@
   box-shadow: var(--glow-accent-strong);
 }
 
+.theme-card-action-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.theme-card-action-installed {
+  background: transparent;
+  color: var(--color-success);
+  border: 1px solid rgba(52, 199, 89, 0.3);
+}
+
+.theme-card-action-installed:hover:not(:disabled) {
+  background: transparent;
+  color: var(--color-success);
+  border-color: rgba(52, 199, 89, 0.3);
+}
+
 .theme-card-action-uninstall {
   background: transparent;
   color: var(--text-secondary);
@@ -128,9 +146,9 @@
 }
 
 .theme-card-action-uninstall:hover:not(:disabled) {
-  background: var(--surface-base);
-  color: var(--text-primary);
-  border-color: var(--text-tertiary);
+  background: rgba(255, 59, 48, 0.1);
+  color: var(--color-error);
+  border-color: var(--color-error);
 }
 
 .theme-card-delete {

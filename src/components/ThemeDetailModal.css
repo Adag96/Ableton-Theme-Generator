@@ -325,10 +325,22 @@
   box-shadow: var(--glow-accent-strong);
 }
 
+.modal-action-installed {
+  background: transparent;
+  color: var(--color-success);
+  border: 1px solid rgba(52, 199, 89, 0.3);
+}
+
+.modal-action-installed:hover:not(:disabled) {
+  background: transparent;
+  color: var(--color-success);
+  border-color: rgba(52, 199, 89, 0.3);
+}
+
 .modal-action-uninstall:hover:not(:disabled) {
-  background: rgba(255, 149, 0, 0.1);
-  border-color: var(--color-warning);
-  color: var(--color-warning);
+  background: rgba(255, 59, 48, 0.1);
+  border-color: var(--color-error);
+  color: var(--color-error);
 }
 
 /* ---------------------------------------------------------------------------

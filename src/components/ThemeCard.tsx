@@ -20,6 +20,7 @@ export const ThemeCard: React.FC<ThemeCardProps> = ({
 }) => {
   const [isWorking, setIsWorking] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isUninstallHovering, setIsUninstallHovering] = useState(false);
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -98,12 +99,32 @@ export const ThemeCard: React.FC<ThemeCardProps> = ({
 
           {theme.isInstalled ? (
             <button
-              className="theme-card-action theme-card-action-uninstall"
+              className={`theme-card-action ${isUninstallHovering ? 'theme-card-action-uninstall' : 'theme-card-action-installed'}`}
               onClick={handleUninstallClick}
+              onMouseEnter={() => setIsUninstallHovering(true)}
+              onMouseLeave={() => setIsUninstallHovering(false)}
               disabled={isWorking}
-              title="Uninstall from Ableton"
+              title={isUninstallHovering ? 'Uninstall from Ableton' : 'Installed in Ableton'}
             >
-              {isWorking ? '...' : 'Uninstall'}
+              {isWorking ? '...' : (
+                <span className="theme-card-action-content">
+                  {isUninstallHovering ? (
+                    <>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                      </svg>
+                      Uninstall
+                    </>
+                  ) : (
+                    <>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                      Installed
+                    </>
+                  )}
+                </span>
+              )}
             </button>
           ) : (
             <button

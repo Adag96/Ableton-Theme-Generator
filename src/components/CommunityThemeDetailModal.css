@@ -265,6 +265,20 @@
   cursor: not-allowed;
 }
 
+.community-modal-installed {
+  background: transparent;
+  color: var(--color-success);
+  border-color: rgba(52, 199, 89, 0.3);
+  box-shadow: none;
+}
+
+.community-modal-installed:hover:not(:disabled) {
+  background: transparent;
+  color: var(--color-success);
+  border-color: rgba(52, 199, 89, 0.3);
+  box-shadow: none;
+}
+
 .community-modal-uninstall {
   background: var(--surface-elevated);
   color: var(--text-secondary);
@@ -273,7 +287,7 @@
 }
 
 .community-modal-uninstall:hover:not(:disabled) {
-  background: var(--surface-elevated);
+  background: rgba(255, 59, 48, 0.1);
   color: var(--color-error);
   border-color: var(--color-error);
   box-shadow: none;

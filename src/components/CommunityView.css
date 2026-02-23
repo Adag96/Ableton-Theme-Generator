@@ -332,6 +332,27 @@
   cursor: not-allowed;
 }
 
+.community-card-button-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+}
+
+.community-card-installed {
+  background: transparent;
+  color: var(--color-success);
+  border: 1px solid rgba(52, 199, 89, 0.3);
+  box-shadow: none;
+}
+
+.community-card-installed:hover:not(:disabled) {
+  background: transparent;
+  color: var(--color-success);
+  border-color: rgba(52, 199, 89, 0.3);
+  box-shadow: none;
+}
+
 .community-card-uninstall {
   background: var(--surface-elevated);
   color: var(--text-secondary);
@@ -340,7 +361,7 @@
 }
 
 .community-card-uninstall:hover:not(:disabled) {
-  background: var(--surface-elevated);
+  background: rgba(255, 59, 48, 0.1);
   color: var(--color-error);
   border-color: var(--color-error);
   box-shadow: none;

@@ -1,6 +1,6 @@
 # Work Log
 
-## 2026-2-22 23:05
+## 2026-2-22 23:27
 - Moved user login status and controls to persist within main title bar instead of only Community view
 - Fixed issue where sign-in overlay was not visible as it was positioned within the title bar
 - Moved the community theme section to the home view in carousel format
@@ -15,6 +15,8 @@
     - Created database trigger to remove community theme entry rows if the user deletes their submission
 - Added a database trigger that automatically creates a profile row when new users sign up
 - Added a local persistent state to keep track of whether or not community themes are installed on user's system
+- Fixed an issue where install/uninstall button also caused the overlay to open when clicking on featured community theme cards
+- Changed UX interactions for install/uninstall card buttons
 
 
 ## 2026-2-21 23:42

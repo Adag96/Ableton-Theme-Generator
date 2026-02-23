@@ -40,6 +40,7 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
   const [isDownloading, setIsDownloading] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [isUninstallHovering, setIsUninstallHovering] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -326,15 +327,23 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
 
           {theme.isInstalled ? (
             <button
-              className="modal-action-button modal-action-uninstall"
+              className={`modal-action-button ${isUninstallHovering ? 'modal-action-uninstall' : 'modal-action-installed'}`}
               onClick={handleUninstall}
+              onMouseEnter={() => setIsUninstallHovering(true)}
+              onMouseLeave={() => setIsUninstallHovering(false)}
               disabled={isInstalling}
-              title="Remove from Ableton"
+              title={isUninstallHovering ? 'Remove from Ableton' : 'Installed in Ableton'}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
-              {isInstalling ? 'Uninstalling...' : 'Uninstall'}
+              {isUninstallHovering ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              )}
+              {isInstalling ? 'Uninstalling...' : (isUninstallHovering ? 'Uninstall' : 'Installed')}
             </button>
           ) : (
             <button
