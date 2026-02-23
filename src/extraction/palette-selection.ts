@@ -1,6 +1,9 @@
-import type { ExtractedColor, PaletteSelectionResult, RoleLocations } from './types';
+import type { ColorLocation, ExtractedColor, PaletteSelectionResult, RoleLocations } from './types';
 import type { ThemeTone, VariantMode } from '../theme/types';
 import { contrastRatio } from '../theme/color-utils';
+
+/** Maximum RGB color distance for finding a matching pixel (~ΔE 10-15) */
+const MAX_COLOR_DISTANCE = 50;
 
 /** Minimum saturation for a color to be considered an accent (%) */
 const MIN_ACCENT_SATURATION = 35;
@@ -42,6 +45,53 @@ function hueDistance(h1: number, h2: number): number {
 /** Get complementary hue */
 function complementaryHue(hue: number): number {
   return (hue + 180) % 360;
+}
+
+/** Calculate Euclidean distance between two hex colors in RGB space */
+function colorDistance(hex1: string, hex2: string): number {
+  const rgb1 = hexToRgb(hex1);
+  const rgb2 = hexToRgb(hex2);
+  return Math.sqrt(
+    (rgb1.r - rgb2.r) ** 2 +
+    (rgb1.g - rgb2.g) ** 2 +
+    (rgb1.b - rgb2.b) ** 2
+  );
+}
+
+/** Convert hex color to RGB */
+function hexToRgb(hex: string): { r: number; g: number; b: number } {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  if (!result) return { r: 0, g: 0, b: 0 };
+  return {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16),
+  };
+}
+
+/**
+ * Find the closest matching pixel location for a target color.
+ * Used for synthetic colors (like surface_base) that need a real pixel location.
+ */
+function findClosestPixelLocation(
+  targetHex: string,
+  colors: ExtractedColor[],
+  maxDistance: number = MAX_COLOR_DISTANCE
+): ColorLocation | undefined {
+  let closestLocation: ColorLocation | undefined;
+  let closestDistance = Infinity;
+
+  for (const color of colors) {
+    if (!color.location) continue;
+
+    const distance = colorDistance(targetHex, color.hex);
+    if (distance < closestDistance && distance <= maxDistance) {
+      closestDistance = distance;
+      closestLocation = color.location;
+    }
+  }
+
+  return closestLocation;
 }
 
 /**
@@ -142,6 +192,9 @@ export function selectThemePalette(
 
   // 2. Surface base: THE KEY DECISION - uses variant mode
   const surfaceBase = selectSurfaceColor(colors, tone, variantMode);
+
+  // Find a real pixel location for the synthetic surface color
+  surfaceBase.location = findClosestPixelLocation(surfaceBase.hex, colors);
 
   // 3. Text primary: find color with best contrast
   let textPrimary: ExtractedColor | null = null;

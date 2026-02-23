@@ -18,12 +18,12 @@ function colorKey(r: number, g: number, b: number): number {
   return (r << 16) | (g << 8) | b;
 }
 
-/** Color entry with accumulated location for centroid calculation */
+/** Color entry with representative pixel location */
 interface ColorEntry {
   rgb: RGB;
   count: number;
-  /** Accumulated location sum for centroid calculation */
-  locationSum: { x: number; y: number };
+  /** Representative pixel location (first pixel seen for this quantized color) */
+  representativeLocation: { x: number; y: number };
 }
 
 /** Color bucket for median cut algorithm */
@@ -91,18 +91,19 @@ function splitBucket(bucket: ColorBucket): [ColorBucket, ColorBucket] {
   ];
 }
 
-/** Get weighted average color and centroid location from a bucket */
+/** Get weighted average color and representative location from a bucket */
 function averageBucketColor(bucket: ColorBucket): { rgb: RGB; count: number; location: ColorLocation } {
   let r = 0, g = 0, b = 0;
-  let locationSumX = 0, locationSumY = 0;
 
-  for (const { rgb, count, locationSum } of bucket.colors) {
-    r += rgb.r * count;
-    g += rgb.g * count;
-    b += rgb.b * count;
-    // Accumulate location sums for centroid
-    locationSumX += locationSum.x;
-    locationSumY += locationSum.y;
+  // Find the most populous color entry to use its representative location
+  let mostPopulousEntry = bucket.colors[0];
+  for (const entry of bucket.colors) {
+    r += entry.rgb.r * entry.count;
+    g += entry.rgb.g * entry.count;
+    b += entry.rgb.b * entry.count;
+    if (entry.count > mostPopulousEntry.count) {
+      mostPopulousEntry = entry;
+    }
   }
 
   return {
@@ -112,11 +113,8 @@ function averageBucketColor(bucket: ColorBucket): { rgb: RGB; count: number; loc
       b: Math.round(b / bucket.totalCount),
     },
     count: bucket.totalCount,
-    // Centroid = average of all pixel locations in the bucket
-    location: {
-      x: locationSumX / bucket.totalCount,
-      y: locationSumY / bucket.totalCount,
-    },
+    // Use the representative location from the most populous color entry
+    location: mostPopulousEntry.representativeLocation,
   };
 }
 
@@ -299,11 +297,9 @@ export function extractColorsFromImage(
 
     if (existing) {
       existing.count++;
-      // Accumulate location for centroid calculation
-      existing.locationSum.x += x;
-      existing.locationSum.y += y;
+      // Keep the first representative location (no averaging)
     } else {
-      colorMap.set(key, { rgb: { r, g, b }, count: 1, locationSum: { x, y } });
+      colorMap.set(key, { rgb: { r, g, b }, count: 1, representativeLocation: { x, y } });
     }
   }
 
