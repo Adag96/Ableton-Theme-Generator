@@ -136,6 +136,81 @@
 }
 
 /* ---------------------------------------------------------------------------
+   Random Generation Section
+   --------------------------------------------------------------------------- */
+
+.import-random-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.import-divider {
+  display: flex;
+  align-items: center;
+  width: 200px;
+  gap: var(--space-sm);
+}
+
+.import-divider::before,
+.import-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--surface-border);
+}
+
+.import-divider-text {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+}
+
+.import-random-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--surface-elevated);
+  backdrop-filter: var(--blur-subtle);
+  -webkit-backdrop-filter: var(--blur-subtle);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.import-random-button:hover {
+  border-color: var(--accent-solid);
+  color: var(--accent-solid);
+  box-shadow: var(--glow-accent);
+  transform: translateY(-1px);
+}
+
+.import-random-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.import-random-title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.import-random-subtitle {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------------------
    Confirmation State - Image Loaded
    --------------------------------------------------------------------------- */
 
@@ -300,7 +375,7 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Color Palette Display
+   Color Palette Display — Editable Swatches (Option A)
    --------------------------------------------------------------------------- */
 
 .import-palette {
@@ -308,6 +383,32 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-sm);
+}
+
+.import-palette-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.import-palette-hint {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+}
+
+.import-palette-reset {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--accent-solid);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.import-palette-reset:hover {
+  opacity: 0.7;
 }
 
 .import-palette-swatches {
@@ -322,12 +423,33 @@
   border-radius: var(--radius-sm);
   border: 2px solid var(--surface-border);
   cursor: default;
-  transition: transform var(--duration-fast) var(--ease-out);
+  transition: transform var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
   box-shadow: var(--shadow-soft);
 }
 
 .import-swatch:hover {
   transform: scale(1.08);
+}
+
+.import-swatch-editable {
+  cursor: pointer;
+}
+
+.import-swatch-editable:hover {
+  border-color: var(--accent-solid);
+  box-shadow: var(--glow-accent);
+}
+
+.import-swatch-active {
+  border-color: var(--accent-solid);
+  box-shadow: var(--glow-accent);
+  transform: scale(1.08);
+}
+
+.import-swatch-overridden {
+  border-style: dashed;
 }
 
 .import-swatch-label {
@@ -338,6 +460,105 @@
   font-size: var(--font-size-xs);
   color: var(--text-secondary);
   white-space: nowrap;
+}
+
+.import-swatch-edited-dot {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-solid);
+  border: 1px solid var(--surface-elevated);
+}
+
+/* ---------------------------------------------------------------------------
+   Mood Sliders (Option B)
+   --------------------------------------------------------------------------- */
+
+.import-mood-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  max-width: 320px;
+}
+
+.import-mood-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+  justify-content: center;
+}
+
+.import-mood-sliders {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: 100%;
+}
+
+.import-mood-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.import-mood-slider-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.import-mood-slider-value {
+  font-family: var(--font-family-mono);
+  color: var(--text-tertiary);
+  min-width: 32px;
+  text-align: right;
+}
+
+/* Custom range slider styling */
+.import-mood-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-recessed);
+  border: 1px solid var(--surface-border);
+  outline: none;
+  cursor: pointer;
+}
+
+.import-mood-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent-solid);
+  border: 2px solid var(--surface-elevated);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.import-mood-range::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.import-mood-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent-solid);
+  border: 2px solid var(--surface-elevated);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
 }
 
 /* ---------------------------------------------------------------------------

@@ -1,0 +1,96 @@
+/* =============================================================================
+   Color Picker Popover
+   ============================================================================= */
+
+.color-picker-popover {
+  position: absolute;
+  z-index: 100;
+  background: var(--surface-elevated);
+  backdrop-filter: var(--blur-surface);
+  -webkit-backdrop-filter: var(--blur-surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-elevated);
+  padding: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  /* Position above the swatch */
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.color-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.color-picker-label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+}
+
+/* Override react-colorful styles to match app aesthetic */
+.color-picker-popover .react-colorful {
+  width: 180px;
+  height: 150px;
+  border-radius: var(--radius-sm);
+}
+
+.color-picker-popover .react-colorful__saturation {
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+.color-picker-popover .react-colorful__hue {
+  height: 12px;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}
+
+.color-picker-popover .react-colorful__pointer {
+  width: 16px;
+  height: 16px;
+  border: 2px solid white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.color-picker-input-row {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: center;
+}
+
+.color-picker-hex-input {
+  flex: 1;
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+  padding: var(--space-xs);
+  background: var(--surface-recessed);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  outline: none;
+  text-align: center;
+}
+
+.color-picker-hex-input:focus {
+  border-color: var(--accent-solid);
+}
+
+.color-picker-reset {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--accent-solid);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-inverse);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.color-picker-reset:hover {
+  background: var(--accent-solid-hover);
+}
