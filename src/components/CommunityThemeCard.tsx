@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import type { CommunityTheme } from '../lib/supabase';
+import { ConfirmationDialog } from './ConfirmationDialog';
 
 interface CommunityThemeCardProps {
   theme: CommunityTheme;
   onDownload: (theme: CommunityTheme) => Promise<void>;
   onClick?: (theme: CommunityTheme) => void;
   onCreatorClick?: (userId: string) => void;
+  onDelete?: () => void;
   showStatus?: boolean;
 }
 
@@ -20,11 +22,13 @@ export const CommunityThemeCard: React.FC<CommunityThemeCardProps> = ({
   onDownload,
   onClick,
   onCreatorClick,
+  onDelete,
   showStatus = false,
 }) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadDone, setDownloadDone] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const creatorName = theme.profiles?.display_name ?? 'Unknown';
   const swatchColors = theme.swatch_colors ?? [];
@@ -46,6 +50,25 @@ export const CommunityThemeCard: React.FC<CommunityThemeCardProps> = ({
 
   const handleCardClick = () => {
     onClick?.(theme);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (theme.status === 'pending') {
+      setShowDeleteConfirm(true);
+    } else {
+      // Rejected: delete immediately, no confirmation
+      onDelete?.();
+    }
+  };
+
+  const handleDeleteConfirm = () => {
+    setShowDeleteConfirm(false);
+    onDelete?.();
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteConfirm(false);
   };
 
   return (
@@ -119,6 +142,25 @@ export const CommunityThemeCard: React.FC<CommunityThemeCardProps> = ({
           </button>
         </div>
       )}
+
+      {onDelete && theme.status !== 'approved' && (
+        <button className="community-card-delete" onClick={handleDeleteClick} title="Remove submission">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+          </svg>
+        </button>
+      )}
+
+      <ConfirmationDialog
+        isOpen={showDeleteConfirm}
+        title="Remove Submission?"
+        message="If you remove this submission, it will no longer be reviewed by our team. Do you wish to continue?"
+        confirmLabel="Remove"
+        variant="destructive"
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+      />
     </div>
   );
 };

@@ -74,7 +74,24 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProf
     }
   };
 
-  const displayedThemes = tab === 'gallery' ? themes : mySubmissions;
+  const handleDeleteSubmission = async (themeId: string) => {
+    const { error } = await supabase
+      .from('community_themes')
+      .delete()
+      .eq('id', themeId);
+
+    if (error) {
+      console.error('Failed to delete submission:', error);
+      return;
+    }
+
+    // Remove from local state
+    setMySubmissions((prev) => prev.filter((t) => t.id !== themeId));
+  };
+
+  // Split submissions into approved and non-approved sections
+  const approvedSubmissions = mySubmissions.filter((t) => t.status === 'approved');
+  const nonApprovedSubmissions = mySubmissions.filter((t) => t.status !== 'approved');
 
   return (
     <div className="community-view">
@@ -115,30 +132,77 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProf
             <div className="community-loading-spinner" />
             Loading themes…
           </div>
-        ) : displayedThemes.length === 0 ? (
-          <div className="community-empty">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M4 16l4.586-4.586a2 2 0 0 1 2.828 0L16 16m-2-2l1.586-1.586a2 2 0 0 1 2.828 0L20 14m-6-6h.01M6 20h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" />
-            </svg>
-            <p>
-              {tab === 'gallery'
-                ? 'No themes in the gallery yet. Be the first to submit!'
-                : "You haven't submitted any themes yet."}
-            </p>
-          </div>
+        ) : tab === 'gallery' ? (
+          // Gallery view
+          themes.length === 0 ? (
+            <div className="community-empty">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 16l4.586-4.586a2 2 0 0 1 2.828 0L16 16m-2-2l1.586-1.586a2 2 0 0 1 2.828 0L20 14m-6-6h.01M6 20h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" />
+              </svg>
+              <p>No themes in the gallery yet. Be the first to submit!</p>
+            </div>
+          ) : (
+            <div className="community-grid">
+              {themes.map((theme) => (
+                <CommunityThemeCard
+                  key={theme.id}
+                  theme={theme}
+                  onDownload={handleDownload}
+                  onClick={setSelectedTheme}
+                  onCreatorClick={onViewProfile}
+                />
+              ))}
+            </div>
+          )
         ) : (
-          <div className="community-grid">
-            {displayedThemes.map((theme) => (
-              <CommunityThemeCard
-                key={theme.id}
-                theme={theme}
-                onDownload={handleDownload}
-                onClick={setSelectedTheme}
-                onCreatorClick={onViewProfile}
-                showStatus={tab === 'submissions'}
-              />
-            ))}
-          </div>
+          // My Submissions view - sectioned
+          mySubmissions.length === 0 ? (
+            <div className="community-empty">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 16l4.586-4.586a2 2 0 0 1 2.828 0L16 16m-2-2l1.586-1.586a2 2 0 0 1 2.828 0L20 14m-6-6h.01M6 20h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" />
+              </svg>
+              <p>You haven't submitted any themes yet.</p>
+            </div>
+          ) : (
+            <div className="my-submissions-sections">
+              {approvedSubmissions.length > 0 && (
+                <div className="my-submissions-section">
+                  <h3 className="my-submissions-section-header">Approved</h3>
+                  <div className="community-grid">
+                    {approvedSubmissions.map((theme) => (
+                      <CommunityThemeCard
+                        key={theme.id}
+                        theme={theme}
+                        onDownload={handleDownload}
+                        onClick={setSelectedTheme}
+                        onCreatorClick={onViewProfile}
+                        showStatus
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {nonApprovedSubmissions.length > 0 && (
+                <div className="my-submissions-section">
+                  <h3 className="my-submissions-section-header">Not Approved</h3>
+                  <div className="community-grid">
+                    {nonApprovedSubmissions.map((theme) => (
+                      <CommunityThemeCard
+                        key={theme.id}
+                        theme={theme}
+                        onDownload={handleDownload}
+                        onClick={setSelectedTheme}
+                        onCreatorClick={onViewProfile}
+                        onDelete={() => handleDeleteSubmission(theme.id)}
+                        showStatus
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )
         )}
       </div>
 

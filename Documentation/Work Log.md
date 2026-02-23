@@ -1,6 +1,6 @@
 # Work Log
 
-## 2026-2-22 19:53
+## 2026-2-22 22:16
 - Moved user login status and controls to persist within main title bar instead of only Community view
 - Fixed issue where sign-in overlay was not visible as it was positioned within the title bar
 - Moved the community theme section to the home view in carousel format
@@ -9,6 +9,11 @@
 - Implemented a public-facing, read-only user profile view
 - All user profile names are now hyperlinked to their read-only profile view
 - Added metadata to track which user created each theme, so multiple users on the same machine have unique themes shown
+- Re-formatted 'My Submissions' view:
+    - View now sorts user submissions by review status
+    - Users can remove submissions that are rejected or in progress
+    - Created database trigger to remove community theme entry rows if the user deletes their submission
+- Added a database trigger that automatically creates a profile row when new users sign up
 
 
 ## 2026-2-21 23:42

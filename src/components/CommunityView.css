@@ -171,6 +171,7 @@
    --------------------------------------------------------------------------- */
 
 .community-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   background: var(--surface-elevated);
@@ -338,4 +339,61 @@
 
 .community-card-install-done:hover:not(:disabled) {
   background: var(--color-success);
+}
+
+/* ---------------------------------------------------------------------------
+   Card Delete Button
+   --------------------------------------------------------------------------- */
+
+.community-card-delete {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: var(--blur-subtle);
+  -webkit-backdrop-filter: var(--blur-subtle);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all var(--duration-fast) var(--ease-out);
+  color: white;
+}
+
+.community-card:hover .community-card-delete {
+  opacity: 1;
+}
+
+.community-card-delete:hover {
+  background: var(--color-error);
+}
+
+/* ---------------------------------------------------------------------------
+   My Submissions Sections
+   --------------------------------------------------------------------------- */
+
+.my-submissions-sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.my-submissions-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.my-submissions-section-header {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0;
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--surface-border);
 }
