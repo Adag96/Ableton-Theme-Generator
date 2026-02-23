@@ -53,7 +53,7 @@ export const UserProfileView: React.FC<UserProfileViewProps> = ({ onBack, onSign
 
   // Compute if form has changes
   const hasChanges = useMemo(() => {
-    if (!profile) return false;
+    if (!profile || !isInitialized) return false;
 
     if (displayName !== (profile.display_name || '')) return true;
     if (bio !== (profile.bio || '')) return true;
@@ -69,7 +69,7 @@ export const UserProfileView: React.FC<UserProfileViewProps> = ({ onBack, onSign
     }
 
     return false;
-  }, [profile, displayName, bio, socialLinks]);
+  }, [profile, displayName, bio, socialLinks, isInitialized]);
 
   // Validation
   const validateForm = (): boolean => {
