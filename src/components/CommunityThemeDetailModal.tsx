@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { CommunityTheme } from '../lib/supabase';
+import { ImageMagnifier } from './ImageMagnifier';
 import './CommunityThemeDetailModal.css';
 
 interface CommunityThemeDetailModalProps {
@@ -93,10 +94,10 @@ export const CommunityThemeDetailModal: React.FC<CommunityThemeDetailModalProps>
         {/* Ableton Preview Image */}
         <div className="community-modal-image-section">
           {theme.preview_image_url ? (
-            <img
+            <ImageMagnifier
               src={theme.preview_image_url}
               alt={`${theme.name} - Ableton Preview`}
-              className="community-modal-preview-image"
+              className="community-modal-preview-container"
             />
           ) : (
             <div className="community-modal-no-preview">

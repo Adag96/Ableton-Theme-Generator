@@ -86,6 +86,15 @@
   margin-bottom: var(--space-md);
 }
 
+.community-modal-preview-container {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.community-modal-preview-container .image-magnifier-image {
+  background: var(--surface-recessed);
+}
+
 .community-modal-preview-image {
   display: block;
   max-width: 100%;

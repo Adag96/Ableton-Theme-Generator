@@ -3,6 +3,7 @@ import type { SavedTheme } from '../types/theme-library';
 import { ConfirmationDialog } from './ConfirmationDialog';
 import { AuthModal } from './AuthModal';
 import { SubmitThemeModal } from './SubmitThemeModal';
+import { ImageMagnifier } from './ImageMagnifier';
 import { useAuth } from '../hooks/useAuth';
 import './ThemeDetailModal.css';
 
@@ -175,12 +176,11 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
         {/* Image preview with color markers */}
         <div className="modal-image-section">
           {theme.previewImage ? (
-            <div className="modal-preview-container">
-              <img
-                src={theme.previewImage}
-                alt={theme.name}
-                className="modal-preview-image"
-              />
+            <ImageMagnifier
+              src={theme.previewImage}
+              alt={theme.name}
+              className="modal-preview-container"
+            >
               {roleLocations.surface_base && (
                 <div
                   className="color-marker"
@@ -225,7 +225,7 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
                   title="Accent 2"
                 />
               )}
-            </div>
+            </ImageMagnifier>
           ) : (
             <div className="modal-no-image">No preview available</div>
           )}

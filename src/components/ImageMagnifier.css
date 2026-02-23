@@ -1,0 +1,61 @@
+/* =============================================================================
+   ImageMagnifier - Zoom loupe for preview images
+   ============================================================================= */
+
+.image-magnifier-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  cursor: crosshair;
+}
+
+.image-magnifier-image {
+  display: block;
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+/* Overlay layer for children (color markers) - positioned over image area */
+.image-magnifier-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Magnifier loupe - rendered via portal at document.body level */
+.image-magnifier-loupe {
+  border-radius: var(--radius-md);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0;
+  transform: scale(0.9);
+  transition:
+    opacity var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+  /* Semi-transparent grey background for areas beyond image edges */
+  background-color: rgba(120, 120, 130, 0.9);
+}
+
+.image-magnifier-loupe-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .image-magnifier-loupe {
+    transition: opacity var(--duration-fast) var(--ease-out);
+    transform: none;
+  }
+
+  .image-magnifier-loupe-visible {
+    transform: none;
+  }
+}

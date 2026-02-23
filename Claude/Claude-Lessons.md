@@ -41,4 +41,12 @@ Each lesson follows this structure:
 
 **Root cause**: Scripts defaulted to outputting within the project directory rather than where the user actually needs them.
 
-**Rule**: When generating test .ask theme files for evaluation in Ableton Live, always output directly to the Ableton themes directory: `/Applications/Ableton Live 12 Suite.app/Contents/App-Resources/Themes/`. This eliminates the extra step of copying files. 
+**Rule**: When generating test .ask theme files for evaluation in Ableton Live, always output directly to the Ableton themes directory: `/Applications/Ableton Live 12 Suite.app/Contents/App-Resources/Themes/`. This eliminates the extra step of copying files.
+
+### 2026-02-23 | UI/UX | object-fit: contain breaks mouse position calculations
+
+**What happened**: Implementing an image magnifier loupe. Mouse tracking worked in the center but "stuck" at left/right/top edges. Multiple fix attempts failed (tolerance, fresh rects, portal rendering).
+
+**Root cause**: When an `<img>` has `object-fit: contain`, the element's bounding rect includes letterboxed/padded areas where the image isn't actually rendered. `getBoundingClientRect()` returns the full element box, not the visible image content bounds.
+
+**Rule**: When doing precise mouse-to-image-content calculations with `object-fit: contain`, you must manually calculate the actual rendered image bounds using the image's natural dimensions and the container's dimensions. The element's bounding rect alone is insufficient.
