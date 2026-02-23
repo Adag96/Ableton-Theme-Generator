@@ -423,3 +423,138 @@
   padding-bottom: var(--space-sm);
   border-bottom: 1px solid var(--surface-border);
 }
+
+/* ---------------------------------------------------------------------------
+   Toolbar (Filter + Sort)
+   --------------------------------------------------------------------------- */
+
+.community-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--surface-base);
+  border-bottom: 1px solid var(--surface-border);
+  flex-shrink: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Filter Toggle
+   --------------------------------------------------------------------------- */
+
+.community-filter-toggle {
+  display: flex;
+  gap: 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--surface-border);
+  background: var(--surface-recessed);
+}
+
+.community-filter-toggle .filter-toggle-option {
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--surface-border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.community-filter-toggle .filter-toggle-option:last-child {
+  border-right: none;
+}
+
+.community-filter-toggle .filter-toggle-option:hover:not(.filter-toggle-option-active) {
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+}
+
+.community-filter-toggle .filter-toggle-option-active {
+  background: var(--accent-solid);
+  color: var(--text-inverse);
+}
+
+.community-filter-toggle .filter-toggle-option-active:hover {
+  background: var(--accent-solid-hover);
+}
+
+.community-toolbar .sort-dropdown-chevron {
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.community-toolbar .sort-dropdown-chevron-open {
+  transform: rotate(180deg);
+}
+
+/* ---------------------------------------------------------------------------
+   Sort Dropdown
+   --------------------------------------------------------------------------- */
+
+.community-sort-dropdown {
+  position: relative;
+}
+
+.community-sort-trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  background: var(--surface-elevated);
+  backdrop-filter: var(--blur-subtle);
+  -webkit-backdrop-filter: var(--blur-subtle);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.community-sort-trigger:hover {
+  background: var(--surface-base);
+  color: var(--text-primary);
+  border-color: var(--accent-solid);
+}
+
+.community-sort-menu {
+  position: absolute;
+  top: calc(100% + var(--space-xs));
+  right: 0;
+  min-width: 100%;
+  background: var(--surface-elevated);
+  backdrop-filter: var(--blur-surface);
+  -webkit-backdrop-filter: var(--blur-surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-elevated);
+  z-index: var(--z-dropdown);
+  overflow: hidden;
+  animation: slide-down var(--duration-fast) var(--ease-out);
+}
+
+.community-sort-option {
+  display: block;
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.community-sort-option:hover {
+  background: var(--surface-base);
+  color: var(--text-primary);
+}
+
+.community-sort-option-active {
+  color: var(--accent-solid);
+}

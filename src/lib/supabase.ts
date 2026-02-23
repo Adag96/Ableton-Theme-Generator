@@ -16,6 +16,7 @@ export type CommunityTheme = {
   swatch_colors: string[];
   variant_mode: string | null;
   source_image_url: string | null;
+  tone: 'light' | 'dark' | null;
   download_count: number;
   created_at: string;
   approved_at: string | null;

@@ -98,6 +98,7 @@ export const SubmitThemeModal: React.FC<SubmitThemeModalProps> = ({ theme, onClo
         swatch_colors: swatchColors,
         source_image_url: sourceImageUrl,
         variant_mode: null,
+        tone: theme.tone,
       });
 
       if (insertError) {
