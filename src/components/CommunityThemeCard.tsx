@@ -112,23 +112,36 @@ export const CommunityThemeCard: React.FC<CommunityThemeCardProps> = ({
       </div>
 
       <div className="community-card-info">
-        <h4 className="community-card-name">{theme.name}</h4>
-        <p className="community-card-creator">
-          by{' '}
-          {theme.user_id && onCreatorClick ? (
-            <button
-              className="community-card-creator-link"
-              onClick={(e) => {
-                e.stopPropagation();
-                onCreatorClick(theme.user_id!);
-              }}
-            >
-              {creatorName}
-            </button>
-          ) : (
-            creatorName
-          )}
-        </p>
+        <div className="community-card-header">
+          <h4 className="community-card-name">{theme.name}</h4>
+          <span className="community-card-creator">
+            by{' '}
+            {theme.user_id && onCreatorClick ? (
+              <button
+                className="community-card-creator-link"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCreatorClick(theme.user_id!);
+                }}
+              >
+                {creatorName}
+              </button>
+            ) : (
+              creatorName
+            )}
+          </span>
+        </div>
+
+        <div className="community-card-swatches-row">
+          {swatchColors.slice(0, 4).map((color, i) => (
+            <div
+              key={i}
+              className="community-card-swatch-item"
+              style={{ backgroundColor: color }}
+              title={['Surface', 'Text', 'Accent 1', 'Accent 2'][i]}
+            />
+          ))}
+        </div>
 
         {showStatus && (
           <span className={`community-card-status community-card-status-${theme.status}`}>
@@ -150,6 +163,9 @@ export const CommunityThemeCard: React.FC<CommunityThemeCardProps> = ({
 
       {theme.status === 'approved' && (
         <div className="community-card-footer">
+          <span className={`community-card-tone community-card-tone-${theme.tone}`}>
+            {theme.tone === 'dark' ? 'Dark' : 'Light'}
+          </span>
           {downloadError && <span className="community-card-error">{downloadError}</span>}
           {isInstalled ? (
             <button
