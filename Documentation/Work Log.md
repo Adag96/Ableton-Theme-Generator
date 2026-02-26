@@ -1,8 +1,9 @@
 # Work Log
 
-## 2026-2-26 17:02
-- Re-formatted theme cards in Community view to match the same visual convention as in My Themes view
-- 
+## 2026-2-26 17:20
+- Re-formatted theme cards in Community view and My Themes view to use the same visual convention
+- Unified theme ID convention so themes that are in both My Themes and Community are synced in terms of installation state
+- Added automatic cleanup that removes uninstalled community-downloaded themes from local storage since they can be re-downloaded anytime
 
 
 ## 2026-2-23 17:50

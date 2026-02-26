@@ -3,6 +3,7 @@ import type { ThemeLibrary, SavedTheme } from '../types/theme-library';
 import type { SemanticColorRoles } from '../theme/types';
 import { generateTheme } from '../theme/derivation';
 import { generateAskXml } from '../theme/ask-generator';
+import type { CommunityTheme } from '../lib/supabase';
 
 const defaultLibrary: ThemeLibrary = { version: 1, themes: [] };
 
@@ -189,38 +190,126 @@ export function useThemeLibrary() {
 
   /**
    * Sync install state: check if installed files exist, update state if missing.
-   * Also handles migration: themes without isInstalled property get it set based on file existence.
+   * Also handles migration and cleanup:
+   * - Themes without isInstalled property get it set based on file existence
+   * - Community-downloaded themes that are uninstalled get removed (can re-download)
    */
   const syncInstallState = useCallback(async () => {
     if (!window.electronAPI || library.themes.length === 0) return;
 
     let hasChanges = false;
-    const updatedThemes = await Promise.all(
-      library.themes.map(async (theme) => {
-        const fileExists = await window.electronAPI!.checkFileExists(theme.filePath);
+    const themesToKeep: SavedTheme[] = [];
+    const themesToRemove: SavedTheme[] = [];
 
-        // Migration: if isInstalled is undefined, set based on file existence
-        if (theme.isInstalled === undefined) {
-          hasChanges = true;
-          return { ...theme, isInstalled: fileExists };
-        }
+    for (const theme of library.themes) {
+      const fileExists = await window.electronAPI.checkFileExists(theme.filePath);
+      let updatedTheme = theme;
 
-        // If marked as installed but file is missing, update state
-        if (theme.isInstalled && !fileExists) {
-          hasChanges = true;
-          return { ...theme, isInstalled: false };
-        }
+      // Migration: if isInstalled is undefined, set based on file existence
+      if (theme.isInstalled === undefined) {
+        hasChanges = true;
+        updatedTheme = { ...theme, isInstalled: fileExists };
+      }
+      // If marked as installed but file is missing, update state
+      else if (theme.isInstalled && !fileExists) {
+        hasChanges = true;
+        updatedTheme = { ...theme, isInstalled: false };
+      }
 
-        return theme;
-      })
-    );
+      // Cleanup: remove community-downloaded themes that are uninstalled
+      // (user can re-download them anytime from the community gallery)
+      if (updatedTheme.fromCommunity && !updatedTheme.isInstalled) {
+        hasChanges = true;
+        themesToRemove.push(updatedTheme);
+      } else {
+        themesToKeep.push(updatedTheme);
+      }
+    }
 
     if (hasChanges) {
-      const updated = { ...library, themes: updatedThemes };
+      // Clean up cached source images for removed themes
+      for (const theme of themesToRemove) {
+        await window.electronAPI.deleteSourceImage(theme.id);
+      }
+
+      const updated = { ...library, themes: themesToKeep };
       setLibrary(updated);
       await window.electronAPI.saveThemeLibrary(updated);
     }
   }, [library]);
+
+  /**
+   * Download a community theme and add it to the local library.
+   * If the theme already exists (by ID), just toggle its install state.
+   */
+  const addThemeFromCommunity = useCallback(async (
+    communityTheme: CommunityTheme
+  ): Promise<{ success: boolean; error?: string }> => {
+    // Check if theme already exists in library (user submitted their own theme, or re-downloading)
+    const existingTheme = library.themes.find(t => t.id === communityTheme.id);
+
+    if (existingTheme) {
+      // Theme already in library - just install it if not installed
+      if (!existingTheme.isInstalled) {
+        return installTheme(existingTheme.id);
+      }
+      return { success: true }; // Already installed
+    }
+
+    // Download the theme file
+    const downloadResult = await window.electronAPI?.downloadCommunityTheme({
+      url: communityTheme.ask_file_url,
+      name: communityTheme.name,
+    });
+
+    if (!downloadResult?.success || !downloadResult.filePath) {
+      return { success: false, error: downloadResult?.error ?? 'Download failed' };
+    }
+
+    // Map swatch_colors array to structured colors object
+    // Order: [surface_base, text_primary, accent_primary, accent_secondary]
+    const colors = {
+      surface_base: communityTheme.swatch_colors[0] ?? '#1a1a1a',
+      text_primary: communityTheme.swatch_colors[1] ?? '#ffffff',
+      accent_primary: communityTheme.swatch_colors[2] ?? '#ff5500',
+      accent_secondary: communityTheme.swatch_colors[3] ?? '#00aaff',
+    };
+
+    // Create SavedTheme entry
+    const newTheme: SavedTheme = {
+      id: communityTheme.id,
+      name: communityTheme.name,
+      createdAt: new Date().toISOString(),
+      createdBy: communityTheme.user_id ?? undefined,
+      filePath: downloadResult.filePath,
+      tone: communityTheme.tone ?? 'dark',
+      colors,
+      isInstalled: true,
+      fromCommunity: true,
+    };
+
+    // Add to library
+    const updated = { ...library, themes: [...library.themes, newTheme] };
+    setLibrary(updated);
+    await window.electronAPI?.saveThemeLibrary(updated);
+
+    return { success: true };
+  }, [library, installTheme]);
+
+  /**
+   * Check if a theme (by ID) exists in the local library and is installed
+   */
+  const isThemeInstalled = useCallback((themeId: string): boolean => {
+    const theme = library.themes.find(t => t.id === themeId);
+    return theme?.isInstalled ?? false;
+  }, [library.themes]);
+
+  /**
+   * Get a theme from the library by ID
+   */
+  const getThemeById = useCallback((themeId: string): SavedTheme | undefined => {
+    return library.themes.find(t => t.id === themeId);
+  }, [library.themes]);
 
   return {
     library,
@@ -232,5 +321,8 @@ export function useThemeLibrary() {
     installTheme,
     uninstallTheme,
     syncInstallState,
+    addThemeFromCommunity,
+    isThemeInstalled,
+    getThemeById,
   };
 }

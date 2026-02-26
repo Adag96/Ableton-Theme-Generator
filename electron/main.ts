@@ -1,7 +1,6 @@
-import { app, BrowserWindow, dialog, ipcMain, shell, nativeTheme } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import path from 'path';
 import fs from 'fs';
-import os from 'os';
 
 const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
 
@@ -259,40 +258,6 @@ app.whenReady().then(() => {
 
   // Theme library persistence
   const themeLibraryPath = path.join(app.getPath('userData'), 'theme-library.json');
-
-  // Community install state persistence
-  const communityInstallStatePath = path.join(app.getPath('userData'), 'community-install-state.json');
-
-  interface CommunityInstallState {
-    version: number;
-    themes: {
-      themeId: string;
-      filePath: string;
-      installedAt: string;
-    }[];
-  }
-
-  ipcMain.handle('load-community-install-state', async () => {
-    try {
-      if (fs.existsSync(communityInstallStatePath)) {
-        const data = fs.readFileSync(communityInstallStatePath, 'utf8');
-        return JSON.parse(data);
-      }
-    } catch (error) {
-      console.error('Error loading community install state:', error);
-    }
-    return { version: 1, themes: [] };
-  });
-
-  ipcMain.handle('save-community-install-state', async (_event, state: CommunityInstallState) => {
-    try {
-      fs.writeFileSync(communityInstallStatePath, JSON.stringify(state, null, 2), 'utf8');
-      return { success: true };
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      return { success: false, error: errorMessage };
-    }
-  });
 
   // User preferences persistence
   const preferencesPath = path.join(app.getPath('userData'), 'preferences.json');

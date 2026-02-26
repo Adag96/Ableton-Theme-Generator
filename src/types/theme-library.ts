@@ -19,6 +19,7 @@ export interface SavedTheme {
   roleLocations?: RoleLocations;
   sourceImagePath?: string; // Cached source image in app data directory
   isInstalled: boolean; // true = .ask file exists in Ableton themes dir
+  fromCommunity?: boolean; // true if downloaded from community gallery
 }
 
 export interface ThemeLibrary {

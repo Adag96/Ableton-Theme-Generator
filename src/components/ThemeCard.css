@@ -125,6 +125,7 @@
 .theme-card-action-content {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-xs);
 }
 

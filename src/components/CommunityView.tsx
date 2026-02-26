@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { supabase, type CommunityTheme } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
-import { useCommunityInstallState } from '../hooks/useCommunityInstallState';
+import { useThemeLibrary } from '../hooks/useThemeLibrary';
 import { CommunityThemeCard } from './CommunityThemeCard';
 import { CommunityThemeDetailModal } from './CommunityThemeDetailModal';
 import './CommunityView.css';
@@ -26,7 +26,7 @@ interface CommunityViewProps {
 
 export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProfile }) => {
   const { user } = useAuth();
-  const { isInstalled, markInstalled, markUninstalled, getFilePath, syncWithFilesystem } = useCommunityInstallState();
+  const { isThemeInstalled, addThemeFromCommunity, uninstallTheme, getThemeById, syncInstallState } = useThemeLibrary();
   const [tab, setTab] = useState<Tab>('gallery');
   const [themes, setThemes] = useState<CommunityTheme[]>([]);
   const [mySubmissions, setMySubmissions] = useState<CommunityTheme[]>([]);
@@ -97,7 +97,7 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProf
 
   // Sync install state with filesystem once on mount
   useEffect(() => {
-    syncWithFilesystem();
+    syncInstallState();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -112,18 +112,13 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProf
 
   const handleDownload = async (theme: CommunityTheme) => {
     // Prevent duplicate downloads - if already installed, skip
-    if (isInstalled(theme.id)) {
+    if (isThemeInstalled(theme.id)) {
       return;
     }
 
-    const result = await window.electronAPI.downloadCommunityTheme({
-      url: theme.ask_file_url,
-      name: theme.name,
-    });
+    const result = await addThemeFromCommunity(theme);
 
-    if (result.success && result.filePath) {
-      // Track installation state
-      await markInstalled(theme.id, result.filePath);
+    if (result.success) {
       // Increment download count in DB (fire-and-forget)
       await supabase.rpc('increment_download_count', { theme_id: theme.id });
       // Optimistically update the count in state
@@ -138,13 +133,11 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProf
   };
 
   const handleUninstall = async (theme: CommunityTheme) => {
-    const filePath = getFilePath(theme.id);
-    if (!filePath) return;
+    const localTheme = getThemeById(theme.id);
+    if (!localTheme) return;
 
-    const result = await window.electronAPI.deleteLibraryThemeFile(filePath);
-    if (result.success) {
-      await markUninstalled(theme.id);
-    } else {
+    const result = await uninstallTheme(theme.id);
+    if (!result.success) {
       throw new Error(result.error ?? 'Uninstall failed');
     }
   };
@@ -351,7 +344,7 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProf
                   onUninstall={handleUninstall}
                   onClick={setSelectedTheme}
                   onCreatorClick={onViewProfile}
-                  isInstalled={isInstalled(theme.id)}
+                  isInstalled={isThemeInstalled(theme.id)}
                 />
               ))}
             </div>
@@ -379,7 +372,7 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProf
                         onUninstall={handleUninstall}
                         onClick={setSelectedTheme}
                         onCreatorClick={onViewProfile}
-                        isInstalled={isInstalled(theme.id)}
+                        isInstalled={isThemeInstalled(theme.id)}
                         showStatus
                       />
                     ))}
@@ -418,7 +411,7 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProf
         onUninstall={handleUninstall}
         onCreatorClick={onViewProfile}
         showStatus={tab === 'submissions'}
-        isInstalled={selectedTheme ? isInstalled(selectedTheme.id) : false}
+        isInstalled={selectedTheme ? isThemeInstalled(selectedTheme.id) : false}
       />
     </div>
   );

@@ -38,8 +38,8 @@ export const SubmitThemeModal: React.FC<SubmitThemeModalProps> = ({ theme, onClo
         return;
       }
 
-      // Generate a unique theme ID
-      const themeId = crypto.randomUUID();
+      // Use the local theme's existing ID as the Supabase record ID
+      const themeId = theme.id;
 
       // Upload .ask file to Supabase Storage
       const blob = new Blob([readResult.content], { type: 'application/xml' });

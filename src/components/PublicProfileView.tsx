@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { supabase, type Profile, type CommunityTheme } from '../lib/supabase';
 import { SOCIAL_PLATFORMS, SOCIAL_ICONS } from '../lib/social-platforms';
-import { useCommunityInstallState } from '../hooks/useCommunityInstallState';
+import { useThemeLibrary } from '../hooks/useThemeLibrary';
 import { CommunityThemeCard } from './CommunityThemeCard';
 import { CommunityThemeDetailModal } from './CommunityThemeDetailModal';
 import './PublicProfileView.css';
@@ -17,7 +17,7 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
   onBack,
   onThemeClick,
 }) => {
-  const { isInstalled, markInstalled, markUninstalled, getFilePath, syncWithFilesystem } = useCommunityInstallState();
+  const { isThemeInstalled, addThemeFromCommunity, uninstallTheme, getThemeById, syncInstallState } = useThemeLibrary();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [themes, setThemes] = useState<CommunityTheme[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -53,23 +53,19 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
 
   // Sync install state with filesystem once on mount
   useEffect(() => {
-    syncWithFilesystem();
+    syncInstallState();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleDownload = async (theme: CommunityTheme) => {
     // Prevent duplicate downloads
-    if (isInstalled(theme.id)) {
+    if (isThemeInstalled(theme.id)) {
       return;
     }
 
-    const result = await window.electronAPI.downloadCommunityTheme({
-      url: theme.ask_file_url,
-      name: theme.name,
-    });
+    const result = await addThemeFromCommunity(theme);
 
-    if (result.success && result.filePath) {
-      await markInstalled(theme.id, result.filePath);
+    if (result.success) {
       await supabase.rpc('increment_download_count', { theme_id: theme.id });
       setThemes((prev) =>
         prev.map((t) =>
@@ -82,13 +78,11 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
   };
 
   const handleUninstall = async (theme: CommunityTheme) => {
-    const filePath = getFilePath(theme.id);
-    if (!filePath) return;
+    const localTheme = getThemeById(theme.id);
+    if (!localTheme) return;
 
-    const result = await window.electronAPI.deleteLibraryThemeFile(filePath);
-    if (result.success) {
-      await markUninstalled(theme.id);
-    } else {
+    const result = await uninstallTheme(theme.id);
+    if (!result.success) {
       throw new Error(result.error ?? 'Uninstall failed');
     }
   };
@@ -200,7 +194,7 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
                   setSelectedTheme(t);
                   onThemeClick(t);
                 }}
-                isInstalled={isInstalled(theme.id)}
+                isInstalled={isThemeInstalled(theme.id)}
               />
             ))}
           </div>
@@ -213,7 +207,7 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
         onClose={() => setSelectedTheme(null)}
         onDownload={handleDownload}
         onUninstall={handleUninstall}
-        isInstalled={selectedTheme ? isInstalled(selectedTheme.id) : false}
+        isInstalled={selectedTheme ? isThemeInstalled(selectedTheme.id) : false}
       />
     </div>
   );
