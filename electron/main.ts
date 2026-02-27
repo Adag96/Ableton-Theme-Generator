@@ -1,6 +1,8 @@
 import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import path from 'path';
 import fs from 'fs';
+import os from 'os';
+import { execSync } from 'child_process';
 
 const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
 
@@ -16,6 +18,21 @@ function getBuildNumber(): string {
     console.error('Error reading build number:', error);
   }
   return '1';
+}
+
+function getOsVersion(): string {
+  try {
+    if (process.platform === 'darwin') {
+      // Get macOS marketing version (e.g., "15.7.2") instead of Darwin kernel version
+      return execSync('sw_vers -productVersion', { encoding: 'utf8' }).trim();
+    } else if (process.platform === 'win32') {
+      // Windows: os.release() returns the actual version (e.g., "10.0.19045")
+      return os.release();
+    }
+  } catch (error) {
+    console.error('Error getting OS version:', error);
+  }
+  return os.release();
 }
 
 interface ThemesDirectoryResult {
@@ -94,6 +111,11 @@ app.whenReady().then(() => {
   ipcMain.handle('get-version', () => app.getVersion());
   ipcMain.handle('get-build-number', () => buildNumber);
   ipcMain.handle('get-platform', () => process.platform);
+  ipcMain.handle('get-system-info', () => ({
+    platform: process.platform,
+    osVersion: getOsVersion(),
+    arch: os.arch(),
+  }));
 
   // Window control handlers
   ipcMain.handle('window-minimize', () => {

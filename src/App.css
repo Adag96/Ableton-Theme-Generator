@@ -76,7 +76,26 @@
 
 .footer-version {
   display: flex;
-  gap: var(--space-md);
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.feedback-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xs);
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.feedback-button:hover {
+  color: var(--accent-solid);
+  background: var(--surface-elevated);
 }
 
 .version-value {

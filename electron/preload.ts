@@ -6,6 +6,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getVersion: () => ipcRenderer.invoke('get-version'),
   getBuildNumber: () => ipcRenderer.invoke('get-build-number'),
   getPlatform: () => ipcRenderer.invoke('get-platform'),
+  getSystemInfo: () => ipcRenderer.invoke('get-system-info'),
 
   // Window controls
   windowMinimize: () => ipcRenderer.invoke('window-minimize'),

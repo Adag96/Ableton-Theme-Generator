@@ -47,3 +47,23 @@ export type Profile = {
 };
 
 export type SocialPlatform = keyof NonNullable<Profile['social_links']>;
+
+export type Feedback = {
+  id: string;
+  user_id: string;
+  type: 'bug' | 'feature';
+  title: string;
+  description: string;
+  priority: number;
+  os_info: {
+    platform: string;
+    osVersion: string;
+    arch: string;
+    appVersion: string;
+  } | null;
+  app_version: string;
+  status: 'new' | 'reviewed' | 'resolved' | 'wontfix';
+  created_at: string;
+  reviewed_at: string | null;
+  admin_notes: string | null;
+};

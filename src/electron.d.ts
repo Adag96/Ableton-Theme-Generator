@@ -22,10 +22,17 @@ export interface ThemeFileInfo {
   createdByApp: boolean;
 }
 
+export interface SystemInfo {
+  platform: 'darwin' | 'win32' | 'linux';
+  osVersion: string;
+  arch: string;
+}
+
 export interface ElectronAPI {
   getVersion: () => Promise<string>;
   getBuildNumber: () => Promise<string>;
   getPlatform: () => Promise<'darwin' | 'win32' | 'linux'>;
+  getSystemInfo: () => Promise<SystemInfo>;
 
   // Window controls
   windowMinimize: () => Promise<void>;

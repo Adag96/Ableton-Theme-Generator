@@ -1,9 +1,10 @@
 # Work Log
 
-## 2026-2-26 17:20
+## 2026-2-26 22:36
 - Re-formatted theme cards in Community view and My Themes view to use the same visual convention
-- Unified theme ID convention so themes that are in both My Themes and Community are synced in terms of installation state
+- Unified theme ID convention so the app correctly recognizes installed themes regardless of which view you're in
 - Added automatic cleanup that removes uninstalled community-downloaded themes from local storage since they can be re-downloaded anytime
+- Created bug/feature request report functionality and added a Supabase table and webhook to email notification
 
 
 ## 2026-2-23 17:50
