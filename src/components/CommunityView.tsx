@@ -212,6 +212,33 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProf
 
   const hasGalleryThemes = themes.length > 0;
 
+  // Determine the current list of themes for modal navigation based on active tab
+  const currentThemeList = useMemo(() => {
+    if (tab === 'gallery') {
+      return filteredThemes;
+    }
+    // For submissions tab, combine approved and non-approved in display order
+    return [...approvedSubmissions, ...nonApprovedSubmissions];
+  }, [tab, filteredThemes, approvedSubmissions, nonApprovedSubmissions]);
+
+  // Find current index in the list
+  const currentThemeIndex = useMemo(() => {
+    if (!selectedTheme) return -1;
+    return currentThemeList.findIndex((t) => t.id === selectedTheme.id);
+  }, [selectedTheme, currentThemeList]);
+
+  const handlePreviousTheme = useCallback(() => {
+    if (currentThemeIndex > 0) {
+      setSelectedTheme(currentThemeList[currentThemeIndex - 1]);
+    }
+  }, [currentThemeIndex, currentThemeList]);
+
+  const handleNextTheme = useCallback(() => {
+    if (currentThemeIndex < currentThemeList.length - 1) {
+      setSelectedTheme(currentThemeList[currentThemeIndex + 1]);
+    }
+  }, [currentThemeIndex, currentThemeList]);
+
   return (
     <div className="community-view">
       <div className="community-header">
@@ -412,6 +439,10 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProf
         onCreatorClick={onViewProfile}
         showStatus={tab === 'submissions'}
         isInstalled={selectedTheme ? isThemeInstalled(selectedTheme.id) : false}
+        onPrevious={handlePreviousTheme}
+        onNext={handleNextTheme}
+        hasPrevious={currentThemeIndex > 0}
+        hasNext={currentThemeIndex < currentThemeList.length - 1}
       />
     </div>
   );

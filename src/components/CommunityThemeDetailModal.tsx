@@ -12,6 +12,10 @@ interface CommunityThemeDetailModalProps {
   onCreatorClick?: (userId: string) => void;
   showStatus?: boolean;
   isInstalled?: boolean;
+  onPrevious?: () => void;
+  onNext?: () => void;
+  hasPrevious?: boolean;
+  hasNext?: boolean;
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -29,6 +33,10 @@ export const CommunityThemeDetailModal: React.FC<CommunityThemeDetailModalProps>
   onCreatorClick,
   showStatus = false,
   isInstalled = false,
+  onPrevious,
+  onNext,
+  hasPrevious = false,
+  hasNext = false,
 }) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isUninstalling, setIsUninstalling] = useState(false);
@@ -42,6 +50,12 @@ export const CommunityThemeDetailModal: React.FC<CommunityThemeDetailModalProps>
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
       onClose();
+    } else if (e.key === 'ArrowLeft' && hasPrevious && onPrevious) {
+      e.preventDefault();
+      onPrevious();
+    } else if (e.key === 'ArrowRight' && hasNext && onNext) {
+      e.preventDefault();
+      onNext();
     }
   };
 
@@ -83,6 +97,36 @@ export const CommunityThemeDetailModal: React.FC<CommunityThemeDetailModalProps>
       onKeyDown={handleKeyDown}
       tabIndex={-1}
     >
+      {/* Navigation Arrows */}
+      {hasPrevious && onPrevious && (
+        <button
+          className="community-modal-nav community-modal-nav-prev"
+          onClick={(e) => {
+            e.stopPropagation();
+            onPrevious();
+          }}
+          aria-label="Previous theme"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+      )}
+      {hasNext && onNext && (
+        <button
+          className="community-modal-nav community-modal-nav-next"
+          onClick={(e) => {
+            e.stopPropagation();
+            onNext();
+          }}
+          aria-label="Next theme"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+      )}
+
       <div className="community-modal-content" onClick={(e) => e.stopPropagation()}>
         <button className="community-modal-close" onClick={onClose} aria-label="Close">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

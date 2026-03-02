@@ -1,5 +1,9 @@
 # Work Log
 
+## 2026-3-2 23:52
+- Added step-through arrows on the left and right of the Ableton preview overlay when viewing themes
+
+
 ## 2026-2-26 22:36
 - Re-formatted theme cards in Community view and My Themes view to use the same visual convention
 - Unified theme ID convention so the app correctly recognizes installed themes regardless of which view you're in

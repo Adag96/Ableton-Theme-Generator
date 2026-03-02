@@ -320,3 +320,61 @@
 .community-modal-rejection strong {
   color: var(--color-error);
 }
+
+/* ---------------------------------------------------------------------------
+   Navigation Arrows
+   --------------------------------------------------------------------------- */
+
+.community-modal-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-border);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: all var(--duration-fast) var(--ease-out);
+  z-index: 101;
+}
+
+.community-modal-nav:hover {
+  background: var(--surface-base);
+  color: var(--text-primary);
+  border-color: var(--accent-solid);
+  box-shadow: var(--glow-accent);
+}
+
+.community-modal-nav-prev {
+  left: calc(50% - min(45vw, 340px) - 60px);
+}
+
+.community-modal-nav-next {
+  right: calc(50% - min(45vw, 340px) - 60px);
+}
+
+/* Adjust arrow positions for different modal widths */
+@media (min-width: 900px) {
+  .community-modal-nav-prev {
+    left: calc(50% - min(35vw, 375px) - 60px);
+  }
+
+  .community-modal-nav-next {
+    right: calc(50% - min(35vw, 375px) - 60px);
+  }
+}
+
+@media (min-width: 1200px) {
+  .community-modal-nav-prev {
+    left: calc(50% - min(30vw, 425px) - 60px);
+  }
+
+  .community-modal-nav-next {
+    right: calc(50% - min(30vw, 425px) - 60px);
+  }
+}

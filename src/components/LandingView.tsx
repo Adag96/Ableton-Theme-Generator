@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase, type CommunityTheme } from '../lib/supabase';
 import { useThemeLibrary } from '../hooks/useThemeLibrary';
 import { CommunityThemeCard } from './CommunityThemeCard';
@@ -116,6 +116,24 @@ export const LandingView: React.FC<LandingViewProps> = ({
 
   const showArrows = themes.length > CAROUSEL_VISIBLE_COUNT;
 
+  // Modal navigation for stepping through themes
+  const selectedThemeIndex = useMemo(() => {
+    if (!selectedTheme) return -1;
+    return themes.findIndex((t) => t.id === selectedTheme.id);
+  }, [selectedTheme, themes]);
+
+  const handlePreviousTheme = useCallback(() => {
+    if (selectedThemeIndex > 0) {
+      setSelectedTheme(themes[selectedThemeIndex - 1]);
+    }
+  }, [selectedThemeIndex, themes]);
+
+  const handleNextTheme = useCallback(() => {
+    if (selectedThemeIndex < themes.length - 1) {
+      setSelectedTheme(themes[selectedThemeIndex + 1]);
+    }
+  }, [selectedThemeIndex, themes]);
+
   return (
     <div className="landing-view">
       {/* Carousel Section */}
@@ -231,6 +249,10 @@ export const LandingView: React.FC<LandingViewProps> = ({
         onUninstall={handleUninstall}
         onCreatorClick={onViewProfile}
         isInstalled={selectedTheme ? isThemeInstalled(selectedTheme.id) : false}
+        onPrevious={handlePreviousTheme}
+        onNext={handleNextTheme}
+        hasPrevious={selectedThemeIndex > 0}
+        hasNext={selectedThemeIndex < themes.length - 1}
       />
     </div>
   );
