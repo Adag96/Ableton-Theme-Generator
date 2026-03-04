@@ -17,6 +17,7 @@ export type CommunityTheme = {
   variant_mode: string | null;
   source_image_url: string | null;
   tone: 'light' | 'dark' | null;
+  contrast_level: 'low' | 'standard' | 'high' | null;
   download_count: number;
   created_at: string;
   approved_at: string | null;

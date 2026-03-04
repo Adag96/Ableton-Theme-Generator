@@ -125,6 +125,42 @@
 }
 
 /* ---------------------------------------------------------------------------
+   Badges (Tone & Contrast)
+   --------------------------------------------------------------------------- */
+
+.community-modal-badges {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.community-modal-badge {
+  display: inline-block;
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-sm);
+}
+
+.community-modal-badge-tone-dark {
+  background: rgba(30, 30, 30, 0.8);
+  color: rgba(170, 170, 170, 1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.community-modal-badge-tone-light {
+  background: rgba(245, 245, 250, 0.9);
+  color: rgba(80, 80, 90, 1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.community-modal-badge-contrast {
+  background: var(--surface-recessed);
+  color: var(--text-secondary);
+  border: 1px solid var(--surface-border);
+}
+
+/* ---------------------------------------------------------------------------
    Info Section
    --------------------------------------------------------------------------- */
 

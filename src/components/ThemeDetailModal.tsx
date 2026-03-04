@@ -282,9 +282,6 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
                 {CONTRAST_LABELS[theme.contrastLevel] ?? theme.contrastLevel} Contrast
               </span>
             )}
-            <span className={`modal-badge ${theme.isInstalled ? 'modal-badge-installed' : 'modal-badge-available'}`}>
-              {theme.isInstalled ? 'Installed' : 'Not Installed'}
-            </span>
           </div>
 
           <div className="modal-swatches-row">

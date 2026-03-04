@@ -24,6 +24,12 @@ const STATUS_LABELS: Record<string, string> = {
   rejected: 'Not Approved',
 };
 
+const CONTRAST_LABELS: Record<string, string> = {
+  low: 'Low',
+  standard: 'Standard',
+  high: 'High',
+};
+
 const SWATCH_LABELS = ['Surface', 'Text', 'Accent 1', 'Accent 2'];
 
 export const CommunityThemeDetailModal: React.FC<CommunityThemeDetailModalProps> = ({
@@ -154,6 +160,18 @@ export const CommunityThemeDetailModal: React.FC<CommunityThemeDetailModalProps>
               </svg>
               <p>Ableton preview coming soon</p>
             </div>
+          )}
+        </div>
+
+        {/* Tone & Contrast Badges */}
+        <div className="community-modal-badges">
+          <span className={`community-modal-badge community-modal-badge-tone-${theme.tone ?? 'dark'}`}>
+            {theme.tone === 'light' ? 'Light' : 'Dark'}
+          </span>
+          {theme.contrast_level && (
+            <span className="community-modal-badge community-modal-badge-contrast">
+              {CONTRAST_LABELS[theme.contrast_level] ?? theme.contrast_level} Contrast
+            </span>
           )}
         </div>
 
