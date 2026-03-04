@@ -98,6 +98,22 @@
   background: var(--surface-elevated);
 }
 
+.support-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  color: var(--text-tertiary);
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-sm);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.support-link:hover {
+  color: var(--accent-solid);
+  background: var(--surface-elevated);
+}
+
 .version-value {
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
