@@ -289,26 +289,34 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
 
           <div className="modal-swatches-row">
             <div className="modal-swatches">
-              <div
-                className="modal-swatch"
-                style={{ backgroundColor: theme.colors.surface_base }}
-                title="Surface"
-              />
-              <div
-                className="modal-swatch"
-                style={{ backgroundColor: theme.colors.text_primary }}
-                title="Text"
-              />
-              <div
-                className="modal-swatch"
-                style={{ backgroundColor: theme.colors.accent_primary }}
-                title="Accent 1"
-              />
-              <div
-                className="modal-swatch"
-                style={{ backgroundColor: theme.colors.accent_secondary }}
-                title="Accent 2"
-              />
+              <div className="modal-swatch-item">
+                <div
+                  className="modal-swatch"
+                  style={{ backgroundColor: theme.colors.surface_base }}
+                />
+                <span className="modal-swatch-label">Surface</span>
+              </div>
+              <div className="modal-swatch-item">
+                <div
+                  className="modal-swatch"
+                  style={{ backgroundColor: theme.colors.text_primary }}
+                />
+                <span className="modal-swatch-label">Text</span>
+              </div>
+              <div className="modal-swatch-item">
+                <div
+                  className="modal-swatch"
+                  style={{ backgroundColor: theme.colors.accent_primary }}
+                />
+                <span className="modal-swatch-label">Accent 1</span>
+              </div>
+              <div className="modal-swatch-item">
+                <div
+                  className="modal-swatch"
+                  style={{ backgroundColor: theme.colors.accent_secondary }}
+                />
+                <span className="modal-swatch-label">Accent 2</span>
+              </div>
             </div>
             <button
               className="modal-edit-button"

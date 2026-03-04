@@ -1,5 +1,9 @@
 # Work Log
 
+## 2026-3-4 21:14
+- Added swatch text labels to preview overlay of community themes to match 'My Themes' preview
+
+
 ## 2026-3-2 23:52
 - Added step-through arrows on the left and right of the Ableton preview overlay when viewing themes
 

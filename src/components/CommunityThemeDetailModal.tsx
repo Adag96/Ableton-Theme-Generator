@@ -24,6 +24,8 @@ const STATUS_LABELS: Record<string, string> = {
   rejected: 'Not Approved',
 };
 
+const SWATCH_LABELS = ['Surface', 'Text', 'Accent 1', 'Accent 2'];
+
 export const CommunityThemeDetailModal: React.FC<CommunityThemeDetailModalProps> = ({
   isOpen,
   theme,
@@ -157,56 +159,59 @@ export const CommunityThemeDetailModal: React.FC<CommunityThemeDetailModalProps>
 
         {/* Theme Info */}
         <div className="community-modal-info-section">
-          <h3 className="community-modal-name">{theme.name}</h3>
-          <p className="community-modal-creator">
-            by{' '}
-            {theme.user_id && onCreatorClick ? (
-              <button
-                className="community-modal-creator-link"
-                onClick={() => {
-                  onCreatorClick(theme.user_id!);
-                  onClose();
-                }}
-              >
-                {creatorName}
-              </button>
-            ) : (
-              creatorName
-            )}
-          </p>
+          <div className="community-modal-info-left">
+            <h3 className="community-modal-name">{theme.name}</h3>
+            <p className="community-modal-creator">
+              by{' '}
+              {theme.user_id && onCreatorClick ? (
+                <button
+                  className="community-modal-creator-link"
+                  onClick={() => {
+                    onCreatorClick(theme.user_id!);
+                    onClose();
+                  }}
+                >
+                  {creatorName}
+                </button>
+              ) : (
+                creatorName
+              )}
+            </p>
 
-          {theme.description && (
-            <p className="community-modal-description">{theme.description}</p>
-          )}
-
-          <div className="community-modal-meta">
-            {showStatus && (
-              <span className={`community-modal-status community-modal-status-${theme.status}`}>
-                {STATUS_LABELS[theme.status] ?? theme.status}
-              </span>
+            {theme.description && (
+              <p className="community-modal-description">{theme.description}</p>
             )}
 
-            {theme.status === 'approved' && (
-              <span className="community-modal-downloads">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-                {theme.download_count} installs
-              </span>
-            )}
+            <div className="community-modal-meta">
+              {showStatus && (
+                <span className={`community-modal-status community-modal-status-${theme.status}`}>
+                  {STATUS_LABELS[theme.status] ?? theme.status}
+                </span>
+              )}
+
+              {theme.status === 'approved' && (
+                <span className="community-modal-downloads">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  {theme.download_count} installs
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Color Swatches */}
           <div className="community-modal-swatches">
             {swatchColors.slice(0, 4).map((color, i) => (
-              <div
-                key={i}
-                className="community-modal-swatch"
-                style={{ backgroundColor: color }}
-                title={color}
-              />
+              <div key={i} className="community-modal-swatch-item">
+                <div
+                  className="community-modal-swatch"
+                  style={{ backgroundColor: color }}
+                />
+                <span className="community-modal-swatch-label">{SWATCH_LABELS[i]}</span>
+              </div>
             ))}
           </div>
         </div>
