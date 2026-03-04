@@ -5,6 +5,7 @@ import { AuthModal } from './AuthModal';
 import { SubmitThemeModal } from './SubmitThemeModal';
 import { ImageMagnifier } from './ImageMagnifier';
 import { useAuth } from '../hooks/useAuth';
+import { useModalOverlayClose } from '../hooks/useModalOverlayClose';
 import './ThemeDetailModal.css';
 
 interface ThemeDetailModalProps {
@@ -37,6 +38,7 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
   onEdit,
 }) => {
   const { user } = useAuth();
+  const { handleOverlayClick, handleContentMouseDown } = useModalOverlayClose(onClose);
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
   const [renameError, setRenameError] = useState<string | null>(null);
@@ -166,8 +168,8 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
   const roleLocations = theme.roleLocations ?? {};
 
   return (
-    <div className="modal-overlay" onClick={onClose} onKeyDown={handleKeyDown} tabIndex={-1}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-overlay" onClick={handleOverlayClick} onKeyDown={handleKeyDown} tabIndex={-1}>
+      <div className="modal-content" onMouseDown={handleContentMouseDown}>
         <button className="modal-close" onClick={onClose} aria-label="Close">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="18" y1="6" x2="6" y2="18" />

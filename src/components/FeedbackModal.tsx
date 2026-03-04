@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
+import { useModalOverlayClose } from '../hooks/useModalOverlayClose';
 import type { SystemInfo } from '../electron';
 import './FeedbackModal.css';
 
@@ -21,6 +22,7 @@ const PRIORITY_LABELS: Record<number, string> = {
 
 export const FeedbackModal: React.FC<FeedbackModalProps> = ({ onClose, onSignInClick }) => {
   const { user } = useAuth();
+  const { handleOverlayClick, handleContentMouseDown } = useModalOverlayClose(onClose);
   const [type, setType] = useState<FeedbackType>('bug');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -117,8 +119,8 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ onClose, onSignInC
   const canSubmit = title.trim().length > 0 && description.trim().length > 0 && !isSubmitting && !cooldown;
 
   return (
-    <div className="feedback-modal-overlay" onClick={onClose}>
-      <div className="feedback-modal-content" onClick={(e) => e.stopPropagation()}>
+    <div className="feedback-modal-overlay" onClick={handleOverlayClick}>
+      <div className="feedback-modal-content" onMouseDown={handleContentMouseDown}>
         <button className="feedback-modal-close" onClick={onClose} aria-label="Close">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="18" y1="6" x2="6" y2="18" />

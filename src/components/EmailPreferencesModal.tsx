@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { supabase, type Profile } from '../lib/supabase';
+import { useModalOverlayClose } from '../hooks/useModalOverlayClose';
 import './EmailPreferencesModal.css';
 
 interface EmailPreferencesModalProps {
@@ -13,6 +14,7 @@ export const EmailPreferencesModal: React.FC<EmailPreferencesModalProps> = ({
   onClose,
   onUpdate,
 }) => {
+  const { handleOverlayClick, handleContentMouseDown } = useModalOverlayClose(onClose);
   const [productUpdates, setProductUpdates] = useState(profile.consent_product_updates ?? false);
   const [marketing, setMarketing] = useState(profile.consent_marketing ?? false);
   const [isSaving, setIsSaving] = useState(false);
@@ -46,8 +48,8 @@ export const EmailPreferencesModal: React.FC<EmailPreferencesModalProps> = ({
     marketing !== (profile.consent_marketing ?? false);
 
   return (
-    <div className="email-prefs-overlay" onClick={onClose}>
-      <div className="email-prefs-content" onClick={(e) => e.stopPropagation()}>
+    <div className="email-prefs-overlay" onClick={handleOverlayClick}>
+      <div className="email-prefs-content" onMouseDown={handleContentMouseDown}>
         <button className="email-prefs-close" onClick={onClose} aria-label="Close">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="18" y1="6" x2="6" y2="18" />

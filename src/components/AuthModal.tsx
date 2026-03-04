@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { useModalOverlayClose } from '../hooks/useModalOverlayClose';
 import './AuthModal.css';
 
 type Mode = 'signin' | 'signup';
@@ -11,6 +12,7 @@ interface AuthModalProps {
 
 export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
   const { signIn, signUp } = useAuth();
+  const { handleOverlayClick, handleContentMouseDown } = useModalOverlayClose(onClose);
   const [mode, setMode] = useState<Mode>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -67,8 +69,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
   };
 
   return (
-    <div className="auth-modal-overlay" onClick={onClose}>
-      <div className="auth-modal-content" onClick={(e) => e.stopPropagation()}>
+    <div className="auth-modal-overlay" onClick={handleOverlayClick}>
+      <div className="auth-modal-content" onMouseDown={handleContentMouseDown}>
         <button className="auth-modal-close" onClick={onClose} aria-label="Close">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="18" y1="6" x2="6" y2="18" />

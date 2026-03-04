@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useModalOverlayClose } from '../hooks/useModalOverlayClose';
 import './ThemeNameDialog.css';
 
 interface ThemeNameDialogProps {
@@ -14,6 +15,7 @@ export const ThemeNameDialog: React.FC<ThemeNameDialogProps> = ({
   onConfirm,
   onCancel,
 }) => {
+  const { handleOverlayClick, handleContentMouseDown } = useModalOverlayClose(onCancel);
   const [name, setName] = useState(defaultName);
 
   useEffect(() => {
@@ -36,8 +38,8 @@ export const ThemeNameDialog: React.FC<ThemeNameDialogProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="dialog-overlay" onClick={onCancel} onKeyDown={handleKeyDown}>
-      <div className="dialog-content" onClick={(e) => e.stopPropagation()}>
+    <div className="dialog-overlay" onClick={handleOverlayClick} onKeyDown={handleKeyDown}>
+      <div className="dialog-content" onMouseDown={handleContentMouseDown}>
         <h3 className="dialog-title">Name Your Theme</h3>
         <form onSubmit={handleSubmit}>
           <input

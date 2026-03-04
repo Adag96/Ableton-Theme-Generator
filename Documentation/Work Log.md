@@ -1,10 +1,11 @@
 # Work Log
 
-## 2026-3-4 21:41
+## 2026-3-4 21:52
 - Added swatch text labels to preview overlay of community themes to match 'My Themes' preview
 - Removed redundant 'installed' / 'not installed' badge on My Themes previews
 - Added dark/light and contrast badges to community theme preview overlays
 - Added contrast level tracking in Supabase database for community themes
+- Added a flag to track drag states and prevent modal close when drag exits modal area
 
 
 ## 2026-3-2 23:52

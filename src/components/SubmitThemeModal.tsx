@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { SavedTheme } from '../types/theme-library';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
+import { useModalOverlayClose } from '../hooks/useModalOverlayClose';
 import './SubmitThemeModal.css';
 
 interface SubmitThemeModalProps {
@@ -11,6 +12,7 @@ interface SubmitThemeModalProps {
 
 export const SubmitThemeModal: React.FC<SubmitThemeModalProps> = ({ theme, onClose }) => {
   const { user } = useAuth();
+  const { handleOverlayClick, handleContentMouseDown } = useModalOverlayClose(onClose);
   const [name, setName] = useState(theme.name);
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -116,8 +118,8 @@ export const SubmitThemeModal: React.FC<SubmitThemeModalProps> = ({ theme, onClo
   };
 
   return (
-    <div className="submit-modal-overlay" onClick={onClose}>
-      <div className="submit-modal-content" onClick={(e) => e.stopPropagation()}>
+    <div className="submit-modal-overlay" onClick={handleOverlayClick}>
+      <div className="submit-modal-content" onMouseDown={handleContentMouseDown}>
         <button className="submit-modal-close" onClick={onClose} aria-label="Close">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="18" y1="6" x2="6" y2="18" />

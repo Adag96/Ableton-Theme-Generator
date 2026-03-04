@@ -1,5 +1,6 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
+import { useModalOverlayClose } from '../hooks/useModalOverlayClose';
 import './ConfirmationDialog.css';
 
 interface ConfirmationDialogProps {
@@ -23,19 +24,12 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   onConfirm,
   onCancel,
 }) => {
+  const { handleOverlayClick, handleContentMouseDown } = useModalOverlayClose(onCancel);
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
       onCancel();
     }
-  };
-
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onCancel();
-  };
-
-  const handleContentClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
   };
 
   const handleButtonClick = (e: React.MouseEvent, action: () => void) => {
@@ -47,7 +41,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 
   return createPortal(
     <div className="dialog-overlay" onClick={handleOverlayClick} onKeyDown={handleKeyDown}>
-      <div className="dialog-content" onClick={handleContentClick}>
+      <div className="dialog-content" onMouseDown={handleContentMouseDown}>
         <h3 className="dialog-title">{title}</h3>
         <p className="dialog-message">{message}</p>
         <div className="dialog-actions">
