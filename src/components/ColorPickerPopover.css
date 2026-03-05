@@ -5,9 +5,8 @@
 .color-picker-popover {
   position: absolute;
   z-index: 100;
-  background: var(--surface-elevated);
-  backdrop-filter: var(--blur-surface);
-  -webkit-backdrop-filter: var(--blur-surface);
+  /* Opaque background to avoid Chromium backdrop-filter rendering bugs on input focus */
+  background: #ffffff;
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-elevated);
@@ -93,4 +92,9 @@
 
 .color-picker-reset:hover {
   background: var(--accent-solid-hover);
+}
+
+/* Dark mode - opaque dark background */
+[data-theme="dark"] .color-picker-popover {
+  background: #2d2d34;
 }

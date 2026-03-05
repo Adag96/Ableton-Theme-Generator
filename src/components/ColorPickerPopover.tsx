@@ -68,7 +68,11 @@ export const ColorPickerPopover: React.FC<ColorPickerPopoverProps> = ({
   }, [onChange]);
 
   return (
-    <div className="color-picker-popover" ref={popoverRef}>
+    <div
+      className="color-picker-popover"
+      ref={popoverRef}
+      onClick={(e) => e.stopPropagation()}
+    >
       <div className="color-picker-header">
         <span className="color-picker-label">{label}</span>
       </div>
