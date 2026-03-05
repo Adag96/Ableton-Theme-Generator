@@ -22,7 +22,7 @@ const PRIORITY_LABELS: Record<number, string> = {
 
 export const FeedbackModal: React.FC<FeedbackModalProps> = ({ onClose, onSignInClick }) => {
   const { user } = useAuth();
-  const { handleOverlayClick, handleContentMouseDown } = useModalOverlayClose(onClose);
+  const { handleOverlayClick, handleOverlayMouseDown, handleContentMouseDown } = useModalOverlayClose(onClose);
   const [type, setType] = useState<FeedbackType>('bug');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -119,7 +119,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({ onClose, onSignInC
   const canSubmit = title.trim().length > 0 && description.trim().length > 0 && !isSubmitting && !cooldown;
 
   return (
-    <div className="feedback-modal-overlay" onClick={handleOverlayClick}>
+    <div className="feedback-modal-overlay" onMouseDown={handleOverlayMouseDown} onClick={handleOverlayClick}>
       <div className="feedback-modal-content" onMouseDown={handleContentMouseDown}>
         <button className="feedback-modal-close" onClick={onClose} aria-label="Close">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

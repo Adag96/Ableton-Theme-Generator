@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import type { SavedTheme } from '../types/theme-library';
 import { ThemeCard } from './ThemeCard';
 import { ThemeDetailModal } from './ThemeDetailModal';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../hooks/useAuth';
 import './MyThemesView.css';
 
 type ToneFilter = 'all' | 'dark' | 'light';
@@ -35,10 +37,12 @@ export const MyThemesView: React.FC<MyThemesViewProps> = ({
   onUninstallTheme,
   onEditTheme,
 }) => {
+  const { user } = useAuth();
   const [filter, setFilter] = useState<ToneFilter>('all');
   const [sortBy, setSortBy] = useState<SortOption>('recent');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedThemeId, setSelectedThemeId] = useState<string | null>(null);
+  const [mySubmissions, setMySubmissions] = useState<{ id: string; status: string }[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Load preferences from localStorage on mount
@@ -59,6 +63,19 @@ export const MyThemesView: React.FC<MyThemesViewProps> = ({
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ filter, sortBy }));
   }, [filter, sortBy]);
+
+  // Fetch user's submissions to show status on theme cards
+  useEffect(() => {
+    if (user) {
+      supabase
+        .from('community_themes')
+        .select('id, status')
+        .eq('user_id', user.id)
+        .then(({ data }) => setMySubmissions(data ?? []));
+    } else {
+      setMySubmissions([]);
+    }
+  }, [user]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -291,6 +308,8 @@ export const MyThemesView: React.FC<MyThemesViewProps> = ({
           setSelectedThemeId(null);
           onEditTheme(theme);
         }}
+        submissions={mySubmissions}
+        onSubmissionCreated={(id, status) => setMySubmissions(prev => [...prev, { id, status }])}
       />
     </div>
   );

@@ -14,7 +14,7 @@ export const EmailPreferencesModal: React.FC<EmailPreferencesModalProps> = ({
   onClose,
   onUpdate,
 }) => {
-  const { handleOverlayClick, handleContentMouseDown } = useModalOverlayClose(onClose);
+  const { handleOverlayClick, handleOverlayMouseDown, handleContentMouseDown } = useModalOverlayClose(onClose);
   const [productUpdates, setProductUpdates] = useState(profile.consent_product_updates ?? false);
   const [marketing, setMarketing] = useState(profile.consent_marketing ?? false);
   const [isSaving, setIsSaving] = useState(false);
@@ -48,7 +48,7 @@ export const EmailPreferencesModal: React.FC<EmailPreferencesModalProps> = ({
     marketing !== (profile.consent_marketing ?? false);
 
   return (
-    <div className="email-prefs-overlay" onClick={handleOverlayClick}>
+    <div className="email-prefs-overlay" onMouseDown={handleOverlayMouseDown} onClick={handleOverlayClick}>
       <div className="email-prefs-content" onMouseDown={handleContentMouseDown}>
         <button className="email-prefs-close" onClick={onClose} aria-label="Close">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

@@ -8,11 +8,12 @@ import './SubmitThemeModal.css';
 interface SubmitThemeModalProps {
   theme: SavedTheme;
   onClose: () => void;
+  onSubmissionCreated?: (id: string, status: string) => void;
 }
 
-export const SubmitThemeModal: React.FC<SubmitThemeModalProps> = ({ theme, onClose }) => {
+export const SubmitThemeModal: React.FC<SubmitThemeModalProps> = ({ theme, onClose, onSubmissionCreated }) => {
   const { user } = useAuth();
-  const { handleOverlayClick, handleContentMouseDown } = useModalOverlayClose(onClose);
+  const { handleOverlayClick, handleOverlayMouseDown, handleContentMouseDown } = useModalOverlayClose(onClose);
   const [name, setName] = useState(theme.name);
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -110,6 +111,7 @@ export const SubmitThemeModal: React.FC<SubmitThemeModalProps> = ({ theme, onClo
       }
 
       setSubmitted(true);
+      onSubmissionCreated?.(themeId, 'pending');
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
     } finally {
@@ -118,8 +120,8 @@ export const SubmitThemeModal: React.FC<SubmitThemeModalProps> = ({ theme, onClo
   };
 
   return (
-    <div className="submit-modal-overlay" onClick={handleOverlayClick}>
-      <div className="submit-modal-content" onMouseDown={handleContentMouseDown}>
+    <div className="submit-modal-overlay" onMouseDown={handleOverlayMouseDown} onClick={handleOverlayClick}>
+      <div className="submit-modal-content" onMouseDown={handleContentMouseDown} onClick={(e) => e.stopPropagation()}>
         <button className="submit-modal-close" onClick={onClose} aria-label="Close">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="18" y1="6" x2="6" y2="18" />

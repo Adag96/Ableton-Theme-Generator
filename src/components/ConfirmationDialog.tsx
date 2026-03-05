@@ -24,7 +24,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   onConfirm,
   onCancel,
 }) => {
-  const { handleOverlayClick, handleContentMouseDown } = useModalOverlayClose(onCancel);
+  const { handleOverlayClick, handleOverlayMouseDown, handleContentMouseDown } = useModalOverlayClose(onCancel);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
@@ -40,7 +40,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="dialog-overlay" onClick={handleOverlayClick} onKeyDown={handleKeyDown}>
+    <div className="dialog-overlay" onMouseDown={handleOverlayMouseDown} onClick={handleOverlayClick} onKeyDown={handleKeyDown}>
       <div className="dialog-content" onMouseDown={handleContentMouseDown}>
         <h3 className="dialog-title">{title}</h3>
         <p className="dialog-message">{message}</p>

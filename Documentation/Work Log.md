@@ -1,5 +1,12 @@
 # Work Log
 
+## 2026-3-5 19:13
+- Fixed an issue where clicking in the description box of the theme submission overlay closed it
+- Fixed click+drag issue that was closing overlays, was still applying to theme submission overlay
+- Users can no longer re-submit themes that were already rejected
+- Updated styling of approved themes to 'Featured' button
+
+
 ## 2026-3-4 21:52
 - Added swatch text labels to preview overlay of community themes to match 'My Themes' preview
 - Removed redundant 'installed' / 'not installed' badge on My Themes previews

@@ -18,6 +18,8 @@ interface ThemeDetailModalProps {
   onInstall: (id: string) => Promise<{ success: boolean; error?: string }>;
   onUninstall: (id: string) => Promise<{ success: boolean; error?: string }>;
   onEdit: (theme: SavedTheme) => void;
+  submissions?: { id: string; status: string }[];
+  onSubmissionCreated?: (id: string, status: string) => void;
 }
 
 const CONTRAST_LABELS: Record<string, string> = {
@@ -36,9 +38,11 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
   onInstall,
   onUninstall,
   onEdit,
+  submissions,
+  onSubmissionCreated,
 }) => {
   const { user } = useAuth();
-  const { handleOverlayClick, handleContentMouseDown } = useModalOverlayClose(onClose);
+  const { handleOverlayClick, handleOverlayMouseDown, handleContentMouseDown } = useModalOverlayClose(onClose);
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
   const [renameError, setRenameError] = useState<string | null>(null);
@@ -166,9 +170,10 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
   if (!isOpen || !theme) return null;
 
   const roleLocations = theme.roleLocations ?? {};
+  const submissionStatus = submissions?.find(s => s.id === theme.id)?.status;
 
   return (
-    <div className="modal-overlay" onClick={handleOverlayClick} onKeyDown={handleKeyDown} tabIndex={-1}>
+    <div className="modal-overlay" onMouseDown={handleOverlayMouseDown} onClick={handleOverlayClick} onKeyDown={handleKeyDown} tabIndex={-1}>
       <div className="modal-content" onMouseDown={handleContentMouseDown}>
         <button className="modal-close" onClick={onClose} aria-label="Close">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -389,17 +394,52 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
             </button>
           )}
 
-          <button
-            className="modal-action-button modal-action-submit"
-            onClick={handleSubmitToGallery}
-            title="Submit this theme to the community gallery"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 2L11 13" />
-              <path d="M22 2L15 22 11 13 2 9l20-7z" />
-            </svg>
-            Share
-          </button>
+          {submissionStatus ? (
+            <button
+              className={`modal-action-button modal-action-status modal-action-status-${submissionStatus}`}
+              disabled
+              title={`This theme has been ${submissionStatus === 'pending' ? 'submitted for review' : submissionStatus}`}
+            >
+              {submissionStatus === 'pending' && (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+              )}
+              {submissionStatus === 'approved' && (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 7 7 7 7" />
+                  <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5C17 4 17 7 17 7" />
+                  <path d="M4 22h16" />
+                  <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                  <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                  <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                </svg>
+              )}
+              {submissionStatus === 'rejected' && (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="15" y1="9" x2="9" y2="15" />
+                  <line x1="9" y1="9" x2="15" y2="15" />
+                </svg>
+              )}
+              {submissionStatus === 'pending' && 'Pending Review'}
+              {submissionStatus === 'approved' && 'Featured'}
+              {submissionStatus === 'rejected' && 'Rejected'}
+            </button>
+          ) : (
+            <button
+              className="modal-action-button modal-action-submit"
+              onClick={handleSubmitToGallery}
+              title="Submit this theme to the community gallery"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 2L11 13" />
+                <path d="M22 2L15 22 11 13 2 9l20-7z" />
+              </svg>
+              Share
+            </button>
+          )}
 
           <button
             className="modal-action-button modal-action-delete"
@@ -445,6 +485,7 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
         <SubmitThemeModal
           theme={theme}
           onClose={() => setShowSubmitModal(false)}
+          onSubmissionCreated={onSubmissionCreated}
         />
       )}
     </div>

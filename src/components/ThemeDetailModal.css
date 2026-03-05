@@ -420,3 +420,29 @@
   border-color: var(--color-error);
   color: var(--color-error);
 }
+
+/* ---------------------------------------------------------------------------
+   Submission Status States
+   --------------------------------------------------------------------------- */
+
+.modal-action-status {
+  cursor: default;
+}
+
+.modal-action-status-pending {
+  background: rgba(255, 179, 0, 0.1);
+  border-color: rgba(255, 179, 0, 0.4);
+  color: rgb(200, 140, 0);
+}
+
+.modal-action-status-approved {
+  background: rgba(212, 175, 55, 0.12);
+  border-color: rgba(212, 175, 55, 0.5);
+  color: rgb(192, 155, 35);
+}
+
+.modal-action-status-rejected {
+  background: rgba(255, 59, 48, 0.1);
+  border-color: rgba(255, 59, 48, 0.4);
+  color: var(--color-error);
+}
