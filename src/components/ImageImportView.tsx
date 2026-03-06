@@ -134,16 +134,23 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
 
     setSelectedTone(editingTheme.tone);
     setContrastLevel(editingTheme.contrastLevel ?? 'medium');
+
+    // Use original colors as the base for slider adjustments (if available)
+    const baseColors = editingTheme.originalColors ?? editingTheme.colors;
     setColorOverrides({
-      surface_base: editingTheme.colors.surface_base,
-      text_primary: editingTheme.colors.text_primary,
-      accent_primary: editingTheme.colors.accent_primary,
-      accent_secondary: editingTheme.colors.accent_secondary,
+      surface_base: baseColors.surface_base,
+      text_primary: baseColors.text_primary,
+      accent_primary: baseColors.accent_primary,
+      accent_secondary: baseColors.accent_secondary,
     });
+
     if (editingTheme.roleLocations) {
       setMarkerPositions(editingTheme.roleLocations);
     }
-    setMood(DEFAULT_MOOD);
+
+    // Restore slider positions if saved, else default
+    setMood(editingTheme.moodSliders ?? DEFAULT_MOOD);
+
     setRandomPalette(null);
     setActivePickerRole(null);
   }, [editingTheme]);
@@ -323,6 +330,9 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
 
   const handleColorChange = useCallback((role: ColorRole, color: string) => {
     setColorOverrides(prev => ({ ...prev, [role]: color }));
+    // When manually editing a color via picker, reset sliders
+    // The manually edited color becomes the new baseline
+    setMood(DEFAULT_MOOD);
   }, []);
 
   const handlePickerClose = useCallback(() => {
@@ -343,6 +353,20 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
     setColorOverrides({});
     setMarkerPositions({});
   }, []);
+
+  // Reset to Original: restore original colors and clear sliders (edit mode only)
+  const handleResetToOriginal = useCallback(() => {
+    const originals = editingTheme?.originalColors ?? editingTheme?.colors;
+    if (originals) {
+      setColorOverrides({
+        surface_base: originals.surface_base,
+        text_primary: originals.text_primary,
+        accent_primary: originals.accent_primary,
+        accent_secondary: originals.accent_secondary,
+      });
+    }
+    setMood(DEFAULT_MOOD);
+  }, [editingTheme]);
 
   // Helper: Calculate the actual rendered image bounds within the <img> element
   // (accounts for object-fit: contain letterboxing)
@@ -615,11 +639,18 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
             <div className="import-palette">
               <div className="import-palette-header">
                 <span className="import-palette-hint">Click a swatch to edit</span>
-                {hasOverrides && (
-                  <button className="import-palette-reset" onClick={handleResetColors}>
-                    Reset Colors
-                  </button>
-                )}
+                <div className="import-palette-actions">
+                  {editingTheme && (
+                    <button className="import-palette-reset" onClick={handleResetToOriginal}>
+                      Reset to Original
+                    </button>
+                  )}
+                  {hasOverrides && !editingTheme && (
+                    <button className="import-palette-reset" onClick={handleResetColors}>
+                      Reset Colors
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="import-palette-swatches">
                 {ROLES.map(role => (
@@ -726,6 +757,9 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
               onClick={() => effectivePalette && onContinue({
                 ...effectivePalette,
                 roles: { ...effectivePalette.roles, contrastLevel },
+                // Pass original colors (for edit, use existing originals; for new, use current overrides before mood)
+                originalColors: editingTheme?.originalColors ?? colorOverrides,
+                moodSliders: mood,
               })}
             >
               {isExtracting ? 'Extracting...' : editingTheme ? 'Save Changes' : 'Generate Theme'}

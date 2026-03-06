@@ -46,7 +46,7 @@ export function useThemeLibrary() {
 
   const updateTheme = useCallback(async (
     id: string,
-    updates: Partial<Pick<SavedTheme, 'colors' | 'tone' | 'contrastLevel' | 'previewImage' | 'roleLocations'>>
+    updates: Partial<Pick<SavedTheme, 'colors' | 'tone' | 'contrastLevel' | 'previewImage' | 'roleLocations' | 'originalColors' | 'moodSliders'>>
   ): Promise<{ success: boolean; error?: string }> => {
     const theme = library.themes.find(t => t.id === id);
     if (!theme) return { success: false, error: 'Theme not found' };

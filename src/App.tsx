@@ -159,6 +159,11 @@ function AppContent() {
 
     // When editing, skip the name dialog and update the theme directly
     if (editingTheme) {
+      // Convert partial originalColors to full object if provided
+      const originalColors = palette.originalColors && Object.keys(palette.originalColors).length === 4
+        ? palette.originalColors as { surface_base: string; text_primary: string; accent_primary: string; accent_secondary: string }
+        : undefined;
+
       const result = await updateTheme(editingTheme.id, {
         colors: {
           surface_base: palette.roles.surface_base,
@@ -170,6 +175,8 @@ function AppContent() {
         contrastLevel: palette.roles.contrastLevel,
         previewImage: previewImage ?? editingTheme.previewImage,
         roleLocations: palette.roleLocations,
+        originalColors,
+        moodSliders: palette.moodSliders,
       });
 
       if (result.success) {
@@ -209,6 +216,11 @@ function AppContent() {
             }
           }
 
+          // Convert partial originalColors to full object if provided
+          const originalColors = pendingTheme.palette.originalColors && Object.keys(pendingTheme.palette.originalColors).length === 4
+            ? pendingTheme.palette.originalColors as { surface_base: string; text_primary: string; accent_primary: string; accent_secondary: string }
+            : undefined;
+
           const savedTheme: SavedTheme = {
             id: themeId,
             name,
@@ -227,6 +239,8 @@ function AppContent() {
             roleLocations: pendingTheme.palette.roleLocations,
             sourceImagePath,
             isInstalled: true,
+            originalColors,
+            moodSliders: pendingTheme.palette.moodSliders,
           };
 
           await addTheme(savedTheme);

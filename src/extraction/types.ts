@@ -53,4 +53,12 @@ export interface PaletteSelectionResult {
     primarySaturation: number;
     secondaryHueDistance: number;
   };
+  /** Original colors before any slider adjustments (for edit restoration) */
+  originalColors?: Partial<Record<'surface_base' | 'text_primary' | 'accent_primary' | 'accent_secondary', string>>;
+  /** Slider positions (for persistence) */
+  moodSliders?: {
+    warmth: number;
+    saturation: number;
+    brightness: number;
+  };
 }
