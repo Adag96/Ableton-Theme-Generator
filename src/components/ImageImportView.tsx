@@ -70,6 +70,24 @@ function hasMoodAdjustments(mood: MoodSliders): boolean {
   return mood.warmth !== 0 || mood.saturation !== 0 || mood.brightness !== 0;
 }
 
+/**
+ * Detect whether an image suits a dark or light theme.
+ * Samples center region and checks average lightness.
+ */
+function detectThemeTone(sampler: ColorSampler): ThemeTone {
+  const samples: number[] = [];
+  // Sample 9 points in a 3x3 grid centered on image (normalized coords 0.25-0.75)
+  for (let y = 0.25; y <= 0.75; y += 0.25) {
+    for (let x = 0.25; x <= 0.75; x += 0.25) {
+      const hex = sampler.sampleAt(x, y, 5);
+      const hsl = hexToHsl(hex);
+      samples.push(hsl.l);
+    }
+  }
+  const avgLightness = samples.reduce((a, b) => a + b, 0) / samples.length;
+  return avgLightness < 50 ? 'dark' : 'light';
+}
+
 export const ImageImportView: React.FC<ImageImportViewProps> = ({
   image,
   onImageLoaded,
@@ -143,6 +161,8 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
   }, [image?.filePath]);
 
   // Create color sampler when image data URL is available
+  // Note: We intentionally omit selectedTone/editingTheme from deps - we only want
+  // to auto-detect once when a new image loads, not re-detect when tone changes
   useEffect(() => {
     if (!imageDataUrl) {
       setColorSampler(null);
@@ -156,6 +176,16 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
       if (!disposed) {
         sampler = s;
         setColorSampler(s);
+        // Auto-detect theme tone if not already set (and not editing)
+        if (!selectedTone && !editingTheme) {
+          try {
+            const detectedTone = detectThemeTone(s);
+            setSelectedTone(detectedTone);
+          } catch (err) {
+            console.error('Failed to detect theme tone:', err);
+            setSelectedTone('dark'); // Fallback to dark
+          }
+        }
       } else {
         s.dispose();
       }
@@ -167,6 +197,7 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
       disposed = true;
       sampler?.dispose();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [imageDataUrl]);
 
   // Extraction runs only when both image and tone are selected
@@ -360,7 +391,7 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
 
   // Option C: Random palette handler
   const handleRandomPalette = useCallback(() => {
-    const tone = selectedTone ?? 'dark';
+    const tone = selectedTone ?? (Math.random() < 0.5 ? 'dark' : 'light');
     if (!selectedTone) setSelectedTone(tone);
     const result = generateRandomPalette(tone);
     setRandomPalette(result);

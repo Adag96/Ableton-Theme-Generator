@@ -1,9 +1,10 @@
 # Work Log
 
-## 2026-3-6 15:14
+## 2026-3-6 16:00
 - Tweaked default window instantiation size so no vertical scrollbar is needed
 - Home and community gallery views now scale proportionally
 - Implemented minimum window size to 1000x750 and maximum window size to 1600x1000
+- Theme generation automatically picks theme type (dark/light) so it starts with swatches populated to clarify user experience
 
 
 ## 2026-3-5 19:29
