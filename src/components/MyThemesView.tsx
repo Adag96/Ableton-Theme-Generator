@@ -265,6 +265,7 @@ export const MyThemesView: React.FC<MyThemesViewProps> = ({
                       onClick={() => setSelectedThemeId(theme.id)}
                       onInstall={() => onInstallTheme(theme.id)}
                       onUninstall={() => onUninstallTheme(theme.id)}
+                      onEdit={onEditTheme}
                     />
                   ))}
                 </div>
@@ -286,6 +287,7 @@ export const MyThemesView: React.FC<MyThemesViewProps> = ({
                       onClick={() => setSelectedThemeId(theme.id)}
                       onInstall={() => onInstallTheme(theme.id)}
                       onUninstall={() => onUninstallTheme(theme.id)}
+                      onEdit={onEditTheme}
                     />
                   ))}
                 </div>

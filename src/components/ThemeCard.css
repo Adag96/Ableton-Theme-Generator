@@ -39,6 +39,7 @@
 
 .theme-card-content {
   padding: var(--space-md);
+  position: relative;
 }
 
 .theme-card-name {
@@ -179,4 +180,27 @@
 
 .theme-card-delete:hover {
   background: var(--color-error);
+}
+
+.theme-card-edit {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: rgba(245, 245, 250, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--duration-fast) var(--ease-out);
+  color: rgba(80, 80, 90, 1);
+}
+
+.theme-card-edit:hover {
+  background: var(--accent-solid);
+  color: var(--text-inverse);
+  border-color: var(--accent-solid);
 }
