@@ -1,12 +1,13 @@
 # Work Log
 
-## 2026-3-6 17:05
+## 2026-3-6 18:21
 - Tweaked default window instantiation size so no vertical scrollbar is needed
 - Home and community gallery views now scale proportionally
 - Implemented minimum window size to 1000x750 and maximum window size to 1600x1000
 - Theme generation automatically picks theme type (dark/light) so it starts with swatches populated to clarify user experience
 - Theme creator edit sliders are now retained after re-saving a theme so the user can re-visit their work
 - Added small edit buttons to theme cards in 'My Themes' view
+- Added 'By submitting this theme, you confirm...' statement to theme submission overlay for legal reasons and made overlay a bit wider
 
 
 ## 2026-3-5 19:29

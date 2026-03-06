@@ -130,6 +130,7 @@ export const SubmitThemeModal: React.FC<SubmitThemeModalProps> = ({ theme, onClo
         </button>
 
         <h2 className="submit-modal-title">Submit to Gallery</h2>
+        <p className="submit-modal-subtitle">Submissions are reviewed before appearing in the gallery.</p>
 
         {submitted ? (
           <div className="submit-modal-success">
@@ -177,8 +178,9 @@ export const SubmitThemeModal: React.FC<SubmitThemeModalProps> = ({ theme, onClo
               />
             </div>
 
-            <p className="submit-modal-note">
-              Submissions are reviewed before appearing in the gallery.
+            <p className="submit-modal-consent">
+              By submitting this theme, you confirm that you have the right to use any
+              associated images and grant permission for them to be displayed in this app.
             </p>
 
             {error && <p className="submit-modal-error">{error}</p>}

@@ -25,7 +25,7 @@
   -webkit-backdrop-filter: var(--blur-surface);
   border-radius: var(--radius-xl);
   padding: var(--space-xl);
-  width: 420px;
+  width: 480px;
   max-width: 95vw;
   box-shadow: var(--shadow-elevated);
   border: 1px solid var(--surface-border);
@@ -59,7 +59,13 @@
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
-  margin: 0 0 var(--space-lg) 0;
+  margin: 0 0 var(--space-xs) 0;
+}
+
+.submit-modal-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: var(--space-xs) 0 var(--space-lg) 0;
 }
 
 .submit-modal-swatches {
@@ -133,6 +139,14 @@
   color: var(--text-tertiary);
   margin: 0;
   line-height: var(--line-height-normal);
+}
+
+.submit-modal-consent {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: var(--line-height-normal);
+  text-align: center;
 }
 
 .submit-modal-error {
