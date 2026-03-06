@@ -76,8 +76,10 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
-    minWidth: 900,
-    minHeight: 650,
+    minWidth: 1000,
+    minHeight: 750,
+    maxWidth: 1600,
+    maxHeight: 1000,
     frame: false,
     transparent: isMac, // Only on macOS for proper vibrancy
     backgroundColor: isWin ? '#f0f0f5' : undefined, // Fallback for Windows

@@ -9,6 +9,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  padding: 2vh 3vw;
 }
 
 .my-themes-header {
@@ -242,23 +243,42 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Grid
+   Grid - Fixed 4 columns with viewport-relative sizing
    --------------------------------------------------------------------------- */
 
 .my-themes-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-lg);
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5vw;
 }
 
-@media (min-width: 900px) {
-  .my-themes-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
+/* Scale card internals */
+.my-themes-grid .my-theme-card-info {
+  padding: 1.2vh 1vw;
+  gap: 0.5vh;
 }
 
-@media (min-width: 1200px) {
-  .my-themes-grid {
-    grid-template-columns: repeat(5, 1fr);
-  }
+.my-themes-grid .my-theme-card-name {
+  font-size: clamp(10px, 1.5vh, 14px);
+}
+
+.my-themes-grid .my-theme-card-swatch-item {
+  width: clamp(16px, 2.5vh, 28px);
+  height: auto;
+  aspect-ratio: 1;
+  flex-shrink: 0;
+}
+
+.my-themes-grid .my-theme-card-footer {
+  padding: 0.8vh 1vw 1.2vh;
+}
+
+.my-themes-grid .theme-badge {
+  padding: 0.3vh 0.6vw;
+  font-size: clamp(8px, 1vh, 11px);
+}
+
+.my-themes-grid .my-theme-card-install {
+  padding: 0.8vh 1.2vw;
+  font-size: clamp(10px, 1.4vh, 13px);
 }

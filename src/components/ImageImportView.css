@@ -8,6 +8,7 @@
   width: 100%;
   height: 100%;
   gap: var(--space-lg);
+  padding: 2vh 3vw;
 }
 
 .import-back-button {

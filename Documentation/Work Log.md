@@ -1,5 +1,11 @@
 # Work Log
 
+## 2026-3-6 15:14
+- Tweaked default window instantiation size so no vertical scrollbar is needed
+- Home and community gallery views now scale proportionally
+- Implemented minimum window size to 1000x750 and maximum window size to 1600x1000
+
+
 ## 2026-3-5 19:29
 - Fixed an issue where clicking in the description box of the theme submission overlay closed it
 - Fixed click+drag issue that was closing overlays, was still applying to theme submission overlay

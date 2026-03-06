@@ -10,6 +10,7 @@
   gap: var(--space-lg);
   max-width: 800px;
   margin: 0 auto;
+  padding: 2vh 3vw;
   overflow-y: auto;
 }
 

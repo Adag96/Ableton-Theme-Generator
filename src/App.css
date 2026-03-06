@@ -17,10 +17,9 @@
 
 .app-main {
   flex: 1;
-  padding: var(--space-xl);
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* Content must fit - no scrolling */
 }
 
 /* ---------------------------------------------------------------------------
@@ -28,7 +27,8 @@
    --------------------------------------------------------------------------- */
 
 .app-footer {
-  padding: var(--space-md) var(--space-xl);
+  flex-shrink: 0;
+  padding: 1.2vh 2vw;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -41,9 +41,9 @@
 .footer-credit {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: 0.5vw;
   margin: 0;
-  font-size: var(--font-size-sm);
+  font-size: clamp(10px, 1.4vh, 13px);
   color: var(--text-secondary);
 }
 
@@ -101,10 +101,10 @@
 .support-link {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
-  padding: var(--space-xs) var(--space-sm);
+  gap: 0.3vw;
+  padding: 0.5vh 0.8vw;
   color: var(--text-tertiary);
-  font-size: var(--font-size-sm);
+  font-size: clamp(10px, 1.4vh, 13px);
   border-radius: var(--radius-sm);
   transition: all var(--duration-fast) var(--ease-out);
 }
@@ -115,7 +115,7 @@
 }
 
 .version-value {
-  font-size: var(--font-size-xs);
+  font-size: clamp(9px, 1.2vh, 11px);
   font-weight: var(--font-weight-medium);
   color: var(--text-tertiary);
   font-family: var(--font-family-mono);
