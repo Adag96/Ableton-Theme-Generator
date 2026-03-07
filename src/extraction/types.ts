@@ -52,6 +52,12 @@ export interface PaletteSelectionResult {
     contrastRatio: number;
     primarySaturation: number;
     secondaryHueDistance: number;
+    /** Whether the surface color was sampled from the image (vs synthesized) */
+    surfaceWasSampled?: boolean;
+    /** Number of candidate colors considered for surface sampling */
+    surfaceCandidateCount?: number;
+    /** Score of the selected sampled surface (0-70 range) */
+    surfaceSampledScore?: number;
   };
   /** Original colors before any slider adjustments (for edit restoration) */
   originalColors?: Partial<Record<'surface_base' | 'text_primary' | 'accent_primary' | 'accent_secondary', string>>;

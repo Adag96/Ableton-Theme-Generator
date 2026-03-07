@@ -1,6 +1,6 @@
 # Work Log
 
-## 2026-3-6 19:24
+## 2026-3-6 23:59
 - Tweaked default window instantiation size so no vertical scrollbar is needed
 - Home and community gallery views now scale proportionally
 - Implemented minimum window size to 1000x750 and maximum window size to 1600x1000
@@ -9,6 +9,7 @@
 - Added small edit buttons to theme cards in 'My Themes' view
 - Added 'By submitting this theme, you confirm...' statement to theme submission overlay for legal reasons and made overlay a bit wider
 - Created temporary 'Image to Theme Generation Research' doc which contains an implementation plan to solve theme generation variety issues
+- Replaced 'Transparent' theme generation mode with new 'Sampled' mode from phase 1 of research implementation. It more frequently derives surface colors directly from the inputted image
 
 
 ## 2026-3-5 19:29

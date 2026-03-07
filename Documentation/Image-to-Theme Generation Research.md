@@ -237,6 +237,32 @@ Before integrating into a slider, implement and test each approach independently
 
 **Deliverable:** Working sampled surface mode with documented test results.
 
+---
+
+**✅ PHASE 1A COMPLETE (2026-03-07)**
+
+**Implementation Summary:**
+- Added `selectSampledSurface()` function in `palette-selection.ts`
+- Modified `selectSurfaceColor()` to try sampled mode first, fall back to synthesis
+- Added debug info to `PaletteSelectionResult` for tracking sampling success
+- Replaced "Transparent" mode with "Sampled" as default (UI now shows: Sampled | Vibrant)
+
+**Threshold Tuning Results:**
+- Initial saturation range (10-40%) had 60% failure rate on MidJourney images
+- Widened to 5-60%: improved to 40% failure rate
+- Final range (5-70%): achieved ~80% success rate on diverse images
+- Lightness and population thresholds unchanged (15-30% dark, 70-85% light, ≥2% population)
+
+**Key Finding:** MidJourney/AI-generated images tend to be highly saturated. The original 40% saturation cap was too restrictive. 70% allows more vibrant surfaces, but users can adjust with mood sliders if needed.
+
+**Files Modified:**
+- `src/theme/types.ts` - Updated `VariantMode` to `'sampled' | 'vibrant'`
+- `src/extraction/types.ts` - Added surface sampling debug fields
+- `src/extraction/palette-selection.ts` - Added `selectSampledSurface()`, updated constants
+- `src/components/ImageImportView.tsx` - Updated UI to show Sampled/Vibrant toggle
+
+---
+
 #### Phase 1B: Multi-Hue Zone Injection (Approach 1)
 
 **Goal:** Implement hue injection as a standalone mode, validate it doesn't produce clashing results.

@@ -2,11 +2,11 @@
 export type ThemeTone = 'light' | 'dark';
 
 /**
- * Variant mode controls the saturation of the synthesized surface color.
- * - 'transparent': Subtle hue tint — professional, clearly image-related (default)
- * - 'vibrant': Bold, dramatically colored surfaces
+ * Variant mode controls how the surface color is selected.
+ * - 'sampled': Use a color sampled directly from the image (default), falls back to synthesis
+ * - 'vibrant': Bold, dramatically colored surfaces (synthesized)
  */
-export type VariantMode = 'transparent' | 'vibrant';
+export type VariantMode = 'sampled' | 'vibrant';
 
 /** Contrast level controls the lightness spread between surface colors */
 export type ContrastLevel = 'low' | 'medium' | 'high' | 'very-high';

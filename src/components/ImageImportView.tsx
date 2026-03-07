@@ -100,7 +100,7 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const [selectedTone, setSelectedTone] = useState<ThemeTone | null>(null);
   const [contrastLevel, setContrastLevel] = useState<ContrastLevel>('medium');
-  const [variantMode, setVariantMode] = useState<VariantMode>('transparent');
+  const [variantMode, setVariantMode] = useState<VariantMode>('sampled');
 
   // Option A: Color overrides
   const [colorOverrides, setColorOverrides] = useState<Partial<Record<ColorRole, string>>>({});
@@ -604,11 +604,11 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
                 <p className="import-option-label">Surface Style</p>
                 <div className="import-variant-tabs">
                   <button
-                    className={`variant-tab ${variantMode === 'transparent' ? 'variant-tab-active' : ''}`}
-                    onClick={() => setVariantMode('transparent')}
-                    title="Subtle hue tint — professional, clearly image-related"
+                    className={`variant-tab ${variantMode === 'sampled' ? 'variant-tab-active' : ''}`}
+                    onClick={() => setVariantMode('sampled')}
+                    title="Surface color sampled directly from the image"
                   >
-                    Transparent
+                    Sampled
                   </button>
                   <button
                     className={`variant-tab ${variantMode === 'vibrant' ? 'variant-tab-active' : ''}`}

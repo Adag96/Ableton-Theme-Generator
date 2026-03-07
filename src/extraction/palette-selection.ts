@@ -14,11 +14,11 @@ const MIN_CONTRAST_RATIO = 4.5;
 /** Minimum hue distance between primary and secondary accents */
 const MIN_HUE_DISTANCE = 60;
 
-/** Surface saturation for transparent mode, dark themes (%) */
-const TRANSPARENT_SURFACE_SAT_DARK = 20;
+/** Surface saturation for sampled fallback, dark themes (%) */
+const FALLBACK_SURFACE_SAT_DARK = 20;
 
-/** Surface saturation for transparent mode, light themes (%) */
-const TRANSPARENT_SURFACE_SAT_LIGHT = 25;
+/** Surface saturation for sampled fallback, light themes (%) */
+const FALLBACK_SURFACE_SAT_LIGHT = 25;
 
 /** Surface saturation for vibrant mode (%) */
 const VIBRANT_SURFACE_SAT = 55;
@@ -28,6 +28,21 @@ const DARK_SURFACE_LIGHTNESS = 22;
 
 /** Fixed surface lightness for light themes (%) */
 const LIGHT_SURFACE_LIGHTNESS = 80;
+
+/** Sampled surface lightness range for dark themes (%) */
+const SAMPLED_DARK_LIGHTNESS_MIN = 15;
+const SAMPLED_DARK_LIGHTNESS_MAX = 30;
+
+/** Sampled surface lightness range for light themes (%) */
+const SAMPLED_LIGHT_LIGHTNESS_MIN = 70;
+const SAMPLED_LIGHT_LIGHTNESS_MAX = 85;
+
+/** Sampled surface saturation range (%) - allow more vibrant surfaces */
+const SAMPLED_SATURATION_MIN = 5;
+const SAMPLED_SATURATION_MAX = 70;
+
+/** Minimum population percentage for sampled surface candidates (%) */
+const SAMPLED_MIN_POPULATION = 2;
 
 /** Ideal hue distance for color harmony (degrees) - peaks at 150° */
 const IDEAL_HARMONY_DISTANCE = 150;
@@ -130,27 +145,112 @@ function computeDominantHue(colors: ExtractedColor[]): number {
 }
 
 /**
+ * Find a suitable surface color by sampling directly from extracted pixels.
+ * Filters by lightness, saturation, and population to find candidates that
+ * will work well as a surface color while maintaining connection to the image.
+ */
+function selectSampledSurface(
+  colors: ExtractedColor[],
+  tonePreference: ThemeTone
+): { color: ExtractedColor; candidateCount: number; score: number } | null {
+  const isDark = tonePreference === 'dark';
+
+  // Define target lightness range based on theme tone
+  const lightnessMin = isDark ? SAMPLED_DARK_LIGHTNESS_MIN : SAMPLED_LIGHT_LIGHTNESS_MIN;
+  const lightnessMax = isDark ? SAMPLED_DARK_LIGHTNESS_MAX : SAMPLED_LIGHT_LIGHTNESS_MAX;
+  const idealLightness = isDark ? DARK_SURFACE_LIGHTNESS : LIGHT_SURFACE_LIGHTNESS;
+
+  // Filter candidates by lightness, saturation, and population
+  const candidates = colors.filter(c => {
+    const { l, s } = c.hsl;
+    const population = c.percentage ?? c.population;
+
+    return (
+      l >= lightnessMin &&
+      l <= lightnessMax &&
+      s >= SAMPLED_SATURATION_MIN &&
+      s <= SAMPLED_SATURATION_MAX &&
+      population >= SAMPLED_MIN_POPULATION
+    );
+  });
+
+  if (candidates.length === 0) {
+    return null;
+  }
+
+  // Compute dominant hue for harmony scoring
+  const dominantHue = computeDominantHue(colors);
+
+  // Score each candidate
+  const scored = candidates.map(c => {
+    const population = c.percentage ?? c.population;
+
+    // Lightness score: closer to ideal is better (0-30 points)
+    const lightnessDelta = Math.abs(c.hsl.l - idealLightness);
+    const lightnessScore = Math.max(0, 30 - lightnessDelta * 2);
+
+    // Harmony score: how well does it harmonize with dominant hue (0-20 points)
+    const harmony = harmonyScore(c.hsl.h, dominantHue);
+
+    // Population score: higher population is better (0-20 points)
+    const populationScore = Math.min(20, population * 2);
+
+    const totalScore = lightnessScore + harmony + populationScore;
+
+    return { color: c, score: totalScore };
+  });
+
+  // Sort by score descending
+  scored.sort((a, b) => b.score - a.score);
+
+  const best = scored[0];
+  return {
+    color: best.color,
+    candidateCount: candidates.length,
+    score: best.score,
+  };
+}
+
+/**
  * Synthesize a surface color at the image's dominant hue.
  * Decouples "what hue is the image" from "does the image have dark pixels of that hue."
  * Lightness and saturation are design-calibrated constants, not extracted from pixels.
+ *
+ * For 'sampled' mode, attempts to find a real pixel first, falling back to synthesis.
  */
 function selectSurfaceColor(
   colors: ExtractedColor[],
   tonePreference: ThemeTone,
   variantMode: VariantMode
-): ExtractedColor {
+): { surface: ExtractedColor; sampledInfo?: { candidateCount: number; score: number } } {
+  // For sampled mode, try to find a real pixel first
+  if (variantMode === 'sampled') {
+    const sampled = selectSampledSurface(colors, tonePreference);
+    if (sampled) {
+      return {
+        surface: sampled.color,
+        sampledInfo: {
+          candidateCount: sampled.candidateCount,
+          score: sampled.score,
+        },
+      };
+    }
+    // Fall through to synthesis if no suitable candidate found
+  }
   const dominantHue = computeDominantHue(colors);
   const lightness = tonePreference === 'dark' ? DARK_SURFACE_LIGHTNESS : LIGHT_SURFACE_LIGHTNESS;
   const saturation = variantMode === 'vibrant'
     ? VIBRANT_SURFACE_SAT
-    : (tonePreference === 'dark' ? TRANSPARENT_SURFACE_SAT_DARK : TRANSPARENT_SURFACE_SAT_LIGHT);
+    : (tonePreference === 'dark' ? FALLBACK_SURFACE_SAT_DARK : FALLBACK_SURFACE_SAT_LIGHT);
 
   return {
-    hex: hslToHex(dominantHue, saturation, lightness),
-    rgb: { r: 0, g: 0, b: 0 }, // synthetic — rgb unused downstream
-    hsl: { h: dominantHue, s: saturation, l: lightness },
-    population: 0,
-    percentage: 0,
+    surface: {
+      hex: hslToHex(dominantHue, saturation, lightness),
+      rgb: { r: 0, g: 0, b: 0 }, // synthetic — rgb unused downstream
+      hsl: { h: dominantHue, s: saturation, l: lightness },
+      population: 0,
+      percentage: 0,
+    },
   };
 }
 
@@ -159,9 +259,9 @@ export interface PaletteSelectionOptions {
   /** User's preferred tone (required for meaningful surface selection) */
   tonePreference?: ThemeTone;
   /**
-   * Variant mode controls the saturation of the synthesized surface:
-   * - 'transparent': Subtle hue tint — professional (default)
-   * - 'vibrant': Bold, dramatically colored surfaces
+   * Variant mode controls how the surface color is selected:
+   * - 'sampled': Sample from image pixels (default), falls back to synthesis
+   * - 'vibrant': Bold, dramatically colored surfaces (synthesized)
    */
   variantMode?: VariantMode;
 }
@@ -184,17 +284,20 @@ export function selectThemePalette(
     throw new Error('No colors provided for palette selection');
   }
 
-  const { tonePreference, variantMode = 'transparent' } = options;
+  const { tonePreference, variantMode = 'sampled' } = options;
 
   // 1. Tone: required for surface selection
   // If not provided, derive from most prominent color
   const tone: ThemeTone = tonePreference ?? (colors[0].hsl.l < 50 ? 'dark' : 'light');
 
   // 2. Surface base: THE KEY DECISION - uses variant mode
-  const surfaceBase = selectSurfaceColor(colors, tone, variantMode);
+  const surfaceResult = selectSurfaceColor(colors, tone, variantMode);
+  const surfaceBase = surfaceResult.surface;
 
-  // Find a real pixel location for the synthetic surface color
-  surfaceBase.location = findClosestPixelLocation(surfaceBase.hex, colors);
+  // Find a real pixel location for the synthetic surface color (sampled mode already has location)
+  if (!surfaceBase.location) {
+    surfaceBase.location = findClosestPixelLocation(surfaceBase.hex, colors);
+  }
 
   // 3. Text primary: find color with best contrast
   let textPrimary: ExtractedColor | null = null;
@@ -288,6 +391,16 @@ export function selectThemePalette(
     roleLocations.accent_secondary = accentSecondary.location;
   }
 
+  const debugInfo = {
+    contrastRatio: finalContrast,
+    primarySaturation: accentPrimary.hsl.s,
+    secondaryHueDistance,
+    // Surface sampling debug info
+    surfaceWasSampled: !!surfaceResult.sampledInfo,
+    surfaceCandidateCount: surfaceResult.sampledInfo?.candidateCount,
+    surfaceSampledScore: surfaceResult.sampledInfo?.score,
+  };
+
   return {
     roles: {
       tone,
@@ -298,11 +411,7 @@ export function selectThemePalette(
     },
     roleLocations,
     extractedColors: colors,
-    debug: {
-      contrastRatio: finalContrast,
-      primarySaturation: accentPrimary.hsl.s,
-      secondaryHueDistance,
-    },
+    debug: debugInfo,
   };
 }
 
