@@ -655,3 +655,74 @@
 .variant-tab-active:hover {
   background: var(--accent-solid-hover);
 }
+
+/* Checkbox label for experimental options */
+.import-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.import-checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-solid);
+  cursor: pointer;
+}
+
+.import-checkbox-label span {
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.import-checkbox-label:hover span {
+  color: var(--text-primary);
+}
+
+/* Slider row for strength control */
+.import-slider-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.import-slider-label {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  min-width: 50px;
+}
+
+.import-slider {
+  flex: 1;
+  height: 4px;
+  appearance: none;
+  background: var(--surface-recessed);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.import-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--accent-solid);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.import-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.import-slider-value {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  min-width: 35px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}

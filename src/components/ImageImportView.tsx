@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import type { ImageFileResult } from '../electron';
 import { useColorExtraction } from '../hooks/useColorExtraction';
 import type { PaletteSelectionResult } from '../extraction';
-import type { ThemeTone, ContrastLevel, VariantMode } from '../theme/types';
+import type { ThemeTone, ContrastLevel, VariantMode, HueInjectionConfig } from '../theme/types';
 import type { SavedTheme } from '../types/theme-library';
 import { hexToHsl, hslToHex } from '../theme/color-utils';
 import { generateRandomPalette } from '../theme/random-palette';
@@ -101,6 +101,8 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
   const [selectedTone, setSelectedTone] = useState<ThemeTone | null>(null);
   const [contrastLevel, setContrastLevel] = useState<ContrastLevel>('medium');
   const [variantMode, setVariantMode] = useState<VariantMode>('sampled');
+  // Phase 1B: Hue injection toggle (experimental)
+  const [hueInjection, setHueInjection] = useState<HueInjectionConfig>({ enabled: false, strength: 0.5 });
 
   // Option A: Color overrides
   const [colorOverrides, setColorOverrides] = useState<Partial<Record<ColorRole, string>>>({});
@@ -255,6 +257,11 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
       }
     }
 
+    // Add hue injection config (Phase 1B experimental)
+    if (hueInjection.enabled) {
+      (roles as Record<string, unknown>).hueInjection = hueInjection;
+    }
+
     return {
       ...basePalette,
       roles,
@@ -268,7 +275,7 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
         ),
       },
     } as PaletteSelectionResult;
-  }, [basePalette, colorOverrides, mood]);
+  }, [basePalette, colorOverrides, mood, hueInjection]);
 
   const handleBrowse = useCallback(async () => {
     if (!window.electronAPI) return;
@@ -618,6 +625,35 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
                     Vibrant
                   </button>
                 </div>
+              </div>
+            )}
+
+            {/* Hue injection toggle (Phase 1B experimental) */}
+            {image && (
+              <div className="import-option-group">
+                <p className="import-option-label">Color Variety (Experimental)</p>
+                <label className="import-checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={hueInjection.enabled}
+                    onChange={(e) => setHueInjection(prev => ({ ...prev, enabled: e.target.checked }))}
+                  />
+                  <span>Inject accent hues into surfaces</span>
+                </label>
+                {hueInjection.enabled && (
+                  <div className="import-slider-row">
+                    <span className="import-slider-label">Strength</span>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={hueInjection.strength! * 100}
+                      onChange={(e) => setHueInjection(prev => ({ ...prev, strength: parseInt(e.target.value) / 100 }))}
+                      className="import-slider"
+                    />
+                    <span className="import-slider-value">{Math.round(hueInjection.strength! * 100)}%</span>
+                  </div>
+                )}
               </div>
             )}
           </div>

@@ -1,5 +1,12 @@
 # Work Log
 
+## 2026-3-9 17:49
+- Continued explorations of 'color variety' via Hue Injection:
+    - detail_bg, surface_highlight, control_bg all working well and implemented into Hue Injection algorithm
+    - surface_border tested but shelved due to unconvincing results
+
+
+
 ## 2026-3-6 23:59
 - Tweaked default window instantiation size so no vertical scrollbar is needed
 - Home and community gallery views now scale proportionally

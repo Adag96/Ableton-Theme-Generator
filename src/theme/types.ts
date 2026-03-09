@@ -11,6 +11,18 @@ export type VariantMode = 'sampled' | 'vibrant';
 /** Contrast level controls the lightness spread between surface colors */
 export type ContrastLevel = 'low' | 'medium' | 'high' | 'very-high';
 
+/**
+ * Configuration for multi-hue zone injection.
+ * When enabled, secondary/tertiary hues are injected into specific UI zones
+ * to add color variety while maintaining cohesion.
+ */
+export interface HueInjectionConfig {
+  /** Whether hue injection is enabled (default: false) */
+  enabled: boolean;
+  /** Strength of hue injection (0.0 = none, 1.0 = full replacement). Default: 0.5 */
+  strength?: number;
+}
+
 /** Multipliers for each contrast level (applied to lightness offsets) */
 export const CONTRAST_MULTIPLIERS: Record<ContrastLevel, number> = {
   low: 1.0,       // Current/original behavior
@@ -32,6 +44,8 @@ export interface SemanticColorRoles {
   accent_secondary: string;
   /** Contrast level for surface color differentiation (default: 'medium') */
   contrastLevel?: ContrastLevel;
+  /** Configuration for multi-hue zone injection (experimental) */
+  hueInjection?: HueInjectionConfig;
   surface_highlight?: string;
   surface_border?: string;
   detail_bg?: string;

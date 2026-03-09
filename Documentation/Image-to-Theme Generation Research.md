@@ -288,6 +288,57 @@ Before integrating into a slider, implement and test each approach independently
 
 ---
 
+**🔄 PHASE 1B IN PROGRESS (2026-03-09)**
+
+**Implementation Summary:**
+- Added `HueInjectionConfig` type to `types.ts` with `enabled` and `strength` fields
+- Added `applyAccentHueToSurface()` function in `derivation.ts` — uses accent's exact hue (no interpolation) at surface-appropriate lightness/saturation
+- Modified `resolveRoles()` to apply hue injection when enabled
+- Added UI toggle in ImageImportView with strength slider (0-100%)
+
+**Key Learning:** Initial approach interpolated hues between surface and accent, which created "mystery colors" not present in the image (e.g., green appearing when blending cream→blue). Fixed by using accent's exact hue and only varying saturation with strength.
+
+**Resolved Roles Tested:**
+
+| Zone | Status | Notes |
+|------|--------|-------|
+| `detail_bg` | ✅ Included | Full strength. Detail view background. Results consistently good. |
+| `surface_highlight` | ✅ Included | 60% strength. Hover/selection states. Subtle but positive. |
+| `control_bg` | ✅ Included | 80% strength. Knob/meter backgrounds. Adds depth. |
+| `surface_border` | ⏸️ Shelved | 50% strength tested. Results inconsistent — sometimes good, sometimes feels disconnected. Revisit later. |
+
+**Current resolved role injection targets (in code):**
+- `detail_bg`: accent_secondary hue at `strength`
+- `surface_highlight`: accent_secondary hue at `strength * 0.6`
+- `control_bg`: accent_secondary hue at `strength * 0.8`
+
+---
+
+**Neutral Scale / Parameter Overrides Tested (2026-03-09):**
+
+Explored injecting hue into the neutral scale stops that affect retro displays (EQ, Spectrum, etc.).
+
+| Target | Status | Notes |
+|--------|--------|-------|
+| Deep stops (n0-n2) | ⏸️ Shelved | Affects `RetroDisplayBackground`. Made the whole display look like a colored overlay — not intentional or well-designed. |
+| Mid stops (n9, n11) | ⏸️ Shelved | Affects `SpectrumDefaultColor`, `BrowserSampleWaveform`. Changed baseline appearance even when injection disabled due to parameter map changes. |
+| `SpectrumDefaultColor` (direct override) | 🔄 In Progress | Direct parameter override only when injection enabled. Preserves baseline. Uses `accent_primary` hue so spectrum fill matches EQ node color. Currently blocked by hue distance check when surface and accent are similar hues. |
+
+**Key Learnings from Neutral Scale Testing:**
+1. Changing the neutral scale affects too many parameters at once — hard to control
+2. Better approach: directly override specific parameters in `generateTheme()` when injection is enabled
+3. Must preserve baseline behavior when injection is OFF — users expect 0% to look identical to before
+4. Spectrum waveform should match EQ nodes (`accent_primary`), not EQ curve lines (`accent_secondary`)
+
+**Open Issue:**
+- `SpectrumDefaultColor` injection is blocked when surface hue and accent_primary hue are within 30° of each other (e.g., lavender surface + purple accent). Need to decide: lower threshold, remove check for spectrum, or leave as-is.
+
+**Next to test:**
+- Resolve the hue distance threshold issue for SpectrumDefaultColor
+- Consider other direct parameter overrides that could benefit from hue injection
+
+---
+
 ### Phase 2: Integrate into Continuous Slider
 
 Once both approaches are validated independently, wire them into a single slider control.

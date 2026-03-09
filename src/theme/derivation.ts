@@ -25,6 +25,51 @@ const MIN_HIGHLIGHT_SPREAD_DARK = 12;
 /** Minimum lightness for control_bg to ensure visibility */
 const MIN_CONTROL_BG_LIGHTNESS = 5;
 
+/** Minimum hue distance for zone injection to be meaningful (degrees) */
+const MIN_INJECTION_HUE_DISTANCE = 30;
+
+/**
+ * Calculate circular hue distance (0-180 degrees).
+ */
+function hueDistance(h1: number, h2: number): number {
+  const diff = Math.abs(h1 - h2);
+  return Math.min(diff, 360 - diff);
+}
+
+/**
+ * Apply an accent color's hue to a surface role, preserving the surface's lightness.
+ * At strength 0, returns the original surface color.
+ * At strength > 0, uses the accent's EXACT hue (no interpolation) with blended saturation.
+ *
+ * This keeps derived colors connected to the visible palette — the result is
+ * recognizably "a darker/lighter version of Accent 2" rather than an interpolated mystery color.
+ *
+ * @param surfaceHex - The original surface color (provides lightness)
+ * @param accentHex - The accent color to derive hue from
+ * @param strength - Blend amount (0 = original surface, 1 = full accent saturation at accent hue)
+ * @returns The blended hex color
+ */
+function applyAccentHueToSurface(surfaceHex: string, accentHex: string, strength: number): string {
+  if (strength <= 0) return surfaceHex;
+
+  const surface = hexToHsl(surfaceHex);
+  const accent = hexToHsl(accentHex);
+
+  // Always use the accent's exact hue — no interpolation through other hues
+  const newHue = accent.h;
+
+  // Saturation scales with strength:
+  // - At strength 0: would return original (handled above)
+  // - At strength 0.5: moderate saturation for subtle tint
+  // - At strength 1.0: stronger saturation for visible color
+  // Base saturation ensures the hue is visible; strength amplifies it
+  const baseSaturation = 15; // Minimum saturation to make hue visible
+  const maxSaturation = Math.min(accent.s * 0.6, 50); // Cap to avoid garish surfaces
+  const newSat = baseSaturation + (maxSaturation - baseSaturation) * strength;
+
+  return hslToHex(newHue, newSat, surface.l);
+}
+
 /**
  * Resolve partial semantic roles into a complete set.
  * Missing optional roles are derived from the required ones.
@@ -101,13 +146,36 @@ export function resolveRoles(input: SemanticColorRoles): ResolvedColorRoles {
   const selection_fg = input.selection_fg
     ?? (isDark ? '#070707' : '#121212');
 
+  // Apply hue injection if enabled
+  // Uses accent_secondary's hue directly at surface-appropriate lightness
+  // so derived colors are recognizably "a version of Accent 2"
+  let injectedDetailBg = detail_bg;
+  let injectedHighlight = surface_highlight;
+  let injectedControlBg = control_bg;
+
+  if (input.hueInjection?.enabled) {
+    const strength = input.hueInjection.strength ?? 0.5;
+
+    // Only inject if the accent hue is meaningfully different from surface
+    if (hueDistance(accentHsl.h, baseHsl.h) >= MIN_INJECTION_HUE_DISTANCE) {
+      // Apply accent_secondary's hue to surface zones at varying strengths
+      // detail_bg: full strength - detail view background
+      injectedDetailBg = applyAccentHueToSurface(detail_bg, input.accent_secondary, strength);
+      // surface_highlight: 60% - hover/selection states
+      injectedHighlight = applyAccentHueToSurface(surface_highlight, input.accent_secondary, strength * 0.6);
+      // control_bg: 80% - knob/meter backgrounds
+      injectedControlBg = applyAccentHueToSurface(control_bg, input.accent_secondary, strength * 0.8);
+      // NOTE: surface_border tested but results inconsistent — bookmarked for later
+    }
+  }
+
   const result: ResolvedColorRoles = {
     tone: input.tone,
     surface_base: input.surface_base,
-    surface_highlight,
+    surface_highlight: injectedHighlight,
     surface_border,
-    detail_bg,
-    control_bg,
+    detail_bg: injectedDetailBg,
+    control_bg: injectedControlBg,
     text_primary: input.text_primary,
     text_secondary,
     accent_primary: input.accent_primary,
@@ -128,10 +196,23 @@ export function resolveRoles(input: SemanticColorRoles): ResolvedColorRoles {
 }
 
 /**
+ * Options for building the neutral scale with optional hue injection.
+ */
+interface NeutralScaleOptions {
+  /** Accent color to inject into mid stops (n9, n11) for spectrum waveforms, browser samples, etc. */
+  accentForMidStops?: string;
+  /** Injection strength (0-1). At 1, mid stops use accent hue fully. */
+  injectionStrength?: number;
+}
+
+/**
  * Build the 13-stop neutral lightness ramp from resolved roles.
  * Preserves hue and saturation from the surface colors; interpolates lightness.
+ *
+ * When hue injection is enabled, deep stops (n0-n2) can use the accent_secondary hue
+ * to add color variety to retro displays, spectrum analyzers, etc.
  */
-export function buildNeutralScale(roles: ResolvedColorRoles): NeutralScale {
+export function buildNeutralScale(roles: ResolvedColorRoles, options?: NeutralScaleOptions): NeutralScale {
   const isDark = roles.tone === 'dark';
   const controlHsl = hexToHsl(roles.control_bg);
   const surfaceHsl = hexToHsl(roles.surface_base);
@@ -139,14 +220,35 @@ export function buildNeutralScale(roles: ResolvedColorRoles): NeutralScale {
   const textHsl = hexToHsl(roles.text_primary);
   const secondaryHsl = hexToHsl(roles.text_secondary);
 
-  // Use surface hue as the tint for the neutral scale.
+  // Use surface hue as the base tint for the neutral scale
+  const hSurface = surfaceHsl.h;
+
+  // For mid stops (n9, n11), optionally inject accent hue for variety
+  // These affect spectrum waveforms, browser sample waveforms, scrollbars, etc.
+  let hMid = hSurface;
+  const injectionStrength = options?.injectionStrength ?? 0;
+  if (options?.accentForMidStops && injectionStrength > 0) {
+    const accentHsl = hexToHsl(options.accentForMidStops);
+    // Use accent hue directly (no interpolation to avoid mystery colors)
+    // Only apply if hues are meaningfully different
+    if (hueDistance(accentHsl.h, hSurface) >= MIN_INJECTION_HUE_DISTANCE) {
+      hMid = accentHsl.h;
+    }
+  }
+
   // Saturation ramp: deep stops (n0–n2) get more saturation for visible tinting,
   // mid stops (n9–n9b) get less, and high-mid stops (n11–n11b) are near-neutral.
-  const h = surfaceHsl.h;
   const sDeep = Math.min(surfaceHsl.s * 1.4, 70); // n0–n2: panel backs — colorful
   const sSurf = surfaceHsl.s;                      // n3–n8: surface zone — as-is
-  const sMid  = surfaceHsl.s * 0.45;               // n9–n9b: scrollbars, rulers
-  const sHigh = surfaceHsl.s * 0.20;               // n11–n11b: secondary text — near neutral
+  // When injecting, boost mid saturation so the hue is visible in waveforms
+  const sMidBase = surfaceHsl.s * 0.45;
+  const sMid = hMid !== hSurface
+    ? Math.max(sMidBase, 20 + (injectionStrength * 20)) // 20-40% when injecting
+    : sMidBase;
+  const sHighBase = surfaceHsl.s * 0.20;
+  const sHigh = hMid !== hSurface
+    ? Math.max(sHighBase, 15 + (injectionStrength * 15)) // 15-30% when injecting
+    : sHighBase;
 
   if (isDark) {
     // Calibrated against Default Dark Neutral Medium:
@@ -157,20 +259,24 @@ export function buildNeutralScale(roles: ResolvedColorRoles): NeutralScale {
     // n11=#868686(L~52.5), n11b=#919191(L~56.9), n12=#b5b5b5(L~70.9)
     const n9L = highlightHsl.l + (secondaryHsl.l - highlightHsl.l) * 0.49;
     return {
-      n0_deepest:   hslToHex(h, sDeep, controlHsl.l * 0.23),
-      n1_deep:      hslToHex(h, sDeep, controlHsl.l * 0.57),
-      n2_dark:      hslToHex(h, sDeep, controlHsl.l * 0.80),
+      // n0-n2: deep stops use surface hue
+      n0_deepest:   hslToHex(hSurface, sDeep, controlHsl.l * 0.23),
+      n1_deep:      hslToHex(hSurface, sDeep, controlHsl.l * 0.57),
+      n2_dark:      hslToHex(hSurface, sDeep, controlHsl.l * 0.80),
+      // n3-n8: surface zone uses surface hue
       n3_control:   roles.control_bg,
-      n4_area:      hslToHex(h, sSurf, controlHsl.l + (surfaceHsl.l - controlHsl.l) * 0.25),
+      n4_area:      hslToHex(hSurface, sSurf, controlHsl.l + (surfaceHsl.l - controlHsl.l) * 0.25),
       n5_border:    roles.surface_border,
       n6_surface:   roles.surface_base,
       n7_detail:    roles.detail_bg,
       n8_highlight: roles.surface_highlight,
-      n9_mid_low:   hslToHex(h, sMid, n9L),
-      n9b_mid:      hslToHex(h, sMid, n9L + (secondaryHsl.l - n9L) * 0.5),
+      // n9-n11b: mid stops use hMid (may be accent hue when injecting)
+      // These affect: SpectrumDefaultColor, BrowserSampleWaveform, scrollbars, rulers
+      n9_mid_low:   hslToHex(hMid, sMid, n9L),
+      n9b_mid:      hslToHex(hMid, sMid, n9L + (secondaryHsl.l - n9L) * 0.5),
       n10_mid:      roles.text_secondary,
-      n11_mid_high: hslToHex(h, sHigh, secondaryHsl.l + (textHsl.l - secondaryHsl.l) * 0.26),
-      n11b_ruler:   hslToHex(h, sHigh, secondaryHsl.l + (textHsl.l - secondaryHsl.l) * 0.44),
+      n11_mid_high: hslToHex(hMid, sHigh, secondaryHsl.l + (textHsl.l - secondaryHsl.l) * 0.26),
+      n11b_ruler:   hslToHex(hMid, sHigh, secondaryHsl.l + (textHsl.l - secondaryHsl.l) * 0.44),
       n12_text:     roles.text_primary,
     };
   } else {
@@ -183,20 +289,23 @@ export function buildNeutralScale(roles: ResolvedColorRoles): NeutralScale {
     // n11=#a5a5a5(L~64.7), n11b=#cfcfcf(L~81.2), n12=#121212(L~7.1)
     const n9L = secondaryHsl.l - (secondaryHsl.l - textHsl.l) * 0.34;
     return {
-      n0_deepest:   hslToHex(h, sDeep, textHsl.l * 0.38),
-      n1_deep:      hslToHex(h, sDeep, textHsl.l + (secondaryHsl.l - textHsl.l) * 0.20),
-      n2_dark:      hslToHex(h, sDeep, textHsl.l + (secondaryHsl.l - textHsl.l) * 0.47),
+      // n0-n2: deep stops use surface hue
+      n0_deepest:   hslToHex(hSurface, sDeep, textHsl.l * 0.38),
+      n1_deep:      hslToHex(hSurface, sDeep, textHsl.l + (secondaryHsl.l - textHsl.l) * 0.20),
+      n2_dark:      hslToHex(hSurface, sDeep, textHsl.l + (secondaryHsl.l - textHsl.l) * 0.47),
+      // n3-n8: surface zone uses surface hue
       n3_control:   roles.control_bg,
-      n4_area:      hslToHex(h, sSurf, secondaryHsl.l),
+      n4_area:      hslToHex(hSurface, sSurf, secondaryHsl.l),
       n5_border:    roles.surface_border,
       n6_surface:   roles.surface_base,
       n7_detail:    roles.detail_bg,
       n8_highlight: roles.surface_highlight,
-      n9_mid_low:   hslToHex(h, sMid, n9L),
-      n9b_mid:      hslToHex(h, sMid, n9L + (secondaryHsl.l - n9L) * 0.38),
+      // n9-n11b: mid stops use hMid (may be accent hue when injecting)
+      n9_mid_low:   hslToHex(hMid, sMid, n9L),
+      n9b_mid:      hslToHex(hMid, sMid, n9L + (secondaryHsl.l - n9L) * 0.38),
       n10_mid:      roles.text_secondary,
-      n11_mid_high: hslToHex(h, sHigh, surfaceHsl.l),
-      n11b_ruler:   hslToHex(h, sHigh, controlHsl.l),
+      n11_mid_high: hslToHex(hMid, sHigh, surfaceHsl.l),
+      n11b_ruler:   hslToHex(hMid, sHigh, controlHsl.l),
       n12_text:     roles.text_primary,
     };
   }
@@ -439,8 +548,31 @@ export function generateTheme(input: SemanticColorRoles): AbletonThemeData {
   const resolved = resolveRoles(input);
   // Auto-adjust foreground colors to meet contrast requirements
   const roles = adjustForContrast(resolved);
-  const neutralScale = buildNeutralScale(roles);
+
+  // Build neutral scale (no injection here - spectrum is handled separately below)
+  const neutralScaleOptions: NeutralScaleOptions | undefined = undefined;
+  const neutralScale = buildNeutralScale(roles, neutralScaleOptions);
+
   const parameters = generateParameters(roles, neutralScale);
+
+  // Apply hue injection overrides for specific parameters
+  // This preserves baseline behavior when injection is disabled
+  if (input.hueInjection?.enabled) {
+    const strength = input.hueInjection.strength ?? 0.5;
+    const accentHsl = hexToHsl(input.accent_primary);
+    const surfaceHsl = hexToHsl(input.surface_base);
+
+    // Only inject if hues are meaningfully different
+    if (hueDistance(accentHsl.h, surfaceHsl.h) >= MIN_INJECTION_HUE_DISTANCE) {
+      // SpectrumDefaultColor: spectrum analyzer waveform fill
+      // Use accent_primary hue so it relates to EQ nodes
+      const spectrumL = roles.tone === 'dark' ? 45 : 55;
+      const spectrumS = 20 + (strength * 25); // 20-45% saturation based on strength
+      const spectrumColor = hslToHex(accentHsl.h, spectrumS, spectrumL);
+      parameters.SpectrumDefaultColor = withAlpha(spectrumColor, roles.tone === 'dark' ? '9f' : '7f');
+    }
+  }
+
   const vuMeters = getVuMeters();
   const blendFactors = getBlendFactors(roles.tone);
 
