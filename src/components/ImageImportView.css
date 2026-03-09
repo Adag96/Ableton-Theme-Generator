@@ -241,6 +241,15 @@
   display: inline-block;
 }
 
+/* Eyedropper mode - when color picker is open, clicking image samples color */
+.import-preview-eyedropper {
+  cursor: crosshair;
+}
+
+.import-preview-eyedropper .import-preview-image {
+  cursor: crosshair;
+}
+
 .import-preview-image {
   display: block;
   max-width: 100%;
@@ -269,6 +278,12 @@
 .color-marker:hover {
   transform: translate(-50%, -50%) scale(1.15);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.color-marker-active {
+  transform: translate(-50%, -50%) scale(1.25);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 0 2px var(--accent-solid);
+  z-index: 50;
 }
 
 .color-marker-dragging {

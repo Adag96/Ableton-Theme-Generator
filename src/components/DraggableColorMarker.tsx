@@ -9,6 +9,8 @@ interface DraggableColorMarkerProps {
   onDrag: (role: string, clientX: number, clientY: number) => void;
   /** Called when drag ends */
   onDragEnd?: () => void;
+  /** Whether this marker's swatch is actively selected */
+  isActive?: boolean;
 }
 
 export const DraggableColorMarker: React.FC<DraggableColorMarkerProps> = ({
@@ -17,6 +19,7 @@ export const DraggableColorMarker: React.FC<DraggableColorMarkerProps> = ({
   position,
   onDrag,
   onDragEnd,
+  isActive = false,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
 
@@ -50,7 +53,7 @@ export const DraggableColorMarker: React.FC<DraggableColorMarkerProps> = ({
 
   return (
     <div
-      className={`color-marker ${isDragging ? 'color-marker-dragging' : ''}`}
+      className={`color-marker ${isDragging ? 'color-marker-dragging' : ''} ${isActive ? 'color-marker-active' : ''}`}
       style={{
         backgroundColor: color,
         left: `${position.x * 100}%`,

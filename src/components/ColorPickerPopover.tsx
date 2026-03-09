@@ -25,10 +25,15 @@ export const ColorPickerPopover: React.FC<ColorPickerPopoverProps> = ({
     setHexInput(color);
   }, [color]);
 
-  // Close on click outside
+  // Close on click outside (but not on the image preview - that's eyedropper mode)
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
+        // Don't close if clicking on the image preview (eyedropper mode)
+        const target = e.target as HTMLElement;
+        if (target.closest('.import-preview-eyedropper')) {
+          return;
+        }
         onClose();
       }
     };

@@ -6,7 +6,7 @@
   position: relative;
   display: flex;
   justify-content: center;
-  cursor: crosshair;
+  cursor: none;
 }
 
 .image-magnifier-image {

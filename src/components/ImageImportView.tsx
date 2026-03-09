@@ -117,7 +117,8 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
   // Draggable marker state
   const imageRef = useRef<HTMLImageElement>(null);
   const [colorSampler, setColorSampler] = useState<ColorSampler | null>(null);
-  const [markerPositions, setMarkerPositions] = useState<Partial<Record<ColorRole, { x: number; y: number }>>>({});
+  // null = explicitly hidden (user manually edited color), undefined = use original location
+  const [markerPositions, setMarkerPositions] = useState<Partial<Record<ColorRole, { x: number; y: number } | null>>>({});
 
   // Reset state when image changes (but not when editing)
   useEffect(() => {
@@ -340,6 +341,8 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
     // When manually editing a color via picker, reset sliders
     // The manually edited color becomes the new baseline
     setMood(DEFAULT_MOOD);
+    // Set marker position to null to hide it (color no longer represents an image location)
+    setMarkerPositions(prev => ({ ...prev, [role]: null }));
   }, []);
 
   const handlePickerClose = useCallback(() => {
@@ -420,6 +423,73 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
     setColorOverrides(prev => ({ ...prev, [role as ColorRole]: sampledColor }));
   }, [colorSampler, getRenderedImageBounds]);
 
+  // Track eyedropper drag state
+  const [isEyedropperDragging, setIsEyedropperDragging] = useState(false);
+  const eyedropperRoleRef = useRef<ColorRole | null>(null);
+
+  // Helper to sample color at client coordinates and update state
+  const sampleColorAtPosition = useCallback((clientX: number, clientY: number, role: ColorRole) => {
+    const img = imageRef.current;
+    if (!img || !colorSampler) return;
+
+    const bounds = getRenderedImageBounds(img);
+
+    // Clamp to image bounds
+    const clampedX = Math.max(bounds.left, Math.min(bounds.left + bounds.width, clientX));
+    const clampedY = Math.max(bounds.top, Math.min(bounds.top + bounds.height, clientY));
+
+    // Convert to normalized coordinates
+    const normX = (clampedX - bounds.left) / bounds.width;
+    const normY = (clampedY - bounds.top) / bounds.height;
+
+    // Sample color
+    const sampledColor = colorSampler.sampleAt(normX, normY, 3);
+
+    // Update marker and color
+    setMarkerPositions(prev => ({ ...prev, [role]: { x: normX, y: normY } }));
+    setColorOverrides(prev => ({ ...prev, [role]: sampledColor }));
+  }, [colorSampler, getRenderedImageBounds]);
+
+  // Eyedropper mode: mousedown on image starts drag sampling
+  const handleImageMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!activePickerRole || !colorSampler) return;
+
+    e.preventDefault(); // Prevent image drag
+
+    // Store the role and start dragging
+    eyedropperRoleRef.current = activePickerRole;
+    setIsEyedropperDragging(true);
+
+    // Sample immediately at mousedown position
+    sampleColorAtPosition(e.clientX, e.clientY, activePickerRole);
+  }, [activePickerRole, colorSampler, sampleColorAtPosition]);
+
+  // Document-level mouse events for eyedropper drag
+  useEffect(() => {
+    if (!isEyedropperDragging) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const role = eyedropperRoleRef.current;
+      if (role) {
+        sampleColorAtPosition(e.clientX, e.clientY, role);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsEyedropperDragging(false);
+      eyedropperRoleRef.current = null;
+      setActivePickerRole(null); // Close picker on release
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isEyedropperDragging, sampleColorAtPosition]);
+
   // Option C: Random palette handler
   const handleRandomPalette = useCallback(() => {
     const tone = selectedTone ?? (Math.random() < 0.5 ? 'dark' : 'light');
@@ -490,7 +560,10 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
           {image && (
             <div className="import-preview">
               {imageDataUrl ? (
-                <div className="import-preview-container">
+                <div
+                className={`import-preview-container ${activePickerRole ? 'import-preview-eyedropper' : ''}`}
+                onMouseDown={handleImageMouseDown}
+              >
                   <img
                     ref={imageRef}
                     src={imageDataUrl}
@@ -499,6 +572,9 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
                   />
                   {/* Draggable color markers - show for colors with original locations or dragged positions */}
                   {basePalette?.roleLocations && ROLES.map(role => {
+                    // Check if marker was explicitly hidden (user manually edited color via picker)
+                    if (markerPositions[role] === null) return null;
+
                     // Use dragged position if available, otherwise original location
                     const originalLocation = basePalette.roleLocations?.[role];
                     const draggedPosition = markerPositions[role];
@@ -514,6 +590,7 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
                         color={effectivePalette?.roles[role] ?? basePalette.roles[role]}
                         position={position}
                         onDrag={handleMarkerDrag}
+                        isActive={activePickerRole === role}
                       />
                     );
                   })}

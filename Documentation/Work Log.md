@@ -1,9 +1,11 @@
 # Work Log
 
-## 2026-3-9 17:49
+## 2026-3-9 18:22
 - Continued explorations of 'color variety' via Hue Injection:
     - detail_bg, surface_highlight, control_bg all working well and implemented into Hue Injection algorithm
     - surface_border tested but shelved due to unconvincing results
+- User can now set swatches to colors from the image, regardless of whether the swatch was algorithmic or from the image directly
+- Color markers now automatically remove themselves when the user manually edits a swatch to a different color
 
 
 
