@@ -10,6 +10,7 @@ Step-by-step instructions for setting up the Supabase backend that powers the Co
 - **Row-level security** so the anon key is safe to ship in the app
 - Two **storage buckets** for `.ask` files and preview images
 - An **email notification** when someone submits a theme (optional but recommended)
+- **Automatic storage cleanup** when themes are deleted (optional but recommended)
 
 Total time: ~20 minutes.
 
@@ -60,10 +61,10 @@ You need two buckets: one for `.ask` files and one for preview screenshots.
 4. Toggle **Public bucket** ON
 5. Click **Create bucket**
 
-### Bucket 2: theme-previews
+### Bucket 2: theme-images
 
 1. Click **New bucket** again
-2. Name it exactly: `theme-previews`
+2. Name it exactly: `theme-images`
 3. Toggle **Public bucket** ON
 4. Click **Create bucket**
 
@@ -83,7 +84,7 @@ You need to add a policy so authenticated users can upload to `theme-files`.
 
 This ensures users can only upload to their own folder (`theme-files/{their-user-id}/...`).
 
-> The `theme-previews` bucket doesn't need an upload policy from the app — you'll upload screenshots manually from the Supabase dashboard.
+> The `theme-images` bucket doesn't need an upload policy from the app — you'll upload screenshots manually from the Supabase dashboard.
 
 ---
 
@@ -155,7 +156,40 @@ supabase functions deploy notify-submission
 
 ---
 
-## Step 6: Verify Everything Works
+## Step 6: Set Up Automatic Storage Cleanup (Recommended)
+
+When you delete a theme row from the dashboard, this will automatically remove the associated `.ask` file and images from storage.
+
+### 6a: Deploy the Edge Function
+
+```bash
+# Deploy the cleanup function
+supabase functions deploy cleanup-storage
+
+# Set the service role key (find it in Settings → API → service_role secret)
+supabase secrets set SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key>
+```
+
+### 6b: Create the Database Webhook
+
+1. In the Supabase dashboard, click **Database** → **Webhooks**
+2. Click **Create a new hook**
+3. Fill in:
+   - **Name:** `cleanup-storage-on-delete`
+   - **Table:** `community_themes`
+   - **Events:** DELETE only
+   - **Type:** Supabase Edge Functions
+   - **Edge Function:** Select `cleanup-storage`
+4. Click **Create webhook**
+
+Now when you delete a theme row, the function will automatically remove:
+- The `.ask` file from `theme-files`
+- The source image from `theme-images` (if present)
+- The preview screenshot from `theme-images` (if present)
+
+---
+
+## Step 7: Verify Everything Works
 
 1. Launch the app with `npm run dev`
 2. Go to **Community**
@@ -178,7 +212,7 @@ When someone submits a theme:
 3. Click the row to see details, then copy the `ask_file_url`
 4. Paste the URL in a browser to download the `.ask` file
 5. Open Ableton, load the theme, take a full-screen screenshot
-6. Go to **Storage** → `theme-previews` → create a `previews/` folder if it doesn't exist
+6. Go to **Storage** → `theme-images` → create a `previews/` folder if it doesn't exist
 7. Upload the screenshot, naming it `{theme-id}.png` (copy the `id` column from the table row)
 8. Get the public URL of the uploaded image (click it → **Get URL**)
 9. Back in the table row, click **Edit**:

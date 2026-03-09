@@ -67,4 +67,4 @@ $$;
 
 -- Storage buckets (run these via Supabase dashboard or Storage API):
 -- create bucket "theme-files" (public)
--- create bucket "theme-previews" (public)
+-- create bucket "theme-images" (public)

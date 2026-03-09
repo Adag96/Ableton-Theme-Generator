@@ -350,7 +350,7 @@ All community data lives in [Supabase](https://supabase.com), a hosted Postgres 
 |---------|---------|
 | **Auth** | Email/password accounts. Sessions persist via localStorage in the renderer process. |
 | **Database** | Two tables: `profiles` (user display names, bio, social links) and `community_themes` (theme metadata, status, file URLs). |
-| **Storage** | Two public buckets: `theme-files` (uploaded `.ask` files) and `theme-previews` (Ableton screenshots added by the developer during review). |
+| **Storage** | Two public buckets: `theme-files` (uploaded `.ask` files) and `theme-images` (source images uploaded with submissions + Ableton screenshots added during review). |
 
 The Supabase client runs entirely in the Electron renderer process. Environment variables (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`) are injected by Vite at build time via `.env`.
 
@@ -402,7 +402,7 @@ No admin UI exists. The developer:
 1. Receives an email notification on each submission
 2. Opens the Supabase dashboard → Table Editor → `community_themes`
 3. Downloads the `.ask` file, loads it in Ableton, takes a screenshot
-4. Uploads the screenshot to `theme-previews/previews/{themeId}.png`
+4. Uploads the screenshot to `theme-images/previews/{themeId}.png`
 5. Updates the row: sets `status = 'approved'`, `preview_image_url`, and `approved_at`
 
 The theme appears in the gallery immediately after approval.

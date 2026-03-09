@@ -79,12 +79,12 @@ export const SubmitThemeModal: React.FC<SubmitThemeModalProps> = ({ theme, onClo
           const imageBlob = new Blob([byteArray], { type: mimeType });
 
           const { error: imageUploadError } = await supabase.storage
-            .from('theme-previews')
+            .from('theme-images')
             .upload(`${user.id}/${themeId}-source.${ext}`, imageBlob);
 
           if (!imageUploadError) {
             const { data: { publicUrl: imageUrl } } = supabase.storage
-              .from('theme-previews')
+              .from('theme-images')
               .getPublicUrl(`${user.id}/${themeId}-source.${ext}`);
             sourceImageUrl = imageUrl;
           }
