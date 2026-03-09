@@ -11,6 +11,7 @@
   max-width: 500px;
   margin: 0 auto;
   padding: 2vh 3vw;
+  overflow-y: auto;
 }
 
 .profile-back-button {

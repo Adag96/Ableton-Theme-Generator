@@ -2,11 +2,13 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { supabase, type CommunityTheme } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useThemeLibrary } from '../hooks/useThemeLibrary';
+import { isAdmin } from '../lib/admin';
 import { CommunityThemeCard } from './CommunityThemeCard';
 import { CommunityThemeDetailModal } from './CommunityThemeDetailModal';
+import { AdminTab } from './admin/AdminTab';
 import './CommunityView.css';
 
-type Tab = 'gallery' | 'submissions';
+type Tab = 'gallery' | 'submissions' | 'admin';
 type ToneFilter = 'all' | 'dark' | 'light';
 type SortOption = 'recent' | 'oldest' | 'a-z' | 'z-a';
 
@@ -27,6 +29,7 @@ interface CommunityViewProps {
 export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProfile }) => {
   const { user } = useAuth();
   const { isThemeInstalled, addThemeFromCommunity, uninstallTheme, getThemeById, syncInstallState } = useThemeLibrary();
+  const userIsAdmin = isAdmin(user?.id);
   const [tab, setTab] = useState<Tab>('gallery');
   const [themes, setThemes] = useState<CommunityTheme[]>([]);
   const [mySubmissions, setMySubmissions] = useState<CommunityTheme[]>([]);
@@ -269,6 +272,14 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProf
           >
             My Submissions
           </button>
+          {userIsAdmin && (
+            <button
+              className={`community-tab ${tab === 'admin' ? 'community-tab-active' : ''}`}
+              onClick={() => setTab('admin')}
+            >
+              Admin
+            </button>
+          )}
         </div>
       )}
 
@@ -345,6 +356,9 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProf
             <div className="community-loading-spinner" />
             Loading themes…
           </div>
+        ) : tab === 'admin' ? (
+          // Admin view
+          <AdminTab />
         ) : tab === 'gallery' ? (
           // Gallery view
           themes.length === 0 ? (

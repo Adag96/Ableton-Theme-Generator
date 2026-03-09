@@ -59,6 +59,10 @@ export interface ElectronAPI {
   deleteSourceImage: (themeId: string) => Promise<{ success: boolean; error?: string }>;
   getSourceImageDataUrl: (cachedPath: string) => Promise<string | null>;
   openExternal: (url: string) => Promise<void>;
+
+  // Admin panel IPC
+  installReviewTheme: (args: { themeName: string; askFileUrl: string }) => Promise<{ success: boolean; filePath?: string; error?: string }>;
+  cleanupReviewTheme: (args: { filePath: string }) => Promise<{ success: boolean; error?: string }>;
 }
 
 declare global {

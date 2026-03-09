@@ -45,4 +45,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('get-source-image-data-url', cachedPath),
   openExternal: (url: string) =>
     ipcRenderer.invoke('open-external', url),
+
+  // Admin panel IPC
+  installReviewTheme: (args: { themeName: string; askFileUrl: string }) =>
+    ipcRenderer.invoke('install-review-theme', args),
+  cleanupReviewTheme: (args: { filePath: string }) =>
+    ipcRenderer.invoke('cleanup-review-theme', args),
 });

@@ -500,6 +500,68 @@ app.whenReady().then(() => {
     }
   });
 
+  // Install a review theme (for admin panel)
+  ipcMain.handle('install-review-theme', async (_event, { themeName, askFileUrl }: { themeName: string; askFileUrl: string }) => {
+    try {
+      const themesDir = detectAbletonThemesDirectory();
+      if (!themesDir.found || !themesDir.path) {
+        return { success: false, error: 'Ableton themes directory not found' };
+      }
+
+      // Sanitize theme name for filename
+      const sanitizedName = themeName.replace(/[/\\:*?"<>|]/g, '_').trim() || 'Theme';
+      const fileName = `REVIEW_${sanitizedName}.ask`;
+      const filePath = path.join(themesDir.path, fileName);
+
+      // Download the .ask file content
+      const response = await fetch(askFileUrl);
+      if (!response.ok) {
+        return { success: false, error: `Download failed: ${response.statusText}` };
+      }
+
+      const buffer = Buffer.from(await response.arrayBuffer());
+
+      // Write to Ableton Themes directory (overwrite if exists)
+      fs.writeFileSync(filePath, buffer);
+      return { success: true, filePath };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      return { success: false, error: errorMessage };
+    }
+  });
+
+  // Clean up a review theme file (for admin panel)
+  ipcMain.handle('cleanup-review-theme', async (_event, { filePath }: { filePath: string }) => {
+    try {
+      const themesDir = detectAbletonThemesDirectory();
+      if (!themesDir.found || !themesDir.path) {
+        return { success: false, error: 'Themes directory not found' };
+      }
+
+      // Safety check: only delete REVIEW_*.ask files within the themes directory
+      const normalizedPath = path.normalize(filePath);
+      const normalizedThemesDir = path.normalize(themesDir.path);
+      const fileName = path.basename(filePath);
+
+      if (!normalizedPath.startsWith(normalizedThemesDir) ||
+          !normalizedPath.endsWith('.ask') ||
+          !fileName.startsWith('REVIEW_')) {
+        return { success: false, error: 'Invalid file path for cleanup' };
+      }
+
+      if (!fs.existsSync(filePath)) {
+        // File already doesn't exist, that's fine
+        return { success: true };
+      }
+
+      fs.unlinkSync(filePath);
+      return { success: true };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      return { success: false, error: errorMessage };
+    }
+  });
+
   // Delete theme file from library context (skip signature check for our own themes)
   ipcMain.handle('delete-library-theme-file', async (_event, filePath: string) => {
     try {
