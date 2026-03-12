@@ -322,7 +322,7 @@ Explored injecting hue into the neutral scale stops that affect retro displays (
 |--------|--------|-------|
 | Deep stops (n0-n2) | ⏸️ Shelved | Affects `RetroDisplayBackground`. Made the whole display look like a colored overlay — not intentional or well-designed. |
 | Mid stops (n9, n11) | ⏸️ Shelved | Affects `SpectrumDefaultColor`, `BrowserSampleWaveform`. Changed baseline appearance even when injection disabled due to parameter map changes. |
-| `SpectrumDefaultColor` (direct override) | 🔄 In Progress | Direct parameter override only when injection enabled. Preserves baseline. Uses `accent_primary` hue so spectrum fill matches EQ node color. Currently blocked by hue distance check when surface and accent are similar hues. |
+| `SpectrumDefaultColor` (direct override) | ✅ Included (dark only) | Direct parameter override when injection enabled. Uses `accent_primary` hue at L=45%, S=20-45%, alpha=62%. See note below about light vs dark themes. |
 
 **Key Learnings from Neutral Scale Testing:**
 1. Changing the neutral scale affects too many parameters at once — hard to control
@@ -330,11 +330,17 @@ Explored injecting hue into the neutral scale stops that affect retro displays (
 3. Must preserve baseline behavior when injection is OFF — users expect 0% to look identical to before
 4. Spectrum waveform should match EQ nodes (`accent_primary`), not EQ curve lines (`accent_secondary`)
 
-**Open Issue:**
-- `SpectrumDefaultColor` injection is blocked when surface hue and accent_primary hue are within 30° of each other (e.g., lavender surface + purple accent). Need to decide: lower threshold, remove check for spectrum, or leave as-is.
+**Light vs Dark Theme Differences (2026-03-12):**
+
+The `SpectrumDefaultColor` injection produces very different results on light vs dark themes:
+- **Dark themes:** Noticeable, subjective variety. The colored spectrum fill stands out against the dark background.
+- **Light themes:** Extremely subtle, almost imperceptible. Tested L values down to 28%, saturation up to 65%, and alpha up to 75% — still barely visible against light backgrounds.
+
+This is likely due to how Ableton renders the spectrum analyzer overlay on light backgrounds. The baseline light theme value (`surface_highlight` at 33% alpha) is already very washed out, and our injection can't overcome the inherent low contrast.
+
+**Decision:** Keep `SpectrumDefaultColor` in the hue injection algorithm. Accept that the effect is primarily visible on dark themes. No special light theme handling — use same values for both (the effect just won't be noticeable on light themes).
 
 **Next to test:**
-- Resolve the hue distance threshold issue for SpectrumDefaultColor
 - Consider other direct parameter overrides that could benefit from hue injection
 
 ---

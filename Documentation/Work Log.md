@@ -2,9 +2,12 @@
 
 ## 2026-3-12 19:45
 - Fixed theme library corruption issue that was causing 'My Themes' to appear empty after app restart
-    - App now validates the library JSON on load and backs up corrupted files before resetting
-    - Writes are now atomic (write to temp file, then rename) to prevent partial writes
-- Preview images are now stored as separate files instead of base64 in the library JSON, reducing file size from ~27MB to <100KB
+    - App now validates the library on load and backs up corrupted files before resetting
+    - Writes are now atomic to prevent partial writes
+- Preview images are now stored as separate files instead of embedded in the library, reducing file size significantly
+- Tested SpectrumDefaultColor (EQ analyzer waveform) for hue injection:
+    - Dark themes: noticeable color variety, included in algorithm
+    - Light themes: effect is imperceptible regardless of settings, no special handling
 
 
 ## 2026-3-9 18:22

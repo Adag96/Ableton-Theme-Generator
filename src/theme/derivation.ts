@@ -566,11 +566,11 @@ export function generateTheme(input: SemanticColorRoles): AbletonThemeData {
     if (hueDistance(accentHsl.h, surfaceHsl.h) >= MIN_INJECTION_HUE_DISTANCE) {
       // SpectrumDefaultColor: spectrum analyzer waveform fill
       // Use accent_primary hue so it relates to EQ nodes
-      // Light themes need lower L and higher S/alpha to be visible against light backgrounds
-      const spectrumL = roles.tone === 'dark' ? 45 : 38;
-      const spectrumS = roles.tone === 'dark' ? 20 + (strength * 25) : 30 + (strength * 20); // dark: 20-45%, light: 30-50%
+      // Note: This effect is much more noticeable on dark themes; light themes show minimal difference
+      const spectrumL = 45;
+      const spectrumS = 20 + (strength * 25); // 20-45% saturation based on strength
       const spectrumColor = hslToHex(accentHsl.h, spectrumS, spectrumL);
-      parameters.SpectrumDefaultColor = withAlpha(spectrumColor, '9f'); // 62% alpha for both
+      parameters.SpectrumDefaultColor = withAlpha(spectrumColor, '9f');
     }
   }
 
