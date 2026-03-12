@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase, type CommunityTheme } from '../lib/supabase';
 import { useThemeLibrary } from '../hooks/useThemeLibrary';
+import { useCommunityThemes } from '../hooks/useCommunityThemes';
 import { CommunityThemeCard } from './CommunityThemeCard';
 import { CommunityThemeDetailModal } from './CommunityThemeDetailModal';
 import './LandingView.css';
@@ -24,27 +25,14 @@ export const LandingView: React.FC<LandingViewProps> = ({
   onViewProfile,
 }) => {
   const { isThemeInstalled, addThemeFromCommunity, uninstallTheme, getThemeById, syncInstallState } = useThemeLibrary();
-  const [themes, setThemes] = useState<CommunityTheme[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { themes: allThemes, isLoading, updateThemeInCache } = useCommunityThemes();
+
+  // Carousel only shows newest 15 themes
+  const themes = useMemo(() => allThemes.slice(0, 15), [allThemes]);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState<CommunityTheme | null>(null);
-
-  const fetchFeaturedThemes = useCallback(async () => {
-    setIsLoading(true);
-    const { data } = await supabase
-      .from('community_themes')
-      .select('*, profiles(display_name)')
-      .eq('status', 'approved')
-      .order('approved_at', { ascending: false })
-      .limit(15);
-    setThemes(data ?? []);
-    setIsLoading(false);
-  }, []);
-
-  useEffect(() => {
-    fetchFeaturedThemes();
-  }, [fetchFeaturedThemes]);
 
   // Sync install state with filesystem once on mount
   useEffect(() => {
@@ -93,12 +81,8 @@ export const LandingView: React.FC<LandingViewProps> = ({
     if (result.success) {
       // Increment download count in DB (fire-and-forget)
       await supabase.rpc('increment_download_count', { theme_id: theme.id });
-      // Optimistically update the count in state
-      setThemes((prev) =>
-        prev.map((t) =>
-          t.id === theme.id ? { ...t, download_count: t.download_count + 1 } : t
-        )
-      );
+      // Optimistically update the count in shared cache
+      updateThemeInCache(theme.id, { download_count: theme.download_count + 1 });
     } else {
       throw new Error(result.error ?? 'Install failed');
     }

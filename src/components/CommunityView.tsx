@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { supabase, type CommunityTheme } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useThemeLibrary } from '../hooks/useThemeLibrary';
+import { useCommunityThemes } from '../hooks/useCommunityThemes';
 import { isAdmin } from '../lib/admin';
 import { CommunityThemeCard } from './CommunityThemeCard';
 import { CommunityThemeDetailModal } from './CommunityThemeDetailModal';
@@ -29,27 +30,15 @@ interface CommunityViewProps {
 export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProfile }) => {
   const { user } = useAuth();
   const { isThemeInstalled, addThemeFromCommunity, uninstallTheme, getThemeById, syncInstallState } = useThemeLibrary();
+  const { themes, isLoading, updateThemeInCache } = useCommunityThemes();
   const userIsAdmin = isAdmin(user?.id);
   const [tab, setTab] = useState<Tab>('gallery');
-  const [themes, setThemes] = useState<CommunityTheme[]>([]);
   const [mySubmissions, setMySubmissions] = useState<CommunityTheme[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [selectedTheme, setSelectedTheme] = useState<CommunityTheme | null>(null);
   const [filter, setFilter] = useState<ToneFilter>('all');
   const [sortBy, setSortBy] = useState<SortOption>('recent');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const fetchGallery = useCallback(async () => {
-    setIsLoading(true);
-    const { data } = await supabase
-      .from('community_themes')
-      .select('*, profiles(display_name)')
-      .eq('status', 'approved')
-      .order('approved_at', { ascending: false });
-    setThemes(data ?? []);
-    setIsLoading(false);
-  }, []);
 
   const fetchMySubmissions = useCallback(async () => {
     if (!user) return;
@@ -60,10 +49,6 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProf
       .order('created_at', { ascending: false });
     setMySubmissions(data ?? []);
   }, [user]);
-
-  useEffect(() => {
-    fetchGallery();
-  }, [fetchGallery]);
 
   // Load preferences from localStorage on mount
   useEffect(() => {
@@ -124,12 +109,8 @@ export const CommunityView: React.FC<CommunityViewProps> = ({ onBack, onViewProf
     if (result.success) {
       // Increment download count in DB (fire-and-forget)
       await supabase.rpc('increment_download_count', { theme_id: theme.id });
-      // Optimistically update the count in state
-      setThemes((prev) =>
-        prev.map((t) =>
-          t.id === theme.id ? { ...t, download_count: t.download_count + 1 } : t
-        )
-      );
+      // Optimistically update the count in shared cache
+      updateThemeInCache(theme.id, { download_count: theme.download_count + 1 });
     } else {
       throw new Error(result.error ?? 'Install failed');
     }

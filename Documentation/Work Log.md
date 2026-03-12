@@ -1,6 +1,7 @@
 # Work Log
 
 ## 2026-3-12 19:45
+- Community themes now load instantly when switching views instead of showing a loading spinner each time
 - Fixed theme library corruption issue that was causing 'My Themes' to appear empty after app restart
     - App now validates the library on load and backs up corrupted files before resetting
     - Writes are now atomic to prevent partial writes

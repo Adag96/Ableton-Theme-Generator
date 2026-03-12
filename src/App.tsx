@@ -13,6 +13,7 @@ import { FeedbackModal } from './components/FeedbackModal';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { AccentProvider } from './hooks/useAccentColors';
 import { AppThemeProvider } from './hooks/useAppTheme';
+import { CommunityThemesProvider } from './hooks/useCommunityThemes';
 import type { ImageFileResult } from './electron';
 import type { PaletteSelectionResult } from './extraction';
 import type { SavedTheme } from './types/theme-library';
@@ -425,9 +426,11 @@ function App() {
   return (
     <AppThemeProvider>
       <AuthProvider>
-        <AccentProvider>
-          <AppContent />
-        </AccentProvider>
+        <CommunityThemesProvider>
+          <AccentProvider>
+            <AppContent />
+          </AccentProvider>
+        </CommunityThemesProvider>
       </AuthProvider>
     </AppThemeProvider>
   );
