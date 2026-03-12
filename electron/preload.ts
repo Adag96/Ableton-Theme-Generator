@@ -43,6 +43,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('delete-source-image', themeId),
   getSourceImageDataUrl: (cachedPath: string) =>
     ipcRenderer.invoke('get-source-image-data-url', cachedPath),
+  savePreviewImage: (args: { dataUrl: string; themeId: string }) =>
+    ipcRenderer.invoke('save-preview-image', args),
+  deletePreviewImage: (themeId: string) =>
+    ipcRenderer.invoke('delete-preview-image', themeId),
+  getPreviewImageDataUrl: (previewPath: string) =>
+    ipcRenderer.invoke('get-preview-image-data-url', previewPath),
   openExternal: (url: string) =>
     ipcRenderer.invoke('open-external', url),
 

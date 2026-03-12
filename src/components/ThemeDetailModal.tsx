@@ -8,6 +8,35 @@ import { useAuth } from '../hooks/useAuth';
 import { useModalOverlayClose } from '../hooks/useModalOverlayClose';
 import './ThemeDetailModal.css';
 
+// Hook to load preview image from file path
+function usePreviewImage(theme: SavedTheme | null): string | null {
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!theme) {
+      setImageUrl(null);
+      return;
+    }
+
+    // Legacy: if previewImage (base64) exists, use it directly
+    if (theme.previewImage) {
+      setImageUrl(theme.previewImage);
+      return;
+    }
+
+    // New: load from file path
+    if (theme.previewImagePath && window.electronAPI) {
+      window.electronAPI.getPreviewImageDataUrl(theme.previewImagePath)
+        .then(dataUrl => setImageUrl(dataUrl))
+        .catch(() => setImageUrl(null));
+    } else {
+      setImageUrl(null);
+    }
+  }, [theme?.previewImage, theme?.previewImagePath, theme?.id]);
+
+  return imageUrl;
+}
+
 interface ThemeDetailModalProps {
   isOpen: boolean;
   theme: SavedTheme | null;
@@ -53,6 +82,7 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const previewImageUrl = usePreviewImage(theme);
 
   useEffect(() => {
     if (theme) {
@@ -184,9 +214,9 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
 
         {/* Image preview with color markers */}
         <div className="modal-image-section">
-          {theme.previewImage ? (
+          {previewImageUrl ? (
             <ImageMagnifier
-              src={theme.previewImage}
+              src={previewImageUrl}
               alt={theme.name}
               className="modal-preview-container"
             >

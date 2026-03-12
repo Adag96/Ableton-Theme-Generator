@@ -58,6 +58,9 @@ export interface ElectronAPI {
   saveSourceImage: (args: { sourcePath: string; themeId: string }) => Promise<{ success: boolean; cachedPath?: string; error?: string }>;
   deleteSourceImage: (themeId: string) => Promise<{ success: boolean; error?: string }>;
   getSourceImageDataUrl: (cachedPath: string) => Promise<string | null>;
+  savePreviewImage: (args: { dataUrl: string; themeId: string }) => Promise<{ success: boolean; previewPath?: string; error?: string }>;
+  deletePreviewImage: (themeId: string) => Promise<{ success: boolean; error?: string }>;
+  getPreviewImageDataUrl: (previewPath: string) => Promise<string | null>;
   openExternal: (url: string) => Promise<void>;
 
   // Admin panel IPC

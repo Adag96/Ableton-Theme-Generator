@@ -24,7 +24,7 @@ import './App.css';
 interface PendingTheme {
   palette: PaletteSelectionResult;
   xmlContent: string;
-  previewImage?: string;
+  previewDataUrl?: string;
 }
 
 type View = 'landing' | 'settings' | 'import' | 'my-themes' | 'community' | 'profile' | 'public-profile';
@@ -152,13 +152,26 @@ function AppContent() {
     const themeData = generateTheme(palette.roles);
     const xmlContent = generateAskXml(themeData);
 
-    let previewImage: string | undefined;
+    // Read image as data URL for preview (will be saved to file later)
+    let previewDataUrl: string | undefined;
     if (importedImage?.filePath && window.electronAPI) {
-      previewImage = (await window.electronAPI.readImageAsDataUrl(importedImage.filePath)) ?? undefined;
+      previewDataUrl = (await window.electronAPI.readImageAsDataUrl(importedImage.filePath)) ?? undefined;
     }
 
     // When editing, skip the name dialog and update the theme directly
     if (editingTheme) {
+      // Save new preview image to file if we have one
+      let previewImagePath = editingTheme.previewImagePath;
+      if (previewDataUrl && window.electronAPI) {
+        const saveResult = await window.electronAPI.savePreviewImage({
+          dataUrl: previewDataUrl,
+          themeId: editingTheme.id,
+        });
+        if (saveResult.success && saveResult.previewPath) {
+          previewImagePath = saveResult.previewPath;
+        }
+      }
+
       // Convert partial originalColors to full object if provided
       const originalColors = palette.originalColors && Object.keys(palette.originalColors).length === 4
         ? palette.originalColors as { surface_base: string; text_primary: string; accent_primary: string; accent_secondary: string }
@@ -173,7 +186,7 @@ function AppContent() {
         },
         tone: palette.roles.tone,
         contrastLevel: palette.roles.contrastLevel,
-        previewImage: previewImage ?? editingTheme.previewImage,
+        previewImagePath,
         roleLocations: palette.roleLocations,
         originalColors,
         moodSliders: palette.moodSliders,
@@ -189,7 +202,7 @@ function AppContent() {
       return;
     }
 
-    setPendingTheme({ palette, xmlContent, previewImage });
+    setPendingTheme({ palette, xmlContent, previewDataUrl });
     setShowNameDialog(true);
   };
 
@@ -216,6 +229,18 @@ function AppContent() {
             }
           }
 
+          // Save preview image to file
+          let previewImagePath: string | undefined;
+          if (pendingTheme.previewDataUrl) {
+            const previewResult = await window.electronAPI.savePreviewImage({
+              dataUrl: pendingTheme.previewDataUrl,
+              themeId,
+            });
+            if (previewResult.success && previewResult.previewPath) {
+              previewImagePath = previewResult.previewPath;
+            }
+          }
+
           // Convert partial originalColors to full object if provided
           const originalColors = pendingTheme.palette.originalColors && Object.keys(pendingTheme.palette.originalColors).length === 4
             ? pendingTheme.palette.originalColors as { surface_base: string; text_primary: string; accent_primary: string; accent_secondary: string }
@@ -235,7 +260,7 @@ function AppContent() {
               accent_secondary: pendingTheme.palette.roles.accent_secondary,
             },
             contrastLevel: pendingTheme.palette.roles.contrastLevel,
-            previewImage: pendingTheme.previewImage,
+            previewImagePath,
             roleLocations: pendingTheme.palette.roleLocations,
             sourceImagePath,
             isInstalled: true,

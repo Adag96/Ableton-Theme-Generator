@@ -1,12 +1,18 @@
 # Work Log
 
+## 2026-3-12 19:45
+- Fixed theme library corruption issue that was causing 'My Themes' to appear empty after app restart
+    - App now validates the library JSON on load and backs up corrupted files before resetting
+    - Writes are now atomic (write to temp file, then rename) to prevent partial writes
+- Preview images are now stored as separate files instead of base64 in the library JSON, reducing file size from ~27MB to <100KB
+
+
 ## 2026-3-9 18:22
 - Continued explorations of 'color variety' via Hue Injection:
     - detail_bg, surface_highlight, control_bg all working well and implemented into Hue Injection algorithm
     - surface_border tested but shelved due to unconvincing results
 - User can now set swatches to colors from the image, regardless of whether the swatch was algorithmic or from the image directly
 - Color markers now automatically remove themselves when the user manually edits a swatch to a different color
-
 
 
 ## 2026-3-6 23:59

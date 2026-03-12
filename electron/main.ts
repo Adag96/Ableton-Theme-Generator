@@ -306,23 +306,55 @@ app.whenReady().then(() => {
   }
 
   ipcMain.handle('load-theme-library', async () => {
+    const defaultLibrary = { version: 1, themes: [] };
+
     try {
       if (fs.existsSync(themeLibraryPath)) {
         const data = fs.readFileSync(themeLibraryPath, 'utf8');
-        return JSON.parse(data);
+        const parsed = JSON.parse(data);
+
+        // Validate structure
+        if (parsed && typeof parsed === 'object' && Array.isArray(parsed.themes)) {
+          return parsed;
+        }
+
+        // Invalid structure - backup and reset
+        console.error('Theme library has invalid structure, resetting...');
+        const backupPath = themeLibraryPath.replace('.json', `-backup-${Date.now()}.json`);
+        fs.renameSync(themeLibraryPath, backupPath);
+        console.log(`Backed up corrupted file to: ${backupPath}`);
       }
     } catch (error) {
       console.error('Error loading theme library:', error);
+
+      // JSON parse failed - file is corrupted, backup and reset
+      if (fs.existsSync(themeLibraryPath)) {
+        try {
+          const backupPath = themeLibraryPath.replace('.json', `-backup-${Date.now()}.json`);
+          fs.renameSync(themeLibraryPath, backupPath);
+          console.log(`Backed up corrupted file to: ${backupPath}`);
+        } catch (backupError) {
+          console.error('Failed to backup corrupted file:', backupError);
+        }
+      }
     }
-    return { version: 1, themes: [] };
+
+    return defaultLibrary;
   });
 
   ipcMain.handle('save-theme-library', async (_event, library: unknown) => {
     try {
-      fs.writeFileSync(themeLibraryPath, JSON.stringify(library, null, 2), 'utf8');
+      const jsonString = JSON.stringify(library, null, 2);
+
+      // Write to temp file first, then rename (atomic write to prevent corruption)
+      const tempPath = themeLibraryPath + '.tmp';
+      fs.writeFileSync(tempPath, jsonString, 'utf8');
+      fs.renameSync(tempPath, themeLibraryPath);
+
       return { success: true };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('Error saving theme library:', error);
       return { success: false, error: errorMessage };
     }
   });
@@ -414,9 +446,15 @@ app.whenReady().then(() => {
   // Source image caching for community gallery submissions
   const sourceImagesDir = path.join(app.getPath('userData'), 'source-images');
 
-  // Ensure source-images directory exists
+  // Preview image storage (Ableton screenshots for My Themes view)
+  const previewImagesDir = path.join(app.getPath('userData'), 'preview-images');
+
+  // Ensure directories exist
   if (!fs.existsSync(sourceImagesDir)) {
     fs.mkdirSync(sourceImagesDir, { recursive: true });
+  }
+  if (!fs.existsSync(previewImagesDir)) {
+    fs.mkdirSync(previewImagesDir, { recursive: true });
   }
 
   ipcMain.handle('save-source-image', async (_event, { sourcePath, themeId }: { sourcePath: string; themeId: string }) => {
@@ -460,6 +498,60 @@ app.whenReady().then(() => {
       return `data:${mimeType};base64,${data.toString('base64')}`;
     } catch (error) {
       console.error('Error reading cached source image:', error);
+      return null;
+    }
+  });
+
+  // Preview image storage - saves base64 data URL to file, returns file path
+  ipcMain.handle('save-preview-image', async (_event, { dataUrl, themeId }: { dataUrl: string; themeId: string }) => {
+    try {
+      // Parse data URL: data:image/png;base64,xxxx
+      const matches = dataUrl.match(/^data:image\/(png|jpeg|jpg);base64,(.+)$/);
+      if (!matches) {
+        return { success: false, error: 'Invalid data URL format' };
+      }
+      const ext = matches[1] === 'jpg' ? 'jpeg' : matches[1];
+      const base64Data = matches[2];
+      const buffer = Buffer.from(base64Data, 'base64');
+
+      const destPath = path.join(previewImagesDir, `${themeId}.${ext}`);
+      fs.writeFileSync(destPath, buffer);
+
+      return { success: true, previewPath: destPath };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('Error saving preview image:', error);
+      return { success: false, error: errorMessage };
+    }
+  });
+
+  // Delete preview image when theme is deleted
+  ipcMain.handle('delete-preview-image', async (_event, themeId: string) => {
+    try {
+      const files = fs.readdirSync(previewImagesDir);
+      const match = files.find(f => f.startsWith(themeId + '.'));
+      if (match) {
+        fs.unlinkSync(path.join(previewImagesDir, match));
+      }
+      return { success: true };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      return { success: false, error: errorMessage };
+    }
+  });
+
+  // Get preview image as data URL for display
+  ipcMain.handle('get-preview-image-data-url', async (_event, previewPath: string) => {
+    try {
+      if (!previewPath || !fs.existsSync(previewPath)) {
+        return null;
+      }
+      const data = fs.readFileSync(previewPath);
+      const ext = path.extname(previewPath).toLowerCase();
+      const mimeType = ext === '.png' ? 'image/png' : 'image/jpeg';
+      return `data:${mimeType};base64,${data.toString('base64')}`;
+    } catch (error) {
+      console.error('Error reading preview image:', error);
       return null;
     }
   });

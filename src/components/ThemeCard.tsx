@@ -1,7 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { SavedTheme } from '../types/theme-library';
 import { ConfirmationDialog } from './ConfirmationDialog';
 import './ThemeCard.css';
+
+// Hook to load preview image from file path
+function usePreviewImage(theme: SavedTheme): string | null {
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Legacy: if previewImage (base64) exists, use it directly
+    if (theme.previewImage) {
+      setImageUrl(theme.previewImage);
+      return;
+    }
+
+    // New: load from file path
+    if (theme.previewImagePath && window.electronAPI) {
+      window.electronAPI.getPreviewImageDataUrl(theme.previewImagePath)
+        .then(dataUrl => setImageUrl(dataUrl))
+        .catch(() => setImageUrl(null));
+    } else {
+      setImageUrl(null);
+    }
+  }, [theme.previewImage, theme.previewImagePath]);
+
+  return imageUrl;
+}
 
 interface ThemeCardProps {
   theme: SavedTheme;
@@ -23,6 +47,7 @@ export const ThemeCard: React.FC<ThemeCardProps> = ({
   const [isWorking, setIsWorking] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isUninstallHovering, setIsUninstallHovering] = useState(false);
+  const previewImageUrl = usePreviewImage(theme);
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -67,9 +92,9 @@ export const ThemeCard: React.FC<ThemeCardProps> = ({
 
   return (
     <div className="theme-card" onClick={onClick} style={{ cursor: 'pointer' }}>
-      {theme.previewImage && (
+      {previewImageUrl && (
         <div className="theme-card-preview">
-          <img src={theme.previewImage} alt={theme.name} />
+          <img src={previewImageUrl} alt={theme.name} />
         </div>
       )}
 

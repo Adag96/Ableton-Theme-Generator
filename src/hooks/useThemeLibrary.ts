@@ -37,6 +37,9 @@ export function useThemeLibrary() {
 
       // Delete cached source image if it exists
       await window.electronAPI.deleteSourceImage(theme.id);
+
+      // Delete cached preview image if it exists
+      await window.electronAPI.deletePreviewImage(theme.id);
     }
 
     const updated = { ...library, themes: library.themes.filter(t => t.id !== id) };
@@ -46,7 +49,7 @@ export function useThemeLibrary() {
 
   const updateTheme = useCallback(async (
     id: string,
-    updates: Partial<Pick<SavedTheme, 'colors' | 'tone' | 'contrastLevel' | 'previewImage' | 'roleLocations' | 'originalColors' | 'moodSliders'>>
+    updates: Partial<Pick<SavedTheme, 'colors' | 'tone' | 'contrastLevel' | 'previewImagePath' | 'roleLocations' | 'originalColors' | 'moodSliders'>>
   ): Promise<{ success: boolean; error?: string }> => {
     const theme = library.themes.find(t => t.id === id);
     if (!theme) return { success: false, error: 'Theme not found' };
