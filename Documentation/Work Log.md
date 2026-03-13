@@ -1,6 +1,6 @@
 # Work Log
 
-## 2026-3-13 19:33
+## 2026-3-13 21:50
 - Redesigned theme creation view: 'Import Image' and 'Make One For Me' buttons now scale proportionally with window size
 - Renamed random theme generator button to 'Make One For Me' with subtitle 'Generate a theme algorithmically'
 - Window now resizes proportionally (3:2 ratio) and remembers size/position between sessions
@@ -9,6 +9,7 @@
 - Alternate button states (Installed, Uninstall hover, Pending Review) now have consistent visual styling with color-matched glows, thicker borders, and proper visibility in both light and dark app themes
 - Footer buttons improved: 'Send Love' and 'Feedback' now have matching pill styling with text labels, larger icons, and better dark mode visibility
 - Added holographic shimmer effect to footer: 'Made With Love by Lonebody' text and 'Support Me' button now animate with neon gradient colors
+- Documented 9 Ableton theme parameters: BrowserSampleWaveform, AutomationColor, VelocitySelectedOrHovered, WaveformColor, DimmedWaveformColor, LoopColor, RetroDisplayBackground, RetroDisplayBackgroundLine, RetroDisplayRed
 
 
 ## 2026-3-12 19:38

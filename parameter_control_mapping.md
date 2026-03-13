@@ -93,7 +93,7 @@ This document tracks which UI controls and visual elements are affected by each 
 | BrowserBar | | |
 | BrowserBarOverlayHintTextColor | | |
 | BrowserDisabledItem | | |
-| BrowserSampleWaveform | | |
+| BrowserSampleWaveform | **Browser:** Waveform color for audio sample previews throughout the browser panel. | |
 | BrowserTagBackground | | |
 
 ### Clips
@@ -123,7 +123,7 @@ This document tracks which UI controls and visual elements are affected by each 
 
 | Parameter | Affected Controls | Notes |
 |-----------|-------------------|-------|
-| AutomationColor | | |
+| AutomationColor | **Arrangement/Clip View:** Automation lines, breakpoint nodes, and envelope curves.<br>**Devices:** Small dots indicating automated parameters on device controls.<br>**Track Header:** Dots next to automated parameter names in the track's automation lane dropdown menu. | Primary automation indicator color throughout UI |
 | AutomationGrid | | |
 | AutomationDisabled | | |
 | AutomationMouseOver | | |
@@ -143,17 +143,17 @@ This document tracks which UI controls and visual elements are affected by each 
 | DetailGridTiles | | |
 | GridGuideline | | |
 | OffGridGuideline | | |
-| LoopColor | | |
+| LoopColor | **Arrangement Timeline:** Loop/Punch Recording Region outline at top of timeline; Loop Start/Punch-In point line; Loop End/Punch-Out point line; Locator markers. | Loop region and marker indicators |
 | OffGridLoopColor | | |
 
 ### Waveforms & MIDI
 
 | Parameter | Affected Controls | Notes |
 |-----------|-------------------|-------|
-| WaveformColor | | |
-| DimmedWaveformColor | | |
+| WaveformColor | **Arrangement View:** Waveforms within audio clips; MIDI notes within MIDI clips.<br>**Clip View Selector:** Preview waveform and MIDI notes in the bottom clip overview. | Primary waveform/note display color in clips |
+| DimmedWaveformColor | **Arrangement View:** Waveforms of deactivated audio clips; MIDI notes in deactivated MIDI clips.<br>**Sample Editor:** Waveform display when viewing a deactivated clip. | Waveform color for deactivated/muted clips |
 | VelocityColor | | |
-| VelocitySelectedOrHovered | | |
+| VelocitySelectedOrHovered | **MIDI Editor:** Velocity bar highlight when hovering over a MIDI note; MIDI note highlight when hovering over its velocity bar. | Hover/interaction state for velocity display |
 | NoteProbability | | |
 | MidiNoteMaxVelocity | | |
 | MidiEditorBlackKeyBackground | | |
@@ -185,13 +185,13 @@ This document tracks which UI controls and visual elements are affected by each 
 
 | Parameter | Affected Controls | Notes |
 |-----------|-------------------|-------|
-| RetroDisplayBackground | | |
-| RetroDisplayBackgroundLine | | |
+| RetroDisplayBackground | **Devices:** Primary background color of visual displays on all effect devices (EQ, Compressor, Spectrum, etc.).<br>**Clip View:** Outlines of vertical track volume meters.<br>**Devices:** Background of assignable X-Y control pads. | Main background for retro/LCD-style device displays |
+| RetroDisplayBackgroundLine | **Devices:** Grid lines and outlines on retro display screens; outlines of certain buttons on device displays.<br>**Limiter:** Background of level meters.<br>**Clip View:** Center line in vertical track volume meters; line outline of Content Options button in browser. | Grid/structural lines in device displays |
 | RetroDisplayForeground | | |
 | RetroDisplayForeground2 | | |
 | RetroDisplayForegroundDisabled | | |
 | RetroDisplayGreen | | |
-| RetroDisplayRed | | |
+| RetroDisplayRed | **EQ Eight:** Main EQ curve line; filter activator toggles.<br>**Devices:** Mod buttons on Shaper, Envelope Follower, etc.; value read-outs on some devices.<br>**Reverb:** Curve lines on filter and diffusion sections. | Secondary accent color for device displays (often paired with RetroDisplayGreen) |
 | RetroDisplayHandle1 | | |
 | RetroDisplayHandle2 | | |
 | RetroDisplayScaleText | | |
@@ -391,6 +391,11 @@ These affect derived colors for take lanes and automation:
 ## Investigation Log
 
 Use this section to document findings as parameters are tested:
+
+### 2026-03-13 - Testing Session
+- **Left off at**: `RetroDisplayGreen` (set to #FFFF00 yellow) — not yet spotted in UI
+- **Still active in TEST-Parameter.ask**: RetroDisplayGreen=#FFFF00, RetroDisplayBackgroundLine=#00FF00
+- **Next to test**: RetroDisplayGreen visibility, then remaining Retro Display params, then VelocityColor/MidiNoteMaxVelocity mystery
 
 <!-- Example entry:
 ### 2025-01-25 - ChosenDefault
