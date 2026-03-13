@@ -77,15 +77,19 @@
 .footer-version {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: 0.5vw;
+}
+
+.footer-version .version-value {
+  margin-right: 0.5vw;
 }
 
 .support-link,
 .feedback-link {
   display: flex;
   align-items: center;
-  gap: 0.4vw;
-  padding: 0.6vh 1vw;
+  gap: 0.3vw;
+  padding: 0.5vh 0.7vw;
   color: var(--text-tertiary);
   font-size: clamp(11px, 1.6vh, 14px);
   border: 1px solid var(--border-subtle);
@@ -114,6 +118,116 @@
 
 .feedback-link:hover svg {
   color: #EF4444;
+}
+
+/* ---------------------------------------------------------------------------
+   Holographic Shimmer Effect for Send Love Button
+   --------------------------------------------------------------------------- */
+
+.support-link--shimmer {
+  position: relative;
+  background: linear-gradient(
+    90deg,
+    #FD896C 0%,
+    #9972FA 33%,
+    #69F7A7 66%,
+    #FD896C 100%
+  );
+  background-size: 300% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent !important;
+  animation: holographic-shimmer 2s linear infinite;
+  border-color: rgba(153, 114, 250, 0.4);
+}
+
+.support-link--shimmer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--surface-elevated);
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-out);
+  z-index: -1;
+}
+
+.support-link--shimmer span {
+  background: inherit;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.support-link--shimmer svg {
+  color: transparent;
+}
+
+@keyframes holographic-shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.support-link--shimmer:hover {
+  background: linear-gradient(
+    90deg,
+    #FD896C 0%,
+    #9972FA 33%,
+    #69F7A7 66%,
+    #FD896C 100%
+  );
+  background-size: 300% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent !important;
+  animation-duration: 0.8s;
+  filter: brightness(1.15);
+  border-color: rgba(153, 114, 250, 0.6);
+}
+
+.support-link--shimmer:hover::before {
+  opacity: 1;
+}
+
+.support-link--shimmer:hover span {
+  background: linear-gradient(
+    90deg,
+    #FD896C 0%,
+    #9972FA 33%,
+    #69F7A7 66%,
+    #FD896C 100%
+  );
+  background-size: 300% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent !important;
+}
+
+/* Shimmer text for inline use */
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    #FD896C 0%,
+    #9972FA 33%,
+    #69F7A7 66%,
+    #FD896C 100%
+  );
+  background-size: 300% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: holographic-shimmer 2s linear infinite;
+  cursor: pointer;
+  transition: filter var(--duration-fast) var(--ease-out);
+}
+
+.shimmer-text:hover {
+  animation-duration: 0.8s;
+  filter: brightness(1.15);
 }
 
 .version-value {

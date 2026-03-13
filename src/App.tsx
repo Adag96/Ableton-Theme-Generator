@@ -378,7 +378,7 @@ function AppContent() {
 
       <footer className="app-footer">
         <p className="footer-credit">
-          Made by <strong>Lonebody</strong>
+          Made <a href="https://ko-fi.com/lonebody" target="_blank" rel="noopener noreferrer" className="shimmer-text" title="Support this project on Ko-fi">With Love</a> by <strong>Lonebody</strong>
           <span className="footer-socials">
             <a
               href="https://www.instagram.com/lonebody/"
@@ -405,18 +405,7 @@ function AppContent() {
           </span>
         </p>
         <div className="footer-version">
-          <a
-            href="https://ko-fi.com/lonebody"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="support-link"
-            title="Support this project on Ko-fi"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.011 3.976-4.011 3.976s-.121.119-.31.023c-.076-.057-.108-.09-.108-.09-.443-.441-3.368-3.049-4.034-3.954-.709-.965-1.041-2.7-.091-3.71.951-1.01 3.005-1.086 4.363.407 0 0 1.565-1.782 3.468-.963 1.904.82 1.832 3.011.723 4.311zm6.173.478c-.928.116-1.682.028-1.682.028V7.284h1.77s1.971.551 1.971 2.638c0 1.913-.985 2.667-2.059 3.015z"/>
-            </svg>
-            <span>Send Love</span>
-          </a>
+          <span className="version-value">v{version}</span>
           <button
             className="feedback-link"
             onClick={() => setShowFeedbackModal(true)}
@@ -428,7 +417,31 @@ function AppContent() {
             </svg>
             <span>Feedback</span>
           </button>
-          <span className="version-value">v{version}</span>
+          <a
+            href="https://ko-fi.com/lonebody"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="support-link support-link--shimmer"
+            title="Support this project on Ko-fi"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24">
+              <defs>
+                <linearGradient id="holographic-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#FD896C">
+                    <animate attributeName="stop-color" values="#FD896C;#9972FA;#69F7A7;#FD896C" dur="2s" repeatCount="indefinite"/>
+                  </stop>
+                  <stop offset="50%" stopColor="#9972FA">
+                    <animate attributeName="stop-color" values="#9972FA;#69F7A7;#FD896C;#9972FA" dur="2s" repeatCount="indefinite"/>
+                  </stop>
+                  <stop offset="100%" stopColor="#69F7A7">
+                    <animate attributeName="stop-color" values="#69F7A7;#FD896C;#9972FA;#69F7A7" dur="2s" repeatCount="indefinite"/>
+                  </stop>
+                </linearGradient>
+              </defs>
+              <path fill="url(#holographic-gradient)" d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.011 3.976-4.011 3.976s-.121.119-.31.023c-.076-.057-.108-.09-.108-.09-.443-.441-3.368-3.049-4.034-3.954-.709-.965-1.041-2.7-.091-3.71.951-1.01 3.005-1.086 4.363.407 0 0 1.565-1.782 3.468-.963 1.904.82 1.832 3.011.723 4.311zm6.173.478c-.928.116-1.682.028-1.682.028V7.284h1.77s1.971.551 1.971 2.638c0 1.913-.985 2.667-2.059 3.015z"/>
+            </svg>
+            <span>Support Me</span>
+          </a>
         </div>
       </footer>
     </div>
