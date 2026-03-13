@@ -49,7 +49,7 @@ export function useThemeLibrary() {
 
   const updateTheme = useCallback(async (
     id: string,
-    updates: Partial<Pick<SavedTheme, 'colors' | 'tone' | 'contrastLevel' | 'previewImagePath' | 'roleLocations' | 'originalColors' | 'moodSliders'>>
+    updates: Partial<Pick<SavedTheme, 'colors' | 'tone' | 'contrastLevel' | 'hueInjection' | 'previewImagePath' | 'roleLocations' | 'originalColors' | 'moodSliders'>>
   ): Promise<{ success: boolean; error?: string }> => {
     const theme = library.themes.find(t => t.id === id);
     if (!theme) return { success: false, error: 'Theme not found' };
@@ -70,6 +70,7 @@ export function useThemeLibrary() {
         accent_primary: updatedTheme.colors.accent_primary,
         accent_secondary: updatedTheme.colors.accent_secondary,
         contrastLevel: updatedTheme.contrastLevel,
+        hueInjection: updatedTheme.hueInjection,
       };
 
       const themeData = generateTheme(roles);
@@ -140,6 +141,7 @@ export function useThemeLibrary() {
       accent_primary: theme.colors.accent_primary,
       accent_secondary: theme.colors.accent_secondary,
       contrastLevel: theme.contrastLevel,
+      hueInjection: theme.hueInjection,
     };
 
     // Generate theme data and XML

@@ -1,9 +1,10 @@
 # Work Log
 
-## 2026-3-13 13:28
+## 2026-3-13 14:27
 - Redesigned theme creation view: 'Import Image' and 'Make One For Me' buttons now scale proportionally with window size
 - Renamed random theme generator button to 'Make One For Me' with subtitle 'Generate a theme algorithmically'
 - Window now resizes proportionally (3:2 ratio) and remembers size/position between sessions
+- Hue Injection settings (enabled state and strength) now persist when saving themes and restore correctly when editing
 
 
 ## 2026-3-12 19:38

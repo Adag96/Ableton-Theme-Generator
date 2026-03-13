@@ -191,6 +191,10 @@ function AppContent() {
         roleLocations: palette.roleLocations,
         originalColors,
         moodSliders: palette.moodSliders,
+        hueInjection: palette.roles.hueInjection ? {
+          enabled: palette.roles.hueInjection.enabled,
+          strength: palette.roles.hueInjection.strength ?? 0.5,
+        } : undefined,
       });
 
       if (result.success) {
@@ -267,6 +271,10 @@ function AppContent() {
             isInstalled: true,
             originalColors,
             moodSliders: pendingTheme.palette.moodSliders,
+            hueInjection: pendingTheme.palette.roles.hueInjection ? {
+              enabled: pendingTheme.palette.roles.hueInjection.enabled,
+              strength: pendingTheme.palette.roles.hueInjection.strength ?? 0.5,
+            } : undefined,
           };
 
           await addTheme(savedTheme);

@@ -154,6 +154,9 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
     // Restore slider positions if saved, else default
     setMood(editingTheme.moodSliders ?? DEFAULT_MOOD);
 
+    // Restore hue injection settings if saved
+    setHueInjection(editingTheme.hueInjection ?? { enabled: false, strength: 0.5 });
+
     setRandomPalette(null);
     setActivePickerRole(null);
   }, [editingTheme]);

@@ -1,4 +1,4 @@
-import type { HSL, SemanticColorRoles, ContrastLevel } from '../theme/types';
+import type { HSL, SemanticColorRoles, ContrastLevel, HueInjectionConfig } from '../theme/types';
 
 /** RGB color representation (0-255 per channel) */
 export interface RGB {
@@ -41,8 +41,8 @@ export type RoleLocations = Partial<Record<'surface_base' | 'text_primary' | 'ac
 
 /** Result of palette selection with semantic roles assigned */
 export interface PaletteSelectionResult {
-  /** The 5 required semantic color roles plus optional contrast level */
-  roles: Pick<SemanticColorRoles, 'tone' | 'surface_base' | 'text_primary' | 'accent_primary' | 'accent_secondary'> & { contrastLevel?: ContrastLevel };
+  /** The 5 required semantic color roles plus optional contrast level and hue injection config */
+  roles: Pick<SemanticColorRoles, 'tone' | 'surface_base' | 'text_primary' | 'accent_primary' | 'accent_secondary'> & { contrastLevel?: ContrastLevel; hueInjection?: HueInjectionConfig };
   /** Locations on the source image for each role color (if available) */
   roleLocations: RoleLocations;
   /** All extracted colors for display/debugging */

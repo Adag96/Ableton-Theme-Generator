@@ -15,6 +15,10 @@ export interface SavedTheme {
     accent_secondary: string;
   };
   contrastLevel?: ContrastLevel;
+  hueInjection?: {
+    enabled: boolean;
+    strength: number;
+  };
   previewImagePath?: string; // Path to preview image file (replaces base64 previewImage)
   previewImage?: string; // DEPRECATED: Legacy base64 data URL, migrated to previewImagePath on load
   roleLocations?: RoleLocations;
