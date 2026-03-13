@@ -76,7 +76,8 @@ export function useThemeLibrary() {
       const themeData = generateTheme(roles);
       const xmlContent = generateAskXml(themeData);
 
-      const result = await window.electronAPI?.writeThemeFile(updatedTheme.filePath, xmlContent);
+      // Use update-theme-file (delete+recreate) for better file change detection
+      const result = await window.electronAPI?.updateThemeFile(updatedTheme.filePath, xmlContent);
       if (!result?.success) {
         return { success: false, error: result?.error ?? 'Failed to write theme file' };
       }

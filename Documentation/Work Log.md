@@ -1,10 +1,11 @@
 # Work Log
 
-## 2026-3-13 14:27
+## 2026-3-13 14:48
 - Redesigned theme creation view: 'Import Image' and 'Make One For Me' buttons now scale proportionally with window size
 - Renamed random theme generator button to 'Make One For Me' with subtitle 'Generate a theme algorithmically'
 - Window now resizes proportionally (3:2 ratio) and remembers size/position between sessions
 - Hue Injection settings (enabled state and strength) now persist when saving themes and restore correctly when editing
+- Theme updates now show a toast notification with instructions to switch themes in Ableton Live to see changes
 
 
 ## 2026-3-12 19:38

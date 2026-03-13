@@ -492,6 +492,37 @@ app.whenReady().then(() => {
     }
   });
 
+  // Update theme file with delete+recreate pattern (for better file change detection by Ableton)
+  ipcMain.handle('update-theme-file', async (_event, filePath: string, xmlContent: string) => {
+    try {
+      // Safety check: only update .ask files within the themes directory
+      const themesDir = detectAbletonThemesDirectory();
+      if (!themesDir.found || !themesDir.path) {
+        return { success: false, error: 'Themes directory not found' };
+      }
+      const normalizedPath = path.normalize(filePath);
+      const normalizedThemesDir = path.normalize(themesDir.path);
+      if (!normalizedPath.startsWith(normalizedThemesDir) || !normalizedPath.endsWith('.ask')) {
+        return { success: false, error: 'Invalid file path' };
+      }
+
+      // Verify file exists before attempting update
+      if (!fs.existsSync(filePath)) {
+        return { success: false, error: 'Theme file not found' };
+      }
+
+      // Delete existing file first, then write new content
+      // This ensures Ableton detects the file change
+      fs.unlinkSync(filePath);
+      fs.writeFileSync(filePath, xmlContent, 'utf8');
+
+      return { success: true };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      return { success: false, error: errorMessage };
+    }
+  });
+
   // Read .ask file content as UTF-8 text (used for uploading to community gallery)
   ipcMain.handle('read-theme-file-as-text', async (_event, filePath: string) => {
     try {

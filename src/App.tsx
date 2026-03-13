@@ -14,6 +14,7 @@ import { AuthProvider, useAuth } from './hooks/useAuth';
 import { AccentProvider } from './hooks/useAccentColors';
 import { AppThemeProvider } from './hooks/useAppTheme';
 import { CommunityThemesProvider } from './hooks/useCommunityThemes';
+import { ToastProvider, useToast } from './components/ToastProvider';
 import type { ImageFileResult } from './electron';
 import type { PaletteSelectionResult } from './extraction';
 import type { SavedTheme } from './types/theme-library';
@@ -42,6 +43,7 @@ function AppContent() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const { user } = useAuth();
+  const { showToast } = useToast();
   const {
     library,
     addTheme,
@@ -201,8 +203,10 @@ function AppContent() {
         setEditingTheme(null);
         setImportedImage(null);
         setCurrentView('my-themes');
+        showToast('Theme updated! Switch themes in Ableton Live to see your changes.', 'success', 6000);
       } else {
         console.error('Failed to update theme:', result.error);
+        showToast(result.error ?? 'Failed to update theme', 'error');
       }
       return;
     }
@@ -436,7 +440,9 @@ function App() {
       <AuthProvider>
         <CommunityThemesProvider>
           <AccentProvider>
-            <AppContent />
+            <ToastProvider>
+              <AppContent />
+            </ToastProvider>
           </AccentProvider>
         </CommunityThemesProvider>
       </AuthProvider>

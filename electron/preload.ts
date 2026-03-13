@@ -31,6 +31,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('check-file-exists', filePath),
   writeThemeFile: (filePath: string, xmlContent: string) =>
     ipcRenderer.invoke('write-theme-file', filePath, xmlContent),
+  updateThemeFile: (filePath: string, xmlContent: string) =>
+    ipcRenderer.invoke('update-theme-file', filePath, xmlContent),
   deleteLibraryThemeFile: (filePath: string) =>
     ipcRenderer.invoke('delete-library-theme-file', filePath),
   readThemeFileAsText: (filePath: string) =>
