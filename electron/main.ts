@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, shell, screen } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
@@ -7,6 +7,40 @@ import { execSync } from 'child_process';
 const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
 
 let mainWindow: BrowserWindow | null = null;
+
+// User preferences persistence
+const preferencesPath = path.join(app.getPath('userData'), 'preferences.json');
+
+interface WindowBounds {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+interface Preferences {
+  lastImageDir?: string;
+  windowBounds?: WindowBounds;
+}
+
+function loadPreferences(): Preferences {
+  try {
+    if (fs.existsSync(preferencesPath)) {
+      return JSON.parse(fs.readFileSync(preferencesPath, 'utf8'));
+    }
+  } catch (error) {
+    console.error('Error loading preferences:', error);
+  }
+  return {};
+}
+
+function savePreferences(prefs: Preferences) {
+  try {
+    fs.writeFileSync(preferencesPath, JSON.stringify(prefs, null, 2), 'utf8');
+  } catch (error) {
+    console.error('Error saving preferences:', error);
+  }
+}
 
 function getBuildNumber(): string {
   try {
@@ -73,13 +107,44 @@ function createWindow() {
   const isMac = process.platform === 'darwin';
   const isWin = process.platform === 'win32';
 
+  // Load saved window bounds or use defaults
+  const prefs = loadPreferences();
+  const defaultBounds = { width: 1200, height: 800 };
+  let bounds = prefs.windowBounds || defaultBounds;
+
+  // Validate bounds are within current display area
+  const displays = screen.getAllDisplays();
+  const isOnScreen = displays.some(display => {
+    const { x, y, width, height } = display.bounds;
+    return bounds.x !== undefined &&
+           bounds.y !== undefined &&
+           bounds.x >= x - 100 &&
+           bounds.x < x + width &&
+           bounds.y >= y - 100 &&
+           bounds.y < y + height;
+  });
+
+  // If saved position is off-screen, center on primary display
+  if (!isOnScreen || bounds.x === undefined || bounds.y === undefined) {
+    const primaryDisplay = screen.getPrimaryDisplay();
+    const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
+    bounds = {
+      width: bounds.width || defaultBounds.width,
+      height: bounds.height || defaultBounds.height,
+      x: Math.round((screenWidth - (bounds.width || defaultBounds.width)) / 2),
+      y: Math.round((screenHeight - (bounds.height || defaultBounds.height)) / 2),
+    };
+  }
+
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    x: bounds.x,
+    y: bounds.y,
+    width: bounds.width,
+    height: bounds.height,
     minWidth: 1000,
-    minHeight: 750,
+    minHeight: 667,  // 1000 / 1.5 = 667 (3:2 ratio)
     maxWidth: 1600,
-    maxHeight: 1000,
+    maxHeight: 1067, // 1600 / 1.5 = 1067 (3:2 ratio)
     frame: false,
     transparent: isMac, // Only on macOS for proper vibrancy
     backgroundColor: isWin ? '#f0f0f5' : undefined, // Fallback for Windows
@@ -93,6 +158,26 @@ function createWindow() {
       nodeIntegration: false,
     },
   });
+
+  // Lock to 3:2 aspect ratio
+  mainWindow.setAspectRatio(1.5);
+
+  // Debounced save on resize/move
+  let saveTimeout: NodeJS.Timeout | null = null;
+  const saveWindowBounds = () => {
+    if (saveTimeout) clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+      if (mainWindow && !mainWindow.isMaximized()) {
+        const currentBounds = mainWindow.getBounds();
+        const currentPrefs = loadPreferences();
+        currentPrefs.windowBounds = currentBounds;
+        savePreferences(currentPrefs);
+      }
+    }, 500);
+  };
+
+  mainWindow.on('resize', saveWindowBounds);
+  mainWindow.on('moved', saveWindowBounds);
 
   if (VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(VITE_DEV_SERVER_URL);
@@ -282,28 +367,6 @@ app.whenReady().then(() => {
 
   // Theme library persistence
   const themeLibraryPath = path.join(app.getPath('userData'), 'theme-library.json');
-
-  // User preferences persistence
-  const preferencesPath = path.join(app.getPath('userData'), 'preferences.json');
-
-  function loadPreferences(): { lastImageDir?: string } {
-    try {
-      if (fs.existsSync(preferencesPath)) {
-        return JSON.parse(fs.readFileSync(preferencesPath, 'utf8'));
-      }
-    } catch (error) {
-      console.error('Error loading preferences:', error);
-    }
-    return {};
-  }
-
-  function savePreferences(prefs: { lastImageDir?: string }) {
-    try {
-      fs.writeFileSync(preferencesPath, JSON.stringify(prefs, null, 2), 'utf8');
-    } catch (error) {
-      console.error('Error saving preferences:', error);
-    }
-  }
 
   ipcMain.handle('load-theme-library', async () => {
     const defaultLibrary = { version: 1, themes: [] };

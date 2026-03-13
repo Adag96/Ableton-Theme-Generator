@@ -1,8 +1,9 @@
 # Work Log
 
-## 2026-3-13 13:18
+## 2026-3-13 13:28
 - Redesigned theme creation view: 'Import Image' and 'Make One For Me' buttons now scale proportionally with window size
 - Renamed random theme generator button to 'Make One For Me' with subtitle 'Generate a theme algorithmically'
+- Window now resizes proportionally (3:2 ratio) and remembers size/position between sessions
 
 
 ## 2026-3-12 19:38
