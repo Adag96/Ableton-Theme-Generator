@@ -44,7 +44,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex: 1;
+  width: clamp(320px, 50vw, 700px);
+  height: clamp(220px, 35vw, 500px);
   border: 2px dashed var(--surface-border);
   border-radius: var(--radius-lg);
   background: var(--surface-elevated);
@@ -56,6 +57,7 @@
   padding: var(--space-xl);
   position: relative;
   overflow: hidden;
+  align-self: center;
 }
 
 .import-dropzone::before {
@@ -102,6 +104,11 @@
   transition: all var(--duration-normal) var(--ease-out);
 }
 
+.import-dropzone-icon svg {
+  width: 48px;
+  height: 48px;
+}
+
 .import-dropzone:hover .import-dropzone-icon,
 .import-dropzone-active .import-dropzone-icon {
   background: var(--accent-solid);
@@ -144,13 +151,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--space-lg);
+  width: clamp(240px, 35vw, 480px);
+  align-self: center;
 }
 
 .import-divider {
   display: flex;
   align-items: center;
-  width: 200px;
+  width: 100%;
   gap: var(--space-sm);
 }
 
@@ -168,27 +177,53 @@
 }
 
 .import-random-button {
-  display: inline-flex;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: var(--space-sm);
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-lg);
+  width: 100%;
+  height: clamp(80px, 12vw, 140px);
   background: var(--surface-elevated);
   backdrop-filter: var(--blur-subtle);
   -webkit-backdrop-filter: var(--blur-subtle);
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-md);
-  color: var(--text-secondary);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
   cursor: pointer;
-  transition: all var(--duration-fast) var(--ease-out);
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.import-random-button-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.import-random-button-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.import-random-button svg {
+  width: clamp(24px, 3.5vw, 40px);
+  height: clamp(24px, 3.5vw, 40px);
+  color: var(--accent-solid);
+  transition: transform var(--duration-normal) var(--ease-out);
 }
 
 .import-random-button:hover {
   border-color: var(--accent-solid);
-  color: var(--accent-solid);
+  color: var(--text-primary);
+  background: rgba(0, 212, 170, 0.05);
   box-shadow: var(--glow-accent);
   transform: translateY(-1px);
+}
+
+.import-random-button:hover svg {
+  transform: scale(1.15);
 }
 
 .import-random-header {
