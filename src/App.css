@@ -43,7 +43,7 @@
   align-items: center;
   gap: 0.5vw;
   margin: 0;
-  font-size: clamp(10px, 1.4vh, 13px);
+  font-size: clamp(11px, 1.6vh, 14px);
   color: var(--text-secondary);
 }
 
@@ -77,45 +77,47 @@
 .footer-version {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
 }
 
-.feedback-button {
+.support-link,
+.feedback-link {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: var(--space-xs);
-  border: none;
-  background: transparent;
+  gap: 0.4vw;
+  padding: 0.6vh 1vw;
   color: var(--text-tertiary);
+  font-size: clamp(11px, 1.6vh, 14px);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
+  background: transparent;
   cursor: pointer;
   transition: all var(--duration-fast) var(--ease-out);
 }
 
-.feedback-button:hover {
-  color: var(--accent-solid);
+.support-link:hover,
+.feedback-link:hover {
   background: var(--surface-elevated);
-}
-
-.support-link {
-  display: flex;
-  align-items: center;
-  gap: 0.3vw;
-  padding: 0.5vh 0.8vw;
-  color: var(--text-tertiary);
-  font-size: clamp(10px, 1.4vh, 13px);
-  border-radius: var(--radius-sm);
-  transition: all var(--duration-fast) var(--ease-out);
 }
 
 .support-link:hover {
   color: var(--accent-solid);
-  background: var(--surface-elevated);
+}
+
+.support-link:hover svg {
+  color: var(--accent-solid);
+}
+
+.feedback-link:hover {
+  color: #EF4444;
+}
+
+.feedback-link:hover svg {
+  color: #EF4444;
 }
 
 .version-value {
-  font-size: clamp(9px, 1.2vh, 11px);
+  font-size: clamp(11px, 1.5vh, 13px);
   font-weight: var(--font-weight-medium);
   color: var(--text-tertiary);
   font-family: var(--font-family-mono);

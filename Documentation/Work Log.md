@@ -1,12 +1,13 @@
 # Work Log
 
-## 2026-3-13 16:48
+## 2026-3-13 18:20
 - Redesigned theme creation view: 'Import Image' and 'Make One For Me' buttons now scale proportionally with window size
 - Renamed random theme generator button to 'Make One For Me' with subtitle 'Generate a theme algorithmically'
 - Window now resizes proportionally (3:2 ratio) and remembers size/position between sessions
 - Hue Injection settings (enabled state and strength) now persist when saving themes and restore correctly when editing
 - Theme updates now show a toast notification with instructions to switch themes in Ableton Live to see changes
 - Alternate button states (Installed, Uninstall hover, Pending Review) now have consistent visual styling with color-matched glows, thicker borders, and proper visibility in both light and dark app themes
+- Footer buttons improved: 'Send Love' and 'Feedback' now have matching pill styling with text labels, larger icons, and better dark mode visibility
 
 
 ## 2026-3-12 19:38
