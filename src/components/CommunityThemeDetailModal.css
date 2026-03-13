@@ -334,31 +334,31 @@
 }
 
 .community-modal-installed {
-  background: transparent;
-  color: var(--color-success);
-  border-color: rgba(52, 199, 89, 0.3);
-  box-shadow: none;
+  background: rgba(34, 160, 70, 0.18);
+  color: rgb(28, 130, 56);
+  border: 1.5px solid rgba(34, 160, 70, 0.5);
+  box-shadow: var(--glow-success);
 }
 
 .community-modal-installed:hover:not(:disabled) {
-  background: transparent;
-  color: var(--color-success);
-  border-color: rgba(52, 199, 89, 0.3);
-  box-shadow: none;
+  background: rgba(34, 160, 70, 0.25);
+  color: rgb(28, 130, 56);
+  border-color: rgba(34, 160, 70, 0.7);
+  box-shadow: var(--glow-success-strong);
 }
 
 .community-modal-uninstall {
-  background: var(--surface-elevated);
+  background: rgba(255, 59, 48, 0.1);
   color: var(--text-secondary);
-  border-color: var(--surface-border);
+  border: 1.5px solid var(--surface-border);
   box-shadow: none;
 }
 
 .community-modal-uninstall:hover:not(:disabled) {
-  background: rgba(255, 59, 48, 0.1);
+  background: rgba(255, 59, 48, 0.15);
   color: var(--color-error);
-  border-color: var(--color-error);
-  box-shadow: none;
+  border-color: rgba(255, 59, 48, 0.6);
+  box-shadow: var(--glow-error);
 }
 
 /* ---------------------------------------------------------------------------
@@ -436,4 +436,18 @@
   .community-modal-nav-next {
     right: calc(50% - min(30vw, 425px) - 60px);
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Dark Theme Adjustments
+   --------------------------------------------------------------------------- */
+
+[data-theme="dark"] .community-modal-installed {
+  background: rgba(52, 199, 89, 0.2);
+  color: var(--color-success);
+  border-color: rgba(52, 199, 89, 0.6);
+}
+
+[data-theme="dark"] .community-modal-uninstall:hover:not(:disabled) {
+  background: rgba(255, 59, 48, 0.2);
 }

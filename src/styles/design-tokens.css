@@ -54,6 +54,14 @@
   --glow-inner: inset 0 0 30px var(--accent-glow);
   --glow-inner-subtle: inset 0 0 20px rgba(0, 212, 170, 0.15);
 
+  /* Semantic state glows */
+  --glow-success: 0 0 16px rgba(52, 199, 89, 0.5);
+  --glow-success-strong: 0 0 24px rgba(52, 199, 89, 0.6);
+  --glow-error: 0 0 16px rgba(255, 59, 48, 0.5);
+  --glow-error-strong: 0 0 24px rgba(255, 59, 48, 0.6);
+  --glow-warning: 0 0 16px rgba(255, 179, 0, 0.5);
+  --glow-warning-strong: 0 0 24px rgba(255, 179, 0, 0.6);
+
   /* ---------------------------------------------------------------------------
      Blur
      Frosted glass effects using backdrop-filter
@@ -186,6 +194,14 @@
   --shadow-inset: inset 0 2px 8px rgba(0, 0, 0, 0.2);
 
   --glow-inner-subtle: inset 0 0 20px rgba(0, 212, 170, 0.2);
+
+  /* Semantic state glows - more pronounced in dark mode */
+  --glow-success: 0 0 20px rgba(52, 199, 89, 0.6);
+  --glow-success-strong: 0 0 28px rgba(52, 199, 89, 0.7);
+  --glow-error: 0 0 20px rgba(255, 59, 48, 0.6);
+  --glow-error-strong: 0 0 28px rgba(255, 59, 48, 0.7);
+  --glow-warning: 0 0 20px rgba(255, 179, 0, 0.6);
+  --glow-warning-strong: 0 0 28px rgba(255, 179, 0, 0.7);
 
   /* ---------------------------------------------------------------------------
      Background

@@ -131,27 +131,30 @@
 }
 
 .theme-card-action-installed {
-  background: transparent;
-  color: var(--color-success);
-  border: 1px solid rgba(52, 199, 89, 0.3);
+  background: rgba(34, 160, 70, 0.18);
+  color: rgb(28, 130, 56);
+  border: 1.5px solid rgba(34, 160, 70, 0.5);
+  box-shadow: var(--glow-success);
 }
 
 .theme-card-action-installed:hover:not(:disabled) {
-  background: transparent;
-  color: var(--color-success);
-  border-color: rgba(52, 199, 89, 0.3);
+  background: rgba(34, 160, 70, 0.25);
+  color: rgb(28, 130, 56);
+  border-color: rgba(34, 160, 70, 0.7);
+  box-shadow: var(--glow-success-strong);
 }
 
 .theme-card-action-uninstall {
-  background: transparent;
+  background: rgba(255, 59, 48, 0.1);
   color: var(--text-secondary);
-  border: 1px solid var(--surface-border);
+  border: 1.5px solid var(--surface-border);
 }
 
 .theme-card-action-uninstall:hover:not(:disabled) {
-  background: rgba(255, 59, 48, 0.1);
+  background: rgba(255, 59, 48, 0.15);
   color: var(--color-error);
-  border-color: var(--color-error);
+  border-color: rgba(255, 59, 48, 0.6);
+  box-shadow: var(--glow-error);
 }
 
 .theme-card-delete {
@@ -203,4 +206,18 @@
   background: var(--accent-solid);
   color: var(--text-inverse);
   border-color: var(--accent-solid);
+}
+
+/* ---------------------------------------------------------------------------
+   Dark Theme Adjustments
+   --------------------------------------------------------------------------- */
+
+[data-theme="dark"] .theme-card-action-installed {
+  background: rgba(52, 199, 89, 0.2);
+  color: var(--color-success);
+  border-color: rgba(52, 199, 89, 0.6);
+}
+
+[data-theme="dark"] .theme-card-action-uninstall:hover:not(:disabled) {
+  background: rgba(255, 59, 48, 0.2);
 }
