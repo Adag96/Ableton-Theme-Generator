@@ -1,8 +1,10 @@
 # Work Log
 
-## 2026-3-15 00:20
+## 2026-3-15 00:28
 - Documented 7 more Ableton theme parameters: RetroDisplayGreen, RetroDisplayHandle1, RetroDisplayHandle2, ControlOnForeground, ControlOffForeground, ViewControlOn, ViewControlOff
 - Updated hue injection research with new candidate parameters (WaveformColor, LoopColor, AutomationColor, etc.) and design decision to keep base algorithm faithful to Ableton's conventions
+- Documented 2 more parameters: GridLineBase, ArrangementRulerMarkings
+- Created tiered implementation plan for expanding hue injection to waveforms, timeline markers, grid, and browser elements
 
 
 ## 2026-3-13 21:50

@@ -136,9 +136,9 @@ This document tracks which UI controls and visual elements are affected by each 
 
 | Parameter | Affected Controls | Notes |
 |-----------|-------------------|-------|
-| ArrangementRulerMarkings | | |
+| ArrangementRulerMarkings | **Arrangement View:** Time Ruler markers and numbers; Beat-Time Ruler markers and numbers. | Ruler text and tick marks |
 | DetailViewRulerMarkings | | |
-| GridLineBase | | |
+| GridLineBase | **Arrangement View:** Main gridlines (visibility depends on user's gridline intensity preference in Ableton settings). | Primary grid color |
 | ArrangerGridTiles | | |
 | DetailGridTiles | | |
 | GridGuideline | | |
@@ -392,10 +392,13 @@ These affect derived colors for take lanes and automation:
 
 Use this section to document findings as parameters are tested:
 
+### 2026-03-15 - Testing Session
+- **Left off at**: GridGuideline (#00FF00 green) and DetailViewRulerMarkings (#00FFFF cyan) — not yet spotted
+- **Still active in TEST-Parameter.ask**: GridLineBase=#FF00FF54, GridGuideline=#00FF00, ArrangementRulerMarkings=#FFFF00, DetailViewRulerMarkings=#00FFFF
+- **Unsolved mysteries**: VelocityColor, MidiNoteMaxVelocity, RetroDisplayHandle2 — never found in testing
+
 ### 2026-03-13 - Testing Session
-- **Left off at**: `RetroDisplayGreen` (set to #FFFF00 yellow) — not yet spotted in UI
-- **Still active in TEST-Parameter.ask**: RetroDisplayGreen=#FFFF00, RetroDisplayBackgroundLine=#00FF00
-- **Next to test**: RetroDisplayGreen visibility, then remaining Retro Display params, then VelocityColor/MidiNoteMaxVelocity mystery
+- Completed testing of RetroDisplayGreen, RetroDisplayHandle1, ControlOnForeground, ControlOffForeground, ViewControlOn, ViewControlOff
 
 <!-- Example entry:
 ### 2025-01-25 - ChosenDefault

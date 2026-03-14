@@ -371,6 +371,123 @@ From manual parameter mapping session, identified high-impact parameters that ar
 
 ---
 
+### Phase 1C: Expanded Hue Injection Implementation Plan
+
+**Goal:** Add new parameter targets to hue injection in a controlled, aesthetic way. Each tier adds more color expressiveness, scaled by the existing strength slider.
+
+#### Design Principles
+
+1. **Accent hue, not interpolation** — Use the exact hue from `accent_primary` or `accent_secondary`, never blend hues (avoids "mystery colors")
+2. **Preserve lightness relationships** — Keep the same relative lightness as the original neutral value
+3. **Scale saturation with strength** — At 0% strength, saturation = 0 (neutral). At 100%, saturation = target max
+4. **Group related parameters** — Parameters that appear together visually should share the same hue source
+5. **Tier by visibility** — Most visible changes first, subtle refinements later
+
+---
+
+#### Tier 1: Arrangement Waveforms & Notes (Highest Impact)
+
+**Parameters:**
+| Parameter | Hue Source | Saturation Range | Lightness | Notes |
+|-----------|------------|------------------|-----------|-------|
+| `WaveformColor` | `accent_primary` | 0-15% | ~10% (dark) | Low saturation to avoid overwhelming clips |
+| `DimmedWaveformColor` | `accent_primary` | 0-10% | ~40% | Deactivated clips, slightly lighter |
+
+**Why accent_primary:** Waveforms are the "content" of the arrangement — they should match the primary theme color, not the secondary accent.
+
+**Implementation:**
+```ts
+// In generateTheme() parameter overrides section
+if (hueInjection.enabled) {
+  const waveformSat = hueInjection.strength * 0.15; // max 15%
+  parameters.WaveformColor = oklchToHex({
+    l: 0.10,
+    c: waveformSat,
+    h: accentPrimaryHue,
+    alpha: 0.94 // preserve original alpha
+  });
+}
+```
+
+**Test criteria:**
+- Clips should feel "tinted" not "colored"
+- Still readable against clip backgrounds
+- Deactivated clips should be obviously dimmed but cohesive
+
+---
+
+#### Tier 2: Timeline & Navigation (High Visibility)
+
+**Parameters:**
+| Parameter | Hue Source | Saturation Range | Lightness | Notes |
+|-----------|------------|------------------|-----------|-------|
+| `LoopColor` | `accent_secondary` | 0-25% | ~57% | Loop brace, locators |
+| `ArrangementRulerMarkings` | `accent_secondary` | 0-15% | ~57% | Time ruler text/ticks |
+| `GridLineBase` | `accent_secondary` | 0-8% | ~3% | Very subtle grid tint |
+
+**Why accent_secondary:** These are "structural" elements that frame the content — secondary accent keeps them distinct from waveforms.
+
+**Test criteria:**
+- Loop region should feel themed but not distracting
+- Grid should be barely perceptible color, mostly just structural
+- Ruler marks should remain highly legible
+
+---
+
+#### Tier 3: Device Displays (Medium Impact)
+
+**Parameters already implemented:**
+- `SpectrumDefaultColor` — ✅ Done
+- `detail_bg`, `surface_highlight`, `control_bg` — ✅ Done (resolved roles)
+
+**New parameters to add:**
+| Parameter | Hue Source | Saturation Range | Lightness | Notes |
+|-----------|------------|------------------|-----------|-------|
+| `RetroDisplayHandle1` | `accent_primary` | 100% (no scaling) | Match accent | EQ nodes, filter handles — should be accent color directly |
+| `RetroDisplayRed` | `accent_secondary` | 100% (no scaling) | Match accent | EQ curves, mod buttons — secondary accent directly |
+
+**Note:** These are already accent-derived in our parameter map, but we should verify they're correctly following the extracted accents, not hardcoded.
+
+---
+
+#### Tier 4: Browser & UI Polish (Lower Priority)
+
+**Parameters:**
+| Parameter | Hue Source | Saturation Range | Lightness | Notes |
+|-----------|------------|------------------|-----------|-------|
+| `BrowserSampleWaveform` | `accent_primary` | 0-20% | ~53% | Waveform previews in browser |
+| `VelocitySelectedOrHovered` | `selection_bg` | Direct use | Match selection | MIDI note hover state |
+
+---
+
+#### Implementation Order
+
+| Step | Parameters | Estimated Effort | Test Focus |
+|------|------------|------------------|------------|
+| 1 | `WaveformColor`, `DimmedWaveformColor` | 30 min | Clip readability, cohesion |
+| 2 | `LoopColor`, `ArrangementRulerMarkings` | 20 min | Timeline legibility |
+| 3 | `GridLineBase` | 10 min | Subtlety check |
+| 4 | `BrowserSampleWaveform` | 10 min | Browser cohesion |
+| 5 | `VelocitySelectedOrHovered` | 10 min | MIDI editing feel |
+| 6 | Verify `RetroDisplayHandle1`, `RetroDisplayRed` | 15 min | Already accent-derived? |
+
+**Total estimated time:** ~1.5 hours for full implementation + testing
+
+---
+
+#### Rollback Safety
+
+Each parameter override should be wrapped in a conditional:
+```ts
+if (hueInjection.enabled && hueInjection.strength > 0) {
+  // apply override
+}
+```
+
+At strength = 0, all parameters remain at their baseline (Ableton-faithful) values.
+
+---
+
 ### Phase 2: Integrate into Continuous Slider
 
 Once both approaches are validated independently, wire them into a single slider control.
