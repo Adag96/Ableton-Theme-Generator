@@ -44,8 +44,8 @@ This document tracks which UI controls and visual elements are affected by each 
 | Parameter | Affected Controls | Notes |
 |-----------|-------------------|-------|
 | ControlForeground | **General:** Primary text/icon color for most non-button UI elements.<br>**Transport Bar:** Arrangement Record button (active state only).<br>**Tracks:** Most text on tracks that isn't on a button.<br>**Browser:** All text and icons (except unavailable locations and section headers like 'Library', 'Places'), search field input text, search clear button, collection text.<br>**Devices:** Titles, knob labels, parameter values, dropdown text, value sliders - anything not on buttons or retro displays. "Drop Audio Effects Here" placeholder text.<br>**Info View:** All text and header.<br>**Settings:** Most text in settings panels (not the category sidebar). | Very widely used for general UI text |
-| ControlOnForeground | | |
-| ControlOffForeground | | |
+| ControlOnForeground | **Devices:** Text of buttons/toggles when in active/enabled state.<br>**Tracks:** Text of track activator, solo, arm, monitoring modes when active.<br>**Transport Bar:** Text of most features when enabled/active.<br>**Status Bar:** Text when alerts or messages are shown. | Text/icon color for controls in "on" state |
+| ControlOffForeground | **Browser:** Text of inactive filter buttons; Browse Back/Forward arrows; Filter View Menu dropdown arrow.<br>**Tracks:** Text of inactive Solo, track activator, monitoring modes.<br>**Transport:** Play button icon when stopped; Stop button icon (always).<br>**Arrangement:** Optimize Arrangement Height/Width buttons when inactive.<br>**Devices:** Text of all device buttons in inactive state (when device is enabled).<br>**Bottom Bar:** Clip View Toggle and Device View Toggle arrow icons when inactive.<br>**Transport Bar:** Automation Mode button icon when inactive. | Text/icon color for controls in "off" state |
 | ControlOnDisabledForeground | | |
 | ControlOffDisabledForeground | | |
 | ControlOnAlternativeForeground | | |
@@ -60,8 +60,8 @@ This document tracks which UI controls and visual elements are affected by each 
 
 | Parameter | Affected Controls | Notes |
 |-----------|-------------------|-------|
-| ViewControlOn | | |
-| ViewControlOff | | |
+| ViewControlOn | **View Toggles:** Show/Hide Info View button when enabled; Mixer View Toggle when enabled; Session/Arrangement view selectors when active.<br>**Bottom Bar:** Device View Toggle and Clip View Toggle background when enabled. | Background/icon color for view toggle buttons in "on" state |
+| ViewControlOff | **View Toggles:** Show/Hide Browser button when disabled; Session/Arrangement view selectors when inactive. | Background/icon color for view toggle buttons in "off" state |
 | ViewCheckControlEnabledOn | | |
 | ViewCheckControlEnabledOff | | |
 | ViewCheckControlDisabledOn | | |
@@ -190,10 +190,10 @@ This document tracks which UI controls and visual elements are affected by each 
 | RetroDisplayForeground | | |
 | RetroDisplayForeground2 | | |
 | RetroDisplayForegroundDisabled | | |
-| RetroDisplayGreen | | |
+| RetroDisplayGreen | **Operator:** Certain value displays (limited use). | Rarely visible — only found in specific Operator device elements |
 | RetroDisplayRed | **EQ Eight:** Main EQ curve line; filter activator toggles.<br>**Devices:** Mod buttons on Shaper, Envelope Follower, etc.; value read-outs on some devices.<br>**Reverb:** Curve lines on filter and diffusion sections. | Secondary accent color for device displays (often paired with RetroDisplayGreen) |
-| RetroDisplayHandle1 | | |
-| RetroDisplayHandle2 | | |
+| RetroDisplayHandle1 | **EQ Eight:** Draggable node handles.<br>**Auto Filter/Reverb:** Filter node handles.<br>**X-Y Pads:** Handle on Erosion, 3rd party plugin modules, etc.<br>**Operator:** ADSR envelope nodes (and likely other ADSR controls). | Primary handle color for interactive nodes on device displays |
+| RetroDisplayHandle2 | Unknown — not visibly identified in testing. | May be deprecated or context-specific |
 | RetroDisplayScaleText | | |
 | RetroDisplayTitle | | |
 | RetroDisplayControlSelectionFrame | | |

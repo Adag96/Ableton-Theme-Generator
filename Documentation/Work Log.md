@@ -1,5 +1,10 @@
 # Work Log
 
+## 2026-3-15 00:20
+- Documented 7 more Ableton theme parameters: RetroDisplayGreen, RetroDisplayHandle1, RetroDisplayHandle2, ControlOnForeground, ControlOffForeground, ViewControlOn, ViewControlOff
+- Updated hue injection research with new candidate parameters (WaveformColor, LoopColor, AutomationColor, etc.) and design decision to keep base algorithm faithful to Ableton's conventions
+
+
 ## 2026-3-13 21:50
 - Redesigned theme creation view: 'Import Image' and 'Make One For Me' buttons now scale proportionally with window size
 - Renamed random theme generator button to 'Make One For Me' with subtitle 'Generate a theme algorithmically'

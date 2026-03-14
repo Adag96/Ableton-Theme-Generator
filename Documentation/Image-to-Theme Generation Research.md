@@ -345,6 +345,32 @@ This is likely due to how Ableton renders the spectrum analyzer overlay on light
 
 ---
 
+**New Hue Injection Candidates (2026-03-13):**
+
+From manual parameter mapping session, identified high-impact parameters that are currently neutral/fixed in Ableton's themes but could benefit from hue injection:
+
+| Parameter | Current Derivation | Injection Proposal | Impact |
+|-----------|-------------------|-------------------|--------|
+| `WaveformColor` | `n2_dark` (neutral) | Inject `accent_primary` hue at low saturation | Waveforms in clips take on theme color — **very visible** |
+| `DimmedWaveformColor` | `n9b_mid` (neutral) | Same hue as WaveformColor, lighter | Deactivated clips stay cohesive |
+| `LoopColor` | `n11b_ruler` (neutral gray) | Inject `accent_primary` or `accent_secondary` hue | Loop markers, locators become themed — **highly visible** |
+| `BrowserSampleWaveform` | `n11_mid_high` (neutral) | Inject accent hue | Browser feels more cohesive |
+| `AutomationColor` | Fixed red `#ff4d47` | Derive from `accent_secondary` | Automation lanes match theme — **dramatic change** |
+| `VelocitySelectedOrHovered` | Fixed blue `#5b8cff` | Derive from `selection_bg` or `accent_primary` | MIDI editing feels themed |
+
+**Design Decision (2026-03-13):**
+- Base algorithm stays faithful to Ableton's design patterns (neutral waveforms, gray markers, red automation)
+- Hue injection becomes the opt-in path for creative color variation
+- These new targets will be added to the color variation slider, giving users control over how "expressive" their theme becomes
+
+**Implementation Priority:**
+1. `WaveformColor` + `DimmedWaveformColor` — highest visual impact, affects every clip
+2. `LoopColor` — visible in arrangement view constantly
+3. `AutomationColor` — dramatic but may feel "wrong" to some users (red = automation is ingrained)
+4. `BrowserSampleWaveform` — nice-to-have, less frequently noticed
+
+---
+
 ### Phase 2: Integrate into Continuous Slider
 
 Once both approaches are validated independently, wire them into a single slider control.
