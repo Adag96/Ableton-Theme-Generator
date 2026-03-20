@@ -58,3 +58,12 @@ Each lesson follows this structure:
 **Root cause**: When an `<img>` has `object-fit: contain`, the element's bounding rect includes letterboxed/padded areas where the image isn't actually rendered. `getBoundingClientRect()` returns the full element box, not the visible image content bounds.
 
 **Rule**: When doing precise mouse-to-image-content calculations with `object-fit: contain`, you must manually calculate the actual rendered image bounds using the image's natural dimensions and the container's dimensions. The element's bounding rect alone is insufficient.
+
+---
+
+### 2026-3-20 — Process
+**What happened**: Created a duplicate date header in Work Log instead of appending to the existing one for the same day.
+
+**Root cause**: The /wrap skill says "match date only, ignore time" when checking for existing headers, but I treated `## 2026-3-20 17:09` and `## 2026-3-20 17:31` as different headers instead of recognizing them as the same day.
+
+**Rule**: When updating the Work Log, strip the time portion from headers before comparing dates. `## 2026-3-20 17:09` is the same day as `## 2026-3-20 17:31` — update the timestamp in the existing header and append bullets to its list.
