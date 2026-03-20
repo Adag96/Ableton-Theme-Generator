@@ -1,12 +1,14 @@
 # Work Log
 
-## 2026-3-20 13:40
+## 2026-3-20 14:23
 - Fixed hue injection for WaveformColor and DimmedWaveformColor — waveforms now visibly take on the accent color for both light and dark themes
 - Added hue injection for LoopColor and OffGridLoopColor — loop braces, locators, and timeline markers now take on the secondary accent color
 - Fixed badge formatting in Community Themes detail modal to match My Themes styling (uppercase, letter spacing)
 - Improved theme preview visibility: larger preview images (300px → 400px), wider magnifier loupe (280×160 rectangle), and responsive modal widths that scale with window size
 - Fixed invisible cursor in My Themes preview overlay — cursor now shows when moving outside the magnifier area
 - Email notifications for theme submissions now show user display name instead of raw user ID
+- Tested GridLineBase for hue injection — rejected because colored gridlines can blend with surface colors, reducing visibility
+- Added test theme generation script for comparing hue injection effects across images
 
 
 ## 2026-3-15 00:28

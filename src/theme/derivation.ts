@@ -604,6 +604,10 @@ export function generateTheme(input: SemanticColorRoles): AbletonThemeData {
     const loopColor = hslToHex(secondaryHsl.h, loopS, loopL);
     parameters.LoopColor = loopColor;
     parameters.OffGridLoopColor = withAlpha(loopColor, '4f');
+
+    // NOTE: GridLineBase was tested for hue injection but rejected.
+    // Gridlines can become too similar to surface colors, reducing visibility.
+    // Keeping them neutral preserves their structural/functional role.
   }
 
   const vuMeters = getVuMeters();
