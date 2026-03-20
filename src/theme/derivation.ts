@@ -627,6 +627,23 @@ export function generateTheme(input: SemanticColorRoles): AbletonThemeData {
       : 40 + (strength * 10); // 40-50% — visible against light browser bg
     const browserWaveColor = hslToHex(accentHsl.h, browserWaveS, browserWaveL);
     parameters.BrowserSampleWaveform = browserWaveColor;
+
+    // Tier 4: AutomationColor — automation lines, breakpoints, envelope curves
+    // Uses accent_secondary hue to distinguish from waveforms.
+    // Baseline is red (#ff4d47 dark, #ea3c3c light) — strongly associated with automation.
+    // NOTE: This may feel "wrong" to users since red = automation is ingrained. Testing required.
+    const autoS = 70 + (strength * 20); // 70-90% saturation — needs to be vibrant
+    const autoL = isDark
+      ? 55 + (strength * 10)  // 55-65% — visible against dark backgrounds
+      : 45 + (strength * 5);  // 45-50% — visible against light backgrounds
+    const autoColor = hslToHex(secondaryHsl.h, autoS, autoL);
+    parameters.AutomationColor = autoColor;
+
+    // AutomationMouseOver — hover state for automation, should be lighter/darker variant
+    const autoHoverL = isDark
+      ? autoL + 15  // lighter on dark themes
+      : autoL - 15; // darker on light themes
+    parameters.AutomationMouseOver = hslToHex(secondaryHsl.h, autoS * 0.85, autoHoverL);
   }
 
   const vuMeters = getVuMeters();
