@@ -1,10 +1,11 @@
 # Work Log
 
-## 2026-3-20 13:03
+## 2026-3-20 13:15
 - Fixed hue injection for WaveformColor and DimmedWaveformColor — waveforms now visibly take on the accent color for both light and dark themes
 - Added hue injection for LoopColor and OffGridLoopColor — loop braces, locators, and timeline markers now take on the secondary accent color
 - Fixed badge formatting in Community Themes detail modal to match My Themes styling (uppercase, letter spacing)
 - Improved theme preview visibility: larger preview images (300px → 400px), wider magnifier loupe (280×160 rectangle), and responsive modal widths that scale with window size
+- Fixed invisible cursor in My Themes preview overlay — cursor now shows when moving outside the magnifier area
 
 ## 2026-3-15 00:28
 - Documented 7 more Ableton theme parameters: RetroDisplayGreen, RetroDisplayHandle1, RetroDisplayHandle2, ControlOnForeground, ControlOffForeground, ViewControlOn, ViewControlOff

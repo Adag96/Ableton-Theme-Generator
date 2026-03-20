@@ -134,7 +134,7 @@ export const ImageMagnifier: React.FC<ImageMagnifierProps> = ({
   return (
     <div
       ref={containerRef}
-      className={`image-magnifier-container ${className}`}
+      className={`image-magnifier-container ${className} ${isHovering ? 'magnifier-active' : ''}`}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >

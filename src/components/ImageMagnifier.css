@@ -6,6 +6,9 @@
   position: relative;
   display: flex;
   justify-content: center;
+}
+
+.image-magnifier-container.magnifier-active {
   cursor: none;
 }
 
