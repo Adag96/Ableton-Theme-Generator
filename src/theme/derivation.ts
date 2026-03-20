@@ -555,6 +555,15 @@ export function generateTheme(input: SemanticColorRoles): AbletonThemeData {
 
   const parameters = generateParameters(roles, neutralScale);
 
+  // Fix light theme BrowserSampleWaveform visibility
+  // The neutral scale uses surfaceHsl.l for n11_mid_high, which is too light in light themes.
+  // Override with a darker value that contrasts well against the browser background.
+  if (input.tone === 'light') {
+    const surfaceHsl = hexToHsl(input.surface_base);
+    // Use ~40% lightness for good contrast against light backgrounds (~80% L)
+    parameters.BrowserSampleWaveform = hslToHex(surfaceHsl.h, surfaceHsl.s * 0.4, 40);
+  }
+
   // Apply hue injection overrides for specific parameters
   // This preserves baseline behavior when injection is disabled
   if (input.hueInjection?.enabled) {
