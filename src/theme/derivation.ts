@@ -562,7 +562,7 @@ export function generateTheme(input: SemanticColorRoles): AbletonThemeData {
     const accentHsl = hexToHsl(input.accent_primary);
     const surfaceHsl = hexToHsl(input.surface_base);
 
-    // Only inject if hues are meaningfully different
+    // Hue-shift effects: only apply when accent hue is meaningfully different from surface
     if (hueDistance(accentHsl.h, surfaceHsl.h) >= MIN_INJECTION_HUE_DISTANCE) {
       // SpectrumDefaultColor: spectrum analyzer waveform fill
       // Use accent_primary hue so it relates to EQ nodes
@@ -572,6 +572,25 @@ export function generateTheme(input: SemanticColorRoles): AbletonThemeData {
       const spectrumColor = hslToHex(accentHsl.h, spectrumS, spectrumL);
       parameters.SpectrumDefaultColor = withAlpha(spectrumColor, '9f');
     }
+
+    // Tier 1: Arrangement Waveforms (highest visual impact)
+    // These always apply — even when accent and surface share a hue, the saturation/lightness
+    // boost makes waveforms visibly colored rather than neutral gray.
+    const isDark = input.tone === 'dark';
+    const waveformS = 40 + (strength * 25); // 40-65% saturation
+    const waveformL = isDark
+      ? 20 + (strength * 10)  // 20-30% — lifted from ~9% so hue is visible against dark clip bg
+      : 30 + (strength * 10); // 30-40% — enough contrast on light clip backgrounds
+    const waveformColor = hslToHex(accentHsl.h, waveformS, waveformL);
+    parameters.WaveformColor = withAlpha(waveformColor, 'ef');
+
+    // DimmedWaveformColor: deactivated clips - same hue, lighter, less saturated
+    const dimmedS = 25 + (strength * 15); // 25-40% saturation
+    const dimmedL = isDark
+      ? 35 + (strength * 10)  // 35-45% — visibly lighter than active waveform
+      : 45 + (strength * 10); // 45-55%
+    const dimmedColor = hslToHex(accentHsl.h, dimmedS, dimmedL);
+    parameters.DimmedWaveformColor = withAlpha(dimmedColor, 'df');
   }
 
   const vuMeters = getVuMeters();

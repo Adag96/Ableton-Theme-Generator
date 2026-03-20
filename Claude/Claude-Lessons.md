@@ -43,6 +43,14 @@ Each lesson follows this structure:
 
 **Rule**: When generating test .ask theme files for evaluation in Ableton Live, always output directly to the Ableton themes directory: `/Applications/Ableton Live 12 Suite.app/Contents/App-Resources/Themes/`. This eliminates the extra step of copying files.
 
+### 2026-03-20 | Color | Hue injection parameter overrides must account for neutral scale baseline
+
+**What happened**: WaveformColor hue injection used absolute saturation values (max 15%) that were lower than what the neutral scale already provided from the surface hue (~28%). Also used hardcoded low lightness (9% dark) where saturation is imperceptible. Additionally, the entire override block was behind a hue distance gate (30°+) that blocked injection when accent and surface shared similar hues — even though the saturation/lightness boost was still valuable.
+
+**Root cause**: Three compounding issues: (1) saturation values assumed a neutral gray baseline, but the neutral scale already tints with surface hue; (2) HSL saturation is invisible at very low lightness; (3) the hue distance gate was too broad — it blocked effects whose value comes from saturation, not hue shift.
+
+**Rule**: When overriding parameters that derive from the neutral scale, check what the baseline already provides — don't assume neutral gray. Separate hue-shift effects (need hue distance gate) from saturation/lightness effects (should always apply). At HSL lightness below ~15%, saturation is imperceptible regardless of value.
+
 ### 2026-02-23 | UI/UX | object-fit: contain breaks mouse position calculations
 
 **What happened**: Implementing an image magnifier loupe. Mouse tracking worked in the center but "stuck" at left/right/top edges. Multiple fix attempts failed (tolerance, fresh rects, portal rendering).

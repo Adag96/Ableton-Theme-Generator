@@ -462,16 +462,31 @@ if (hueInjection.enabled) {
 
 #### Implementation Order
 
-| Step | Parameters | Estimated Effort | Test Focus |
-|------|------------|------------------|------------|
-| 1 | `WaveformColor`, `DimmedWaveformColor` | 30 min | Clip readability, cohesion |
-| 2 | `LoopColor`, `ArrangementRulerMarkings` | 20 min | Timeline legibility |
-| 3 | `GridLineBase` | 10 min | Subtlety check |
-| 4 | `BrowserSampleWaveform` | 10 min | Browser cohesion |
-| 5 | `VelocitySelectedOrHovered` | 10 min | MIDI editing feel |
-| 6 | Verify `RetroDisplayHandle1`, `RetroDisplayRed` | 15 min | Already accent-derived? |
+| Step | Parameters | Estimated Effort | Test Focus | Status |
+|------|------------|------------------|------------|--------|
+| 1 | `WaveformColor`, `DimmedWaveformColor` | 30 min | Clip readability, cohesion | ✅ Done (2026-03-15) |
+| 2 | `LoopColor`, `ArrangementRulerMarkings` | 20 min | Timeline legibility | |
+| 3 | `GridLineBase` | 10 min | Subtlety check | |
+| 4 | `BrowserSampleWaveform` | 10 min | Browser cohesion | |
+| 5 | `VelocitySelectedOrHovered` | 10 min | MIDI editing feel | |
+| 6 | Verify `RetroDisplayHandle1`, `RetroDisplayRed` | 15 min | Already accent-derived? | |
 
 **Total estimated time:** ~1.5 hours for full implementation + testing
+
+---
+
+**Step 1 Implementation Notes (2026-03-15, revised 2026-03-20):**
+
+Added to `generateTheme()` in `derivation.ts`:
+- `WaveformColor`: accent_primary hue, S=40-65%, L=20-30% (dark) / 30-40% (light), alpha=ef
+- `DimmedWaveformColor`: accent_primary hue, S=25-40%, L=35-45% (dark) / 45-55% (light), alpha=df
+
+**Revision notes (2026-03-20):** Original implementation had three bugs:
+1. Saturation cap (15%) was below the neutral scale baseline (~28% for saturated surfaces) — injection was actually *desaturating*
+2. Hardcoded lightness at ~9% (dark) made saturation imperceptible — HSL saturation is invisible below ~15% lightness
+3. Waveform overrides were inside the hue distance gate (30°+) — blocked injection when accent/surface shared similar hues, even though the saturation boost was the primary value
+
+Fix: Raised saturation/lightness to values clearly above baseline, and moved waveform overrides outside the hue distance gate. Verified working on both light and dark themes.
 
 ---
 
