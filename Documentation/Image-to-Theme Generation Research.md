@@ -419,11 +419,12 @@ if (hueInjection.enabled) {
 #### Tier 2: Timeline & Navigation (High Visibility)
 
 **Parameters:**
-| Parameter | Hue Source | Saturation Range | Lightness | Notes |
-|-----------|------------|------------------|-----------|-------|
-| `LoopColor` | `accent_secondary` | 0-25% | ~57% | Loop brace, locators |
-| `ArrangementRulerMarkings` | `accent_secondary` | 0-15% | ~57% | Time ruler text/ticks |
-| `GridLineBase` | `accent_secondary` | 0-8% | ~3% | Very subtle grid tint |
+| Parameter | Hue Source | Saturation Range | Lightness | Notes | Status |
+|-----------|------------|------------------|-----------|-------|--------|
+| `LoopColor` | `accent_secondary` | 30-50% | 50-60% (dark), 25-35% (light) | Loop brace, locators | ✅ Done |
+| `OffGridLoopColor` | `accent_secondary` | Same as LoopColor | Same, with 4f alpha | Loop region fill | ✅ Done |
+| `ArrangementRulerMarkings` | `accent_secondary` | 0-15% | ~57% | Time ruler text/ticks | Not tested |
+| `GridLineBase` | `accent_secondary` | 0-8% | ~3% | Very subtle grid tint | ❌ Rejected |
 
 **Why accent_secondary:** These are "structural" elements that frame the content — secondary accent keeps them distinct from waveforms.
 
@@ -431,6 +432,8 @@ if (hueInjection.enabled) {
 - Loop region should feel themed but not distracting
 - Grid should be barely perceptible color, mostly just structural
 - Ruler marks should remain highly legible
+
+**GridLineBase rejection notes (2026-03-20):** Tested with 40-80% saturation and 8-15% lightness. Even with high saturation, colored gridlines can become too similar to surface colors in certain palettes, reducing their visibility as structural elements. Keeping gridlines neutral preserves their functional role.
 
 ---
 
@@ -440,38 +443,69 @@ if (hueInjection.enabled) {
 - `SpectrumDefaultColor` — ✅ Done
 - `detail_bg`, `surface_highlight`, `control_bg` — ✅ Done (resolved roles)
 
-**New parameters to add:**
-| Parameter | Hue Source | Saturation Range | Lightness | Notes |
-|-----------|------------|------------------|-----------|-------|
-| `RetroDisplayHandle1` | `accent_primary` | 100% (no scaling) | Match accent | EQ nodes, filter handles — should be accent color directly |
-| `RetroDisplayRed` | `accent_secondary` | 100% (no scaling) | Match accent | EQ curves, mod buttons — secondary accent directly |
+**Parameters already using accent colors directly (no hue injection needed):**
+| Parameter | Hue Source | Notes |
+|-----------|------------|-------|
+| `RetroDisplayHandle1` | `accent_primary` | EQ nodes, filter handles — already mapped to accent_primary in parameter-map.json |
+| `RetroDisplayRed` | `accent_secondary` | EQ curves, mod buttons — already mapped to accent_secondary in parameter-map.json |
 
-**Note:** These are already accent-derived in our parameter map, but we should verify they're correctly following the extracted accents, not hardcoded.
+**Note (2026-03-20):** These parameters are already correctly mapped to accent colors in the base parameter map, so they don't need special hue injection handling — they automatically use the extracted accents.
 
 ---
 
 #### Tier 4: Browser & UI Polish (Lower Priority)
 
 **Parameters:**
-| Parameter | Hue Source | Saturation Range | Lightness | Notes |
-|-----------|------------|------------------|-----------|-------|
-| `BrowserSampleWaveform` | `accent_primary` | 0-20% | ~53% | Waveform previews in browser |
-| `VelocitySelectedOrHovered` | `selection_bg` | Direct use | Match selection | MIDI note hover state |
+| Parameter | Hue Source | Saturation Range | Lightness | Notes | Status |
+|-----------|------------|------------------|-----------|-------|--------|
+| `BrowserSampleWaveform` | `accent_primary` | 25-50% | 50-60% (dark), 40-50% (light) | Waveform previews in browser | ✅ Done |
+| `AutomationColor` | `accent_secondary` | 70-90% | 55-65% (dark), 45-50% (light) | Automation lines, breakpoints, indicator dots | ✅ Done |
+| `AutomationMouseOver` | `accent_secondary` | ~60-75% | ±15% from AutomationColor | Hover state for automation | ✅ Done |
+| `VelocitySelectedOrHovered` | `selection_bg` | Direct use | Match selection | MIDI note hover state | Not tested |
+
+**BrowserSampleWaveform notes (2026-03-20):** Also added a baseline fix for light themes — the neutral scale's `n11_mid_high` was using surface lightness (~80%), making browser waveforms nearly invisible. Now overridden to ~40% lightness for light themes regardless of hue injection state.
+
+**AutomationColor notes (2026-03-20):** Tested and approved despite red being traditionally associated with automation in Ableton. Users enabling hue injection are consciously trading "clean/conventional" for "expressive/vibey" — the slider makes this tradeoff explicit.
 
 ---
 
 #### Implementation Order
 
-| Step | Parameters | Estimated Effort | Test Focus | Status |
-|------|------------|------------------|------------|--------|
-| 1 | `WaveformColor`, `DimmedWaveformColor` | 30 min | Clip readability, cohesion | ✅ Done (2026-03-15) |
-| 2 | `LoopColor`, `ArrangementRulerMarkings` | 20 min | Timeline legibility | |
-| 3 | `GridLineBase` | 10 min | Subtlety check | |
-| 4 | `BrowserSampleWaveform` | 10 min | Browser cohesion | |
-| 5 | `VelocitySelectedOrHovered` | 10 min | MIDI editing feel | |
-| 6 | Verify `RetroDisplayHandle1`, `RetroDisplayRed` | 15 min | Already accent-derived? | |
+| Step | Parameters | Test Focus | Status |
+|------|------------|------------|--------|
+| 1 | `WaveformColor`, `DimmedWaveformColor` | Clip readability, cohesion | ✅ Done (2026-03-20) |
+| 2 | `LoopColor`, `OffGridLoopColor` | Timeline legibility | ✅ Done (2026-03-20) |
+| 3 | `GridLineBase` | Subtlety check | ❌ Rejected (2026-03-20) |
+| 4 | `BrowserSampleWaveform` | Browser cohesion | ✅ Done (2026-03-20) |
+| 5 | `AutomationColor`, `AutomationMouseOver` | Automation visibility | ✅ Done (2026-03-20) |
+| 6 | `RetroDisplayHandle1`, `RetroDisplayRed` | Already accent-derived | ✅ Already mapped (no injection needed) |
+| 7 | `VelocitySelectedOrHovered` | MIDI editing feel | Not tested |
+| 8 | `ArrangementRulerMarkings` | Ruler legibility | Not tested |
 
-**Total estimated time:** ~1.5 hours for full implementation + testing
+#### Summary of Hue Injection Parameters (as of 2026-03-20)
+
+**Implemented and active:**
+| Parameter | Hue Source | Description |
+|-----------|------------|-------------|
+| `WaveformColor` | `accent_primary` | Arrangement waveforms |
+| `DimmedWaveformColor` | `accent_primary` | Deactivated clip waveforms |
+| `LoopColor` | `accent_secondary` | Loop braces, locators, timeline markers |
+| `OffGridLoopColor` | `accent_secondary` | Loop region fill (with alpha) |
+| `SpectrumDefaultColor` | `accent_primary` | Spectrum analyzer waveform |
+| `BrowserSampleWaveform` | `accent_primary` | Browser waveform previews |
+| `AutomationColor` | `accent_secondary` | Automation lines, breakpoints, indicator dots |
+| `AutomationMouseOver` | `accent_secondary` | Automation hover state |
+
+**Rejected:**
+| Parameter | Reason |
+|-----------|--------|
+| `GridLineBase` | Colored gridlines can blend with surface colors, reducing visibility |
+
+**Not needing injection (already accent-mapped):**
+| Parameter | Existing Mapping |
+|-----------|------------------|
+| `RetroDisplayHandle1` | `accent_primary` |
+| `RetroDisplayRed` | `accent_secondary` |
 
 ---
 
