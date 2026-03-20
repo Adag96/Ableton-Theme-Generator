@@ -1,6 +1,6 @@
 # Work Log
 
-## 2026-3-20 17:31
+## 2026-3-20 20:45
 - Fixed hue injection for WaveformColor and DimmedWaveformColor — waveforms now visibly take on the accent color for both light and dark themes
 - Added hue injection for LoopColor and OffGridLoopColor — loop braces, locators, and timeline markers now take on the secondary accent color
 - Fixed badge formatting in Community Themes detail modal to match My Themes styling (uppercase, letter spacing)
@@ -13,6 +13,11 @@
 - Fixed browser waveform previews being nearly invisible in light themes
 - Added hue injection for AutomationColor — automation lines, breakpoints, and indicator dots now take on the secondary accent color
 - Added generation version tracking — every theme now records which algorithm version created it, stored locally and in the community gallery, to prevent algorithm updates from silently changing existing themes
+- Boosted hue injection saturation ceilings for light themes — light themes now get ~1.4-1.5x saturation compared to dark themes across all hue-injected parameters, compensating for HSL saturation being perceptually weaker at high lightness
+  - `applyAccentHueToSurface()`: light cap raised to accent.s×0.85 / max 70% (was ×0.6 / max 50%)
+  - Neutral scale mid stops: light 30-55% (was 20-40%), high stops: 25-45% (was 15-30%)
+  - Per-parameter overrides: WaveformColor 55-80%, LoopColor 40-65%, BrowserSampleWaveform 35-65%, AutomationColor 80-95%
+  - Dark theme values unchanged
 
 
 ## 2026-3-15 00:28

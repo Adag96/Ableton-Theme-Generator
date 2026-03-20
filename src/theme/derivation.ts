@@ -63,7 +63,12 @@ function hueDistance(h1: number, h2: number): number {
  * @param strength - Blend amount (0 = original surface, 1 = full accent saturation at accent hue)
  * @returns The blended hex color
  */
-function applyAccentHueToSurface(surfaceHex: string, accentHex: string, strength: number): string {
+function applyAccentHueToSurface(
+  surfaceHex: string,
+  accentHex: string,
+  strength: number,
+  isLightTheme: boolean = false,
+): string {
   if (strength <= 0) return surfaceHex;
 
   const surface = hexToHsl(surfaceHex);
@@ -77,8 +82,11 @@ function applyAccentHueToSurface(surfaceHex: string, accentHex: string, strength
   // - At strength 0.5: moderate saturation for subtle tint
   // - At strength 1.0: stronger saturation for visible color
   // Base saturation ensures the hue is visible; strength amplifies it
-  const baseSaturation = 15; // Minimum saturation to make hue visible
-  const maxSaturation = Math.min(accent.s * 0.6, 50); // Cap to avoid garish surfaces
+  // Light themes need higher saturation — HSL saturation is perceptually weaker at high lightness
+  const baseSaturation = isLightTheme ? 20 : 15;
+  const maxSaturation = isLightTheme
+    ? Math.min(accent.s * 0.85, 70)  // Light: higher cap — 50% S at L=80% looks nearly white
+    : Math.min(accent.s * 0.6, 50);  // Dark: original conservative cap
   const newSat = baseSaturation + (maxSaturation - baseSaturation) * strength;
 
   return hslToHex(newHue, newSat, surface.l);
@@ -172,13 +180,14 @@ export function resolveRoles(input: SemanticColorRoles): ResolvedColorRoles {
 
     // Only inject if the accent hue is meaningfully different from surface
     if (hueDistance(accentHsl.h, baseHsl.h) >= MIN_INJECTION_HUE_DISTANCE) {
+      const isLight = !isDark;
       // Apply accent_secondary's hue to surface zones at varying strengths
       // detail_bg: full strength - detail view background
-      injectedDetailBg = applyAccentHueToSurface(detail_bg, input.accent_secondary, strength);
+      injectedDetailBg = applyAccentHueToSurface(detail_bg, input.accent_secondary, strength, isLight);
       // surface_highlight: 60% - hover/selection states
-      injectedHighlight = applyAccentHueToSurface(surface_highlight, input.accent_secondary, strength * 0.6);
+      injectedHighlight = applyAccentHueToSurface(surface_highlight, input.accent_secondary, strength * 0.6, isLight);
       // control_bg: 80% - knob/meter backgrounds
-      injectedControlBg = applyAccentHueToSurface(control_bg, input.accent_secondary, strength * 0.8);
+      injectedControlBg = applyAccentHueToSurface(control_bg, input.accent_secondary, strength * 0.8, isLight);
       // NOTE: surface_border tested but results inconsistent — bookmarked for later
     }
   }
@@ -252,16 +261,23 @@ export function buildNeutralScale(roles: ResolvedColorRoles, options?: NeutralSc
 
   // Saturation ramp: deep stops (n0–n2) get more saturation for visible tinting,
   // mid stops (n9–n9b) get less, and high-mid stops (n11–n11b) are near-neutral.
-  const sDeep = Math.min(surfaceHsl.s * 1.4, 70); // n0–n2: panel backs — colorful
-  const sSurf = surfaceHsl.s;                      // n3–n8: surface zone — as-is
+  // Light themes need higher saturation — HSL saturation is perceptually weaker at high lightness
+  const sDeep = isDark
+    ? Math.min(surfaceHsl.s * 1.4, 70)   // n0–n2: panel backs — colorful
+    : Math.min(surfaceHsl.s * 2.0, 80);  // Light: stronger boost needed at high lightness
+  const sSurf = surfaceHsl.s;            // n3–n8: surface zone — as-is
   // When injecting, boost mid saturation so the hue is visible in waveforms
   const sMidBase = surfaceHsl.s * 0.45;
   const sMid = hMid !== hSurface
-    ? Math.max(sMidBase, 20 + (injectionStrength * 20)) // 20-40% when injecting
+    ? (isDark
+      ? Math.max(sMidBase, 20 + (injectionStrength * 20))  // Dark: 20-40% when injecting
+      : Math.max(sMidBase, 30 + (injectionStrength * 25))) // Light: 30-55% when injecting
     : sMidBase;
   const sHighBase = surfaceHsl.s * 0.20;
   const sHigh = hMid !== hSurface
-    ? Math.max(sHighBase, 15 + (injectionStrength * 15)) // 15-30% when injecting
+    ? (isDark
+      ? Math.max(sHighBase, 15 + (injectionStrength * 15))  // Dark: 15-30% when injecting
+      : Math.max(sHighBase, 25 + (injectionStrength * 20))) // Light: 25-45% when injecting
     : sHighBase;
 
   if (isDark) {
@@ -582,6 +598,7 @@ export function generateTheme(input: SemanticColorRoles): AbletonThemeData {
   // This preserves baseline behavior when injection is disabled
   if (input.hueInjection?.enabled) {
     const strength = input.hueInjection.strength ?? 0.5;
+    const isDark = input.tone === 'dark';
     const accentHsl = hexToHsl(input.accent_primary);
     const surfaceHsl = hexToHsl(input.surface_base);
 
@@ -589,18 +606,24 @@ export function generateTheme(input: SemanticColorRoles): AbletonThemeData {
     if (hueDistance(accentHsl.h, surfaceHsl.h) >= MIN_INJECTION_HUE_DISTANCE) {
       // SpectrumDefaultColor: spectrum analyzer waveform fill
       // Use accent_primary hue so it relates to EQ nodes
-      // Note: This effect is much more noticeable on dark themes; light themes show minimal difference
-      const spectrumL = 45;
-      const spectrumS = 20 + (strength * 25); // 20-45% saturation based on strength
+      // Light themes: baseline is surface_highlight at 33% alpha — nearly invisible.
+      // Need lower lightness, higher saturation, and higher alpha to register against light display bg.
+      const spectrumL = isDark ? 45 : 35;  // Light: darker so it contrasts against light display bg
+      const spectrumS = isDark
+        ? 20 + (strength * 25)   // Dark: 20-45% saturation
+        : 40 + (strength * 35);  // Light: 40-75% — much more saturation needed
+      const spectrumAlpha = isDark ? '9f' : 'cf';  // Light: 81% alpha (was 62%) to cut through light bg
       const spectrumColor = hslToHex(accentHsl.h, spectrumS, spectrumL);
-      parameters.SpectrumDefaultColor = withAlpha(spectrumColor, '9f');
+      parameters.SpectrumDefaultColor = withAlpha(spectrumColor, spectrumAlpha);
     }
 
     // Tier 1: Arrangement Waveforms (highest visual impact)
     // These always apply — even when accent and surface share a hue, the saturation/lightness
     // boost makes waveforms visibly colored rather than neutral gray.
-    const isDark = input.tone === 'dark';
-    const waveformS = 40 + (strength * 25); // 40-65% saturation
+    // Light themes get ~1.4x saturation boost — HSL saturation is perceptually weaker at high lightness
+    const waveformS = isDark
+      ? 40 + (strength * 25)   // Dark: 40-65% saturation
+      : 55 + (strength * 25);  // Light: 55-80% — compensates for perceptual weakness
     const waveformL = isDark
       ? 20 + (strength * 10)  // 20-30% — lifted from ~9% so hue is visible against dark clip bg
       : 30 + (strength * 10); // 30-40% — enough contrast on light clip backgrounds
@@ -608,7 +631,9 @@ export function generateTheme(input: SemanticColorRoles): AbletonThemeData {
     parameters.WaveformColor = withAlpha(waveformColor, 'ef');
 
     // DimmedWaveformColor: deactivated clips - same hue, lighter, less saturated
-    const dimmedS = 25 + (strength * 15); // 25-40% saturation
+    const dimmedS = isDark
+      ? 25 + (strength * 15)   // Dark: 25-40% saturation
+      : 35 + (strength * 20);  // Light: 35-55%
     const dimmedL = isDark
       ? 35 + (strength * 10)  // 35-45% — visibly lighter than active waveform
       : 45 + (strength * 10); // 45-55%
@@ -620,7 +645,9 @@ export function generateTheme(input: SemanticColorRoles): AbletonThemeData {
     // Applied unconditionally (no hue distance gate) — same reasoning as waveforms:
     // the saturation boost is valuable even when accent and surface hues are close.
     const secondaryHsl = hexToHsl(input.accent_secondary);
-    const loopS = 30 + (strength * 20); // 30-50% saturation
+    const loopS = isDark
+      ? 30 + (strength * 20)   // Dark: 30-50% saturation
+      : 40 + (strength * 25);  // Light: 40-65%
     const loopL = isDark
       ? 50 + (strength * 10)  // 50-60% — baseline n11b_ruler is ~57% lightness in dark
       : 25 + (strength * 10); // 25-35% — baseline n11b_ruler is ~24% lightness in light
@@ -635,7 +662,9 @@ export function generateTheme(input: SemanticColorRoles): AbletonThemeData {
     // Tier 4: BrowserSampleWaveform — waveform previews in browser
     // Uses accent_primary (same as arrangement waveforms) for consistency.
     // Baseline is n11_mid_high (~52% L dark, ~65% L light) — a neutral gray.
-    const browserWaveS = 25 + (strength * 25); // 25-50% saturation
+    const browserWaveS = isDark
+      ? 25 + (strength * 25)   // Dark: 25-50% saturation
+      : 35 + (strength * 30);  // Light: 35-65%
     const browserWaveL = isDark
       ? 50 + (strength * 10)  // 50-60% — visible against dark browser bg
       : 40 + (strength * 10); // 40-50% — visible against light browser bg
@@ -646,7 +675,9 @@ export function generateTheme(input: SemanticColorRoles): AbletonThemeData {
     // Uses accent_secondary hue to distinguish from waveforms.
     // Baseline is red (#ff4d47 dark, #ea3c3c light) — strongly associated with automation.
     // NOTE: This may feel "wrong" to users since red = automation is ingrained. Testing required.
-    const autoS = 70 + (strength * 20); // 70-90% saturation — needs to be vibrant
+    const autoS = isDark
+      ? 70 + (strength * 20)   // Dark: 70-90% saturation — needs to be vibrant
+      : 80 + (strength * 15);  // Light: 80-95% — push harder at high lightness
     const autoL = isDark
       ? 55 + (strength * 10)  // 55-65% — visible against dark backgrounds
       : 45 + (strength * 5);  // 45-50% — visible against light backgrounds

@@ -61,9 +61,9 @@ Each lesson follows this structure:
 
 ---
 
-### 2026-3-20 — Process
-**What happened**: Created a duplicate date header in Work Log instead of appending to the existing one for the same day.
+### 2026-3-20 — Process — CRITICAL, REPEATED VIOLATION
+**What happened**: Created duplicate date headers in Work Log TWICE on the same day instead of appending to the existing one.
 
-**Root cause**: The /wrap skill says "match date only, ignore time" when checking for existing headers, but I treated `## 2026-3-20 17:09` and `## 2026-3-20 17:31` as different headers instead of recognizing them as the same day.
+**Root cause**: Not checking the Work Log for an existing same-day header before writing. This has happened multiple times despite being documented as a lesson AND in the /wrap skill.
 
-**Rule**: When updating the Work Log, strip the time portion from headers before comparing dates. `## 2026-3-20 17:09` is the same day as `## 2026-3-20 17:31` — update the timestamp in the existing header and append bullets to its list.
+**Rule**: BEFORE writing ANY entry to Work Log: (1) Read the file, (2) Check if a `## 2026-X-XX` header already exists for today's date (ignore the time portion), (3) If yes, update that header's timestamp and append bullets to its list, (4) If no, create a new header. NEVER create a new `##` header if one already exists for the same date. This is non-negotiable.
