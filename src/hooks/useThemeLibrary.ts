@@ -292,6 +292,7 @@ export function useThemeLibrary() {
       colors,
       isInstalled: true,
       fromCommunity: true,
+      generationVersion: communityTheme.generation_version ?? 1,
     };
 
     // Add to library

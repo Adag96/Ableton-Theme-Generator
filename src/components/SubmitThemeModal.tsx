@@ -103,6 +103,7 @@ export const SubmitThemeModal: React.FC<SubmitThemeModalProps> = ({ theme, onClo
         variant_mode: null,
         tone: theme.tone,
         contrast_level: theme.contrastLevel ?? 'standard',
+        generation_version: theme.generationVersion ?? 1,
       });
 
       if (insertError) {

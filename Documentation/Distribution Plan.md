@@ -326,12 +326,13 @@ macOS code signing requires an Apple Developer account ($99/year). Windows code 
 Once v1.0.0 is out, subsequent releases follow a shorter process:
 
 1. Bump version in `package.json` (e.g., `1.0.0` → `1.1.0`)
-2. Commit and tag: `git commit -m "Bump to v1.1.0"` → `git tag v1.1.0` → push
-3. Build: `npm run build:all`
-4. Create GitHub Release from the new tag
-5. Upload all artifacts (same files as above, with new version numbers)
-6. Write release notes describing what changed
-7. Publish
+2. **If the theme generation algorithm changed**: increment `GENERATION_VERSION` in `src/theme/derivation.ts` (see [Semantic Color Roles Specification](./Semantic%20Color%20Roles%20Specification.md#generation-versioning))
+3. Commit and tag: `git commit -m "Bump to v1.1.0"` → `git tag v1.1.0` → push
+4. Build: `npm run build:all`
+5. Create GitHub Release from the new tag
+6. Upload all artifacts (same files as above, with new version numbers)
+7. Write release notes describing what changed
+8. Publish
 
 If the auto-updater has been implemented (see below), existing users will be notified automatically.
 

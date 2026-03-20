@@ -29,6 +29,20 @@ const MIN_CONTROL_BG_LIGHTNESS = 5;
 const MIN_INJECTION_HUE_DISTANCE = 30;
 
 /**
+ * Generation algorithm version. Increment this whenever the derivation algorithm,
+ * parameter map, neutral scale, hue injection, or any logic that affects .ask output
+ * changes in a way that would produce visually different results from the same inputs.
+ *
+ * This version is saved with every theme (locally and in the community gallery).
+ * When regenerating a theme whose generationVersion doesn't match, the app should
+ * prompt the user before overwriting with the new algorithm's output.
+ *
+ * Only increment when shipping a public release with algorithm changes — not during
+ * beta development. See Documentation/Semantic Color Roles Specification.md for details.
+ */
+export const GENERATION_VERSION = 1;
+
+/**
  * Calculate circular hue distance (0-180 degrees).
  */
 function hueDistance(h1: number, h2: number): number {

@@ -19,7 +19,7 @@ import type { ImageFileResult } from './electron';
 import type { PaletteSelectionResult } from './extraction';
 import type { SavedTheme } from './types/theme-library';
 import { useThemeLibrary } from './hooks/useThemeLibrary';
-import { generateTheme } from './theme/derivation';
+import { generateTheme, GENERATION_VERSION } from './theme/derivation';
 import { generateAskXml } from './theme/ask-generator';
 import './App.css';
 
@@ -279,6 +279,7 @@ function AppContent() {
               enabled: pendingTheme.palette.roles.hueInjection.enabled,
               strength: pendingTheme.palette.roles.hueInjection.strength ?? 0.5,
             } : undefined,
+            generationVersion: GENERATION_VERSION,
           };
 
           await addTheme(savedTheme);

@@ -181,6 +181,23 @@ For novel themes (like the Steel Blue test), the engine produces valid, coherent
 
 ---
 
+## Generation Versioning
+
+Every theme records the `generationVersion` — an integer tracking which version of the derivation algorithm produced it. This value is stored in:
+
+- **`SavedTheme.generationVersion`** in the local theme library
+- **`community_themes.generation_version`** in the Supabase database
+
+The canonical constant is `GENERATION_VERSION` in `src/theme/derivation.ts`. It starts at `1` and should **only be incremented when shipping a public release** that changes the derivation algorithm, parameter map, neutral scale, hue injection, or any logic that would produce visually different .ask output from the same input colors.
+
+**Do not increment during beta development.** All pre-release algorithm changes remain under version `1`.
+
+When the app regenerates a theme (re-export, re-install, edit) whose `generationVersion` is older than the current `GENERATION_VERSION`, it should prompt the user before overwriting, since the output may look visually different.
+
+Themes without a `generationVersion` (created before this field existed) are treated as version `1`.
+
+---
+
 ## File References
 
 | File | Purpose |

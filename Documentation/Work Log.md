@@ -1,5 +1,8 @@
 # Work Log
 
+## 2026-3-20 17:31
+- Added generation version tracking — every theme now records which algorithm version created it, stored locally and in the community gallery, to prevent algorithm updates from silently changing existing themes
+
 ## 2026-3-20 17:09
 - Fixed hue injection for WaveformColor and DimmedWaveformColor — waveforms now visibly take on the accent color for both light and dark themes
 - Added hue injection for LoopColor and OffGridLoopColor — loop braces, locators, and timeline markers now take on the secondary accent color

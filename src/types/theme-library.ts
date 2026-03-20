@@ -25,6 +25,7 @@ export interface SavedTheme {
   sourceImagePath?: string; // Cached source image in app data directory
   isInstalled: boolean; // true = .ask file exists in Ableton themes dir
   fromCommunity?: boolean; // true if downloaded from community gallery
+  generationVersion?: number; // Algorithm version that generated this theme (see GENERATION_VERSION in derivation.ts)
 
   // Original colors before any slider adjustments (for edit restoration)
   originalColors?: {
