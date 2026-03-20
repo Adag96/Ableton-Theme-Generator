@@ -7,7 +7,8 @@ interface ImageMagnifierProps {
   alt: string;
   className?: string;
   magnification?: number;
-  loupeSize?: number;
+  loupeWidth?: number;
+  loupeHeight?: number;
   children?: React.ReactNode;
 }
 
@@ -42,7 +43,8 @@ export const ImageMagnifier: React.FC<ImageMagnifierProps> = ({
   alt,
   className = '',
   magnification = 2,
-  loupeSize = 160,
+  loupeWidth = 280,
+  loupeHeight = 160,
   children,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -89,11 +91,12 @@ export const ImageMagnifier: React.FC<ImageMagnifierProps> = ({
   const renderLoupe = () => {
     if (!imageBounds || !isHovering || !imageLoaded) return null;
 
-    const halfLoupe = loupeSize / 2;
+    const halfLoupeWidth = loupeWidth / 2;
+    const halfLoupeHeight = loupeHeight / 2;
 
     // Position loupe centered on cursor
-    const loupeX = cursorPos.clientX - halfLoupe;
-    const loupeY = cursorPos.clientY - halfLoupe;
+    const loupeX = cursorPos.clientX - halfLoupeWidth;
+    const loupeY = cursorPos.clientY - halfLoupeHeight;
 
     // Calculate where in the rendered image the cursor is (0-1 range)
     const normalizedX = (cursorPos.clientX - imageBounds.left) / imageBounds.width;
@@ -104,15 +107,15 @@ export const ImageMagnifier: React.FC<ImageMagnifierProps> = ({
     const bgHeight = imageBounds.height * magnification;
 
     // Background position to show the magnified area centered in loupe
-    const bgX = normalizedX * bgWidth - halfLoupe;
-    const bgY = normalizedY * bgHeight - halfLoupe;
+    const bgX = normalizedX * bgWidth - halfLoupeWidth;
+    const bgY = normalizedY * bgHeight - halfLoupeHeight;
 
     const loupeStyle: React.CSSProperties = {
       position: 'fixed',
       left: loupeX,
       top: loupeY,
-      width: loupeSize,
-      height: loupeSize,
+      width: loupeWidth,
+      height: loupeHeight,
       backgroundImage: `url(${src})`,
       backgroundSize: `${bgWidth}px ${bgHeight}px`,
       backgroundPosition: `${-bgX}px ${-bgY}px`,

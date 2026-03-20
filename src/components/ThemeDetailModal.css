@@ -25,13 +25,25 @@
   -webkit-backdrop-filter: var(--blur-surface);
   border-radius: var(--radius-xl);
   padding: var(--space-lg);
+  width: min(90vw, 560px);
   min-width: 400px;
-  max-width: 560px;
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: var(--shadow-elevated);
   border: 1px solid var(--surface-border);
   animation: modal-enter var(--duration-normal) var(--ease-spring);
+}
+
+@media (min-width: 900px) {
+  .modal-content {
+    width: min(70vw, 680px);
+  }
+}
+
+@media (min-width: 1200px) {
+  .modal-content {
+    width: min(60vw, 800px);
+  }
 }
 
 .modal-close {
@@ -76,7 +88,7 @@
 .modal-preview-image {
   display: block;
   max-width: 100%;
-  max-height: 300px;
+  max-height: 400px;
   object-fit: contain;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);
