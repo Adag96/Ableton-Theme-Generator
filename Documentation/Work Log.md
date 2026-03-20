@@ -1,7 +1,8 @@
 # Work Log
 
-## 2026-3-20 11:56
+## 2026-3-20 12:40
 - Fixed hue injection for WaveformColor and DimmedWaveformColor — waveforms now visibly take on the accent color for both light and dark themes
+- Added hue injection for LoopColor and OffGridLoopColor — loop braces, locators, and timeline markers now take on the secondary accent color
 
 ## 2026-3-15 00:28
 - Documented 7 more Ableton theme parameters: RetroDisplayGreen, RetroDisplayHandle1, RetroDisplayHandle2, ControlOnForeground, ControlOffForeground, ViewControlOn, ViewControlOff

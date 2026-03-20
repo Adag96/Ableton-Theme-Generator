@@ -591,6 +591,19 @@ export function generateTheme(input: SemanticColorRoles): AbletonThemeData {
       : 45 + (strength * 10); // 45-55%
     const dimmedColor = hslToHex(accentHsl.h, dimmedS, dimmedL);
     parameters.DimmedWaveformColor = withAlpha(dimmedColor, 'df');
+
+    // Tier 2: LoopColor — loop braces, locators, timeline markers
+    // Uses accent_secondary hue to distinguish from waveforms (accent_primary).
+    // Applied unconditionally (no hue distance gate) — same reasoning as waveforms:
+    // the saturation boost is valuable even when accent and surface hues are close.
+    const secondaryHsl = hexToHsl(input.accent_secondary);
+    const loopS = 30 + (strength * 20); // 30-50% saturation
+    const loopL = isDark
+      ? 50 + (strength * 10)  // 50-60% — baseline n11b_ruler is ~57% lightness in dark
+      : 25 + (strength * 10); // 25-35% — baseline n11b_ruler is ~24% lightness in light
+    const loopColor = hslToHex(secondaryHsl.h, loopS, loopL);
+    parameters.LoopColor = loopColor;
+    parameters.OffGridLoopColor = withAlpha(loopColor, '4f');
   }
 
   const vuMeters = getVuMeters();
