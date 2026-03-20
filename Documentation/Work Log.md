@@ -1,5 +1,8 @@
 # Work Log
 
+## 2026-3-20 17:30
+- ABL-104: Email notifications for theme submissions now show user display name instead of raw user ID
+
 ## 2026-3-20 13:15
 - Fixed hue injection for WaveformColor and DimmedWaveformColor — waveforms now visibly take on the accent color for both light and dark themes
 - Added hue injection for LoopColor and OffGridLoopColor — loop braces, locators, and timeline markers now take on the secondary accent color

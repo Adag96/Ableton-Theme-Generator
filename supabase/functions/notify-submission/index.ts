@@ -3,24 +3,38 @@
 //
 // Setup:
 //   1. Deploy this function: supabase functions deploy notify-submission
-//   2. Set secrets: supabase secrets set RESEND_API_KEY=re_xxx NOTIFY_EMAIL=your@email.com
+//   2. Set secrets: supabase secrets set RESEND_API_KEY=re_xxx NOTIFY_EMAIL=your@email.com SERVICE_ROLE_KEY=<key>
 //   3. Create a Database Webhook in the Supabase dashboard:
 //      - Table: community_themes
 //      - Event: INSERT
 //      - URL: https://<project-ref>.supabase.co/functions/v1/notify-submission
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')!;
 const NOTIFY_EMAIL = Deno.env.get('NOTIFY_EMAIL')!;
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
+const SERVICE_ROLE_KEY = Deno.env.get('SERVICE_ROLE_KEY')!;
 
 serve(async (req) => {
   try {
     const payload = await req.json();
     const record = payload.record;
 
-    // Fetch submitter display name
-    const submitterName = record.user_id ? `User ${record.user_id}` : 'Anonymous';
+    // Fetch submitter display name from profiles table
+    let submitterName = 'Anonymous';
+    if (record.user_id) {
+      const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
+        auth: { persistSession: false }
+      });
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', record.user_id)
+        .single();
+      submitterName = profile?.display_name ?? `User ${record.user_id}`;
+    }
 
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
