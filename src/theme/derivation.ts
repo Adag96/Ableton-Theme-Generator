@@ -608,6 +608,16 @@ export function generateTheme(input: SemanticColorRoles): AbletonThemeData {
     // NOTE: GridLineBase was tested for hue injection but rejected.
     // Gridlines can become too similar to surface colors, reducing visibility.
     // Keeping them neutral preserves their structural/functional role.
+
+    // Tier 4: BrowserSampleWaveform — waveform previews in browser
+    // Uses accent_primary (same as arrangement waveforms) for consistency.
+    // Baseline is n11_mid_high (~52% L dark, ~65% L light) — a neutral gray.
+    const browserWaveS = 25 + (strength * 25); // 25-50% saturation
+    const browserWaveL = isDark
+      ? 50 + (strength * 10)  // 50-60% — visible against dark browser bg
+      : 40 + (strength * 10); // 40-50% — visible against light browser bg
+    const browserWaveColor = hslToHex(accentHsl.h, browserWaveS, browserWaveL);
+    parameters.BrowserSampleWaveform = browserWaveColor;
   }
 
   const vuMeters = getVuMeters();
