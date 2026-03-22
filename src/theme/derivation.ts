@@ -599,27 +599,33 @@ export function generateTheme(input: SemanticColorRoles): AbletonThemeData {
   if (input.hueInjection?.enabled) {
     const strength = input.hueInjection.strength ?? 0.5;
     const isDark = input.tone === 'dark';
-    const accentHsl = hexToHsl(input.accent_primary);
+
+    // Build the accent palette with fallback chain:
+    // - Primary always exists
+    // - Secondary always exists (may be synthesized)
+    // - Tertiary falls back to secondary if not extracted
+    // - Quaternary falls back to tertiary (which may fall back to primary)
+    const accentPrimaryHsl = hexToHsl(input.accent_primary);
+    const accentSecondaryHsl = hexToHsl(input.accent_secondary);
+    const accentTertiaryHsl = input.accent_tertiary
+      ? hexToHsl(input.accent_tertiary)
+      : accentSecondaryHsl;
+    const accentQuaternaryHsl = input.accent_quaternary
+      ? hexToHsl(input.accent_quaternary)
+      : accentTertiaryHsl;
+
     const surfaceHsl = hexToHsl(input.surface_base);
 
-    // Hue-shift effects: only apply when accent hue is meaningfully different from surface
-    if (hueDistance(accentHsl.h, surfaceHsl.h) >= MIN_INJECTION_HUE_DISTANCE) {
-      // SpectrumDefaultColor: spectrum analyzer waveform fill
-      // Use accent_primary hue so it relates to EQ nodes
-      // Light themes: baseline is surface_highlight at 33% alpha — nearly invisible.
-      // Need lower lightness, higher saturation, and higher alpha to register against light display bg.
-      const spectrumL = isDark ? 45 : 35;  // Light: darker so it contrasts against light display bg
-      const spectrumS = isDark
-        ? 20 + (strength * 25)   // Dark: 20-45% saturation
-        : 40 + (strength * 35);  // Light: 40-75% — much more saturation needed
-      const spectrumAlpha = isDark ? '9f' : 'cf';  // Light: 81% alpha (was 62%) to cut through light bg
-      const spectrumColor = hslToHex(accentHsl.h, spectrumS, spectrumL);
-      parameters.SpectrumDefaultColor = withAlpha(spectrumColor, spectrumAlpha);
-    }
+    // Strength-based accent gating: higher strength = more accents used
+    // 0.00-0.25: Only primary (waveforms, browser waveforms)
+    // 0.25-0.50: Primary + secondary (+ loops)
+    // 0.50-0.75: Primary + secondary + tertiary (+ automation)
+    // 0.75-1.00: All four accents (+ spectrum)
+    const useSecondary = strength >= 0.25;
+    const useTertiary = strength >= 0.50;
+    const useQuaternary = strength >= 0.75;
 
-    // Tier 1: Arrangement Waveforms (highest visual impact)
-    // These always apply — even when accent and surface share a hue, the saturation/lightness
-    // boost makes waveforms visibly colored rather than neutral gray.
+    // Tier 1: Waveforms — accent_primary (highest visual impact, always applied)
     // Light themes get ~1.4x saturation boost — HSL saturation is perceptually weaker at high lightness
     const waveformS = isDark
       ? 40 + (strength * 25)   // Dark: 40-65% saturation
@@ -627,7 +633,7 @@ export function generateTheme(input: SemanticColorRoles): AbletonThemeData {
     const waveformL = isDark
       ? 20 + (strength * 10)  // 20-30% — lifted from ~9% so hue is visible against dark clip bg
       : 30 + (strength * 10); // 30-40% — enough contrast on light clip backgrounds
-    const waveformColor = hslToHex(accentHsl.h, waveformS, waveformL);
+    const waveformColor = hslToHex(accentPrimaryHsl.h, waveformS, waveformL);
     parameters.WaveformColor = withAlpha(waveformColor, 'ef');
 
     // DimmedWaveformColor: deactivated clips - same hue, lighter, less saturated
@@ -637,30 +643,10 @@ export function generateTheme(input: SemanticColorRoles): AbletonThemeData {
     const dimmedL = isDark
       ? 35 + (strength * 10)  // 35-45% — visibly lighter than active waveform
       : 45 + (strength * 10); // 45-55%
-    const dimmedColor = hslToHex(accentHsl.h, dimmedS, dimmedL);
+    const dimmedColor = hslToHex(accentPrimaryHsl.h, dimmedS, dimmedL);
     parameters.DimmedWaveformColor = withAlpha(dimmedColor, 'df');
 
-    // Tier 2: LoopColor — loop braces, locators, timeline markers
-    // Uses accent_secondary hue to distinguish from waveforms (accent_primary).
-    // Applied unconditionally (no hue distance gate) — same reasoning as waveforms:
-    // the saturation boost is valuable even when accent and surface hues are close.
-    const secondaryHsl = hexToHsl(input.accent_secondary);
-    const loopS = isDark
-      ? 30 + (strength * 20)   // Dark: 30-50% saturation
-      : 40 + (strength * 25);  // Light: 40-65%
-    const loopL = isDark
-      ? 50 + (strength * 10)  // 50-60% — baseline n11b_ruler is ~57% lightness in dark
-      : 25 + (strength * 10); // 25-35% — baseline n11b_ruler is ~24% lightness in light
-    const loopColor = hslToHex(secondaryHsl.h, loopS, loopL);
-    parameters.LoopColor = loopColor;
-    parameters.OffGridLoopColor = withAlpha(loopColor, '4f');
-
-    // NOTE: GridLineBase was tested for hue injection but rejected.
-    // Gridlines can become too similar to surface colors, reducing visibility.
-    // Keeping them neutral preserves their structural/functional role.
-
-    // Tier 4: BrowserSampleWaveform — waveform previews in browser
-    // Uses accent_primary (same as arrangement waveforms) for consistency.
+    // Tier 1b: BrowserSampleWaveform — accent_primary (consistent with arrangement waveforms)
     // Baseline is n11_mid_high (~52% L dark, ~65% L light) — a neutral gray.
     const browserWaveS = isDark
       ? 25 + (strength * 25)   // Dark: 25-50% saturation
@@ -668,27 +654,58 @@ export function generateTheme(input: SemanticColorRoles): AbletonThemeData {
     const browserWaveL = isDark
       ? 50 + (strength * 10)  // 50-60% — visible against dark browser bg
       : 40 + (strength * 10); // 40-50% — visible against light browser bg
-    const browserWaveColor = hslToHex(accentHsl.h, browserWaveS, browserWaveL);
+    const browserWaveColor = hslToHex(accentPrimaryHsl.h, browserWaveS, browserWaveL);
     parameters.BrowserSampleWaveform = browserWaveColor;
 
-    // Tier 4: AutomationColor — automation lines, breakpoints, envelope curves
-    // Uses accent_secondary hue to distinguish from waveforms.
-    // Baseline is red (#ff4d47 dark, #ea3c3c light) — strongly associated with automation.
-    // NOTE: This may feel "wrong" to users since red = automation is ingrained. Testing required.
-    const autoS = isDark
-      ? 70 + (strength * 20)   // Dark: 70-90% saturation — needs to be vibrant
-      : 80 + (strength * 15);  // Light: 80-95% — push harder at high lightness
-    const autoL = isDark
-      ? 55 + (strength * 10)  // 55-65% — visible against dark backgrounds
-      : 45 + (strength * 5);  // 45-50% — visible against light backgrounds
-    const autoColor = hslToHex(secondaryHsl.h, autoS, autoL);
-    parameters.AutomationColor = autoColor;
+    // Tier 2: LoopColor — accent_secondary (timeline markers, distinct from waveforms)
+    // Only applied when strength >= 0.25
+    if (useSecondary) {
+      const loopS = isDark
+        ? 30 + (strength * 20)   // Dark: 30-50% saturation
+        : 40 + (strength * 25);  // Light: 40-65%
+      const loopL = isDark
+        ? 50 + (strength * 10)  // 50-60% — baseline n11b_ruler is ~57% lightness in dark
+        : 25 + (strength * 10); // 25-35% — baseline n11b_ruler is ~24% lightness in light
+      const loopColor = hslToHex(accentSecondaryHsl.h, loopS, loopL);
+      parameters.LoopColor = loopColor;
+      parameters.OffGridLoopColor = withAlpha(loopColor, '4f');
+    }
 
-    // AutomationMouseOver — hover state for automation, should be lighter/darker variant
-    const autoHoverL = isDark
-      ? autoL + 15  // lighter on dark themes
-      : autoL - 15; // darker on light themes
-    parameters.AutomationMouseOver = hslToHex(secondaryHsl.h, autoS * 0.85, autoHoverL);
+    // Tier 3: AutomationColor — accent_tertiary (envelope/breakpoint lines)
+    // Only applied when strength >= 0.50
+    // NOTE: GridLineBase was tested for hue injection but rejected.
+    // Gridlines can become too similar to surface colors, reducing visibility.
+    if (useTertiary) {
+      const autoS = isDark
+        ? 70 + (strength * 20)   // Dark: 70-90% saturation — needs to be vibrant
+        : 80 + (strength * 15);  // Light: 80-95% — push harder at high lightness
+      const autoL = isDark
+        ? 55 + (strength * 10)  // 55-65% — visible against dark backgrounds
+        : 45 + (strength * 5);  // 45-50% — visible against light backgrounds
+      const autoColor = hslToHex(accentTertiaryHsl.h, autoS, autoL);
+      parameters.AutomationColor = autoColor;
+
+      // AutomationMouseOver — hover state for automation, should be lighter/darker variant
+      const autoHoverL = isDark
+        ? autoL + 15  // lighter on dark themes
+        : autoL - 15; // darker on light themes
+      parameters.AutomationMouseOver = hslToHex(accentTertiaryHsl.h, autoS * 0.85, autoHoverL);
+    }
+
+    // Tier 4: SpectrumDefaultColor — accent_quaternary (peripheral element)
+    // Only applied when strength >= 0.75 and hue is meaningfully different from surface
+    if (useQuaternary && hueDistance(accentQuaternaryHsl.h, surfaceHsl.h) >= MIN_INJECTION_HUE_DISTANCE) {
+      // SpectrumDefaultColor: spectrum analyzer waveform fill
+      // Light themes: baseline is surface_highlight at 33% alpha — nearly invisible.
+      // Need lower lightness, higher saturation, and higher alpha to register against light display bg.
+      const spectrumL = isDark ? 45 : 35;  // Light: darker so it contrasts against light display bg
+      const spectrumS = isDark
+        ? 20 + (strength * 25)   // Dark: 20-45% saturation
+        : 40 + (strength * 35);  // Light: 40-75% — much more saturation needed
+      const spectrumAlpha = isDark ? '9f' : 'cf';  // Light: 81% alpha (was 62%) to cut through light bg
+      const spectrumColor = hslToHex(accentQuaternaryHsl.h, spectrumS, spectrumL);
+      parameters.SpectrumDefaultColor = withAlpha(spectrumColor, spectrumAlpha);
+    }
   }
 
   const vuMeters = getVuMeters();

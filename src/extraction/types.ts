@@ -37,12 +37,17 @@ export interface ExtractionOptions {
 }
 
 /** Location info for a role color (undefined if synthetic/fallback) */
-export type RoleLocations = Partial<Record<'surface_base' | 'text_primary' | 'accent_primary' | 'accent_secondary', ColorLocation>>;
+export type RoleLocations = Partial<Record<'surface_base' | 'text_primary' | 'accent_primary' | 'accent_secondary' | 'accent_tertiary' | 'accent_quaternary', ColorLocation>>;
 
 /** Result of palette selection with semantic roles assigned */
 export interface PaletteSelectionResult {
-  /** The 5 required semantic color roles plus optional contrast level and hue injection config */
-  roles: Pick<SemanticColorRoles, 'tone' | 'surface_base' | 'text_primary' | 'accent_primary' | 'accent_secondary'> & { contrastLevel?: ContrastLevel; hueInjection?: HueInjectionConfig };
+  /** The 5 required semantic color roles plus optional extras for hue injection */
+  roles: Pick<SemanticColorRoles, 'tone' | 'surface_base' | 'text_primary' | 'accent_primary' | 'accent_secondary'> & {
+    contrastLevel?: ContrastLevel;
+    hueInjection?: HueInjectionConfig;
+    accent_tertiary?: string;
+    accent_quaternary?: string;
+  };
   /** Locations on the source image for each role color (if available) */
   roleLocations: RoleLocations;
   /** All extracted colors for display/debugging */
@@ -58,6 +63,8 @@ export interface PaletteSelectionResult {
     surfaceCandidateCount?: number;
     /** Score of the selected sampled surface (0-70 range) */
     surfaceSampledScore?: number;
+    /** Number of accent colors extracted from image (2-4, rest are synthesized) */
+    extractedAccentCount?: number;
   };
   /** Original colors before any slider adjustments (for edit restoration) */
   originalColors?: Partial<Record<'surface_base' | 'text_primary' | 'accent_primary' | 'accent_secondary', string>>;

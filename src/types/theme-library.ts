@@ -13,6 +13,8 @@ export interface SavedTheme {
     text_primary: string;
     accent_primary: string;
     accent_secondary: string;
+    accent_tertiary?: string;
+    accent_quaternary?: string;
   };
   contrastLevel?: ContrastLevel;
   hueInjection?: {
@@ -33,6 +35,8 @@ export interface SavedTheme {
     text_primary: string;
     accent_primary: string;
     accent_secondary: string;
+    accent_tertiary?: string;
+    accent_quaternary?: string;
   };
 
   // Slider positions at time of save

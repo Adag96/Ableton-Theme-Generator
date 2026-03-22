@@ -6,13 +6,19 @@ import { contrastRatio } from '../theme/color-utils';
 const MAX_COLOR_DISTANCE = 50;
 
 /** Minimum saturation for a color to be considered an accent (%) */
-const MIN_ACCENT_SATURATION = 35;
+const MIN_ACCENT_SATURATION = 25;
 
 /** Minimum contrast ratio for text legibility (WCAG AA) */
 const MIN_CONTRAST_RATIO = 4.5;
 
-/** Minimum hue distance between primary and secondary accents */
-const MIN_HUE_DISTANCE = 60;
+/**
+ * Minimum perceptual color distance for accent selection.
+ * Uses combined hue + saturation distance for better human perception matching.
+ * E.g., coral (8°, 69%) vs tan (35°, 40%) = sqrt(27² + 29²) ≈ 40
+ */
+const MIN_COLOR_DISTANCE_SECONDARY = 50;
+const MIN_COLOR_DISTANCE_TERTIARY = 40;
+const MIN_COLOR_DISTANCE_QUATERNARY = 30;
 
 /** Surface saturation for sampled fallback, dark themes (%) */
 const FALLBACK_SURFACE_SAT_DARK = 20;
@@ -51,10 +57,24 @@ const IDEAL_HARMONY_DISTANCE = 150;
 const FALLBACK_TEXT_DARK = '#ffffff';
 const FALLBACK_TEXT_LIGHT = '#121212';
 
-/** Calculate circular hue distance */
+/** Calculate circular hue distance (0-180) */
 function hueDistance(h1: number, h2: number): number {
   const diff = Math.abs(h1 - h2);
   return Math.min(diff, 360 - diff);
+}
+
+/**
+ * Calculate perceptual color distance combining hue and saturation.
+ * This better matches human perception than hue alone - e.g., a desaturated
+ * tan is perceptually distinct from a saturated coral even at similar hues.
+ */
+function perceptualColorDistance(
+  h1: number, s1: number,
+  h2: number, s2: number
+): number {
+  const hueDist = hueDistance(h1, h2);
+  const satDist = Math.abs(s1 - s2);
+  return Math.sqrt(hueDist * hueDist + satDist * satDist);
 }
 
 /** Get complementary hue */
@@ -339,26 +359,32 @@ export function selectThemePalette(
   // Use most saturated, or fall back to most prominent non-surface color
   const accentPrimary = sortedByAccent[0] ?? colors.find(c => c.hex !== surfaceBase.hex) ?? colors[0];
 
-  // 5. Accent secondary: next saturated with hue distance for contrast
+  // 5. Accent secondary: perceptually distinct from primary (hue + saturation)
   let accentSecondary: ExtractedColor | null = null;
   let bestSecondaryScore = 0;
-  let secondaryHueDistance = 0;
+  let secondaryColorDistance = 0;
 
   for (const color of sortedByAccent) {
     if (color.hex === accentPrimary.hex) continue;
 
-    const dist = hueDistance(color.hsl.h, accentPrimary.hsl.h);
-    if (dist >= MIN_HUE_DISTANCE) {
-      // Combine: hue distance and harmony with primary accent
+    const dist = perceptualColorDistance(
+      color.hsl.h, color.hsl.s,
+      accentPrimary.hsl.h, accentPrimary.hsl.s
+    );
+    if (dist >= MIN_COLOR_DISTANCE_SECONDARY) {
+      // Combine: perceptual distance and harmony with primary accent
       const harmony = harmonyScore(color.hsl.h, accentPrimary.hsl.h);
       const score = dist + harmony;
       if (!accentSecondary || score > bestSecondaryScore) {
         accentSecondary = color;
         bestSecondaryScore = score;
-        secondaryHueDistance = dist;
+        secondaryColorDistance = dist;
       }
     }
   }
+
+  // Track whether secondary was extracted vs synthesized
+  const secondaryWasExtracted = !!accentSecondary;
 
   // Fallback: use complement of primary accent
   if (!accentSecondary) {
@@ -372,8 +398,64 @@ export function selectThemePalette(
     // Convert back to hex
     const { h, s, l } = accentSecondary.hsl;
     accentSecondary.hex = hslToHex(h, s, l);
-    secondaryHueDistance = 180;
+    secondaryColorDistance = 180;
   }
+
+  // 6. Accent tertiary & quaternary: additional colors for hue injection zones
+  // Uses perceptual distance (hue + saturation) to find distinct color families
+  const selectedAccents = [
+    { h: accentPrimary.hsl.h, s: accentPrimary.hsl.s },
+    { h: accentSecondary.hsl.h, s: accentSecondary.hsl.s },
+  ];
+  let accentTertiary: ExtractedColor | null = null;
+  let accentQuaternary: ExtractedColor | null = null;
+  let tertiaryWasExtracted = false;
+  let quaternaryWasExtracted = false;
+
+  // Find tertiary: must be perceptually distinct from ALL already-selected accents
+  for (const color of sortedByAccent) {
+    if (color.hex === accentPrimary.hex || color.hex === accentSecondary.hex) continue;
+
+    const distFromAll = selectedAccents.every(acc =>
+      perceptualColorDistance(color.hsl.h, color.hsl.s, acc.h, acc.s) >= MIN_COLOR_DISTANCE_TERTIARY
+    );
+    if (distFromAll) {
+      // Score by saturation + harmony with existing palette
+      const avgHarmony = selectedAccents.reduce((sum, acc) => sum + harmonyScore(color.hsl.h, acc.h), 0) / selectedAccents.length;
+      const score = color.hsl.s + avgHarmony * 0.5;
+      if (!accentTertiary || score > (accentTertiary.hsl.s + avgHarmony * 0.5)) {
+        accentTertiary = color;
+        tertiaryWasExtracted = true;
+      }
+    }
+  }
+
+  // If tertiary found, add it and look for quaternary
+  if (accentTertiary) {
+    selectedAccents.push({ h: accentTertiary.hsl.h, s: accentTertiary.hsl.s });
+
+    for (const color of sortedByAccent) {
+      if (color.hex === accentPrimary.hex || color.hex === accentSecondary.hex || color.hex === accentTertiary.hex) continue;
+
+      const distFromAll = selectedAccents.every(acc =>
+        perceptualColorDistance(color.hsl.h, color.hsl.s, acc.h, acc.s) >= MIN_COLOR_DISTANCE_QUATERNARY
+      );
+      if (distFromAll) {
+        const avgHarmony = selectedAccents.reduce((sum, acc) => sum + harmonyScore(color.hsl.h, acc.h), 0) / selectedAccents.length;
+        const score = color.hsl.s + avgHarmony * 0.5;
+        if (!accentQuaternary || score > (accentQuaternary.hsl.s + avgHarmony * 0.5)) {
+          accentQuaternary = color;
+          quaternaryWasExtracted = true;
+        }
+      }
+    }
+  }
+
+  // Count how many accents came from extraction (not synthesized)
+  let extractedAccentCount = 1; // primary always extracted
+  if (secondaryWasExtracted) extractedAccentCount++;
+  if (tertiaryWasExtracted) extractedAccentCount++;
+  if (quaternaryWasExtracted) extractedAccentCount++;
 
   // Build role locations (undefined for synthetic/fallback colors)
   const roleLocations: RoleLocations = {
@@ -391,14 +473,24 @@ export function selectThemePalette(
     roleLocations.accent_secondary = accentSecondary.location;
   }
 
+  // Include locations for tertiary/quaternary if extracted
+  if (accentTertiary?.location) {
+    roleLocations.accent_tertiary = accentTertiary.location;
+  }
+  if (accentQuaternary?.location) {
+    roleLocations.accent_quaternary = accentQuaternary.location;
+  }
+
   const debugInfo = {
     contrastRatio: finalContrast,
     primarySaturation: accentPrimary.hsl.s,
-    secondaryHueDistance,
+    secondaryHueDistance: secondaryColorDistance, // Now perceptual distance, not just hue
     // Surface sampling debug info
     surfaceWasSampled: !!surfaceResult.sampledInfo,
     surfaceCandidateCount: surfaceResult.sampledInfo?.candidateCount,
     surfaceSampledScore: surfaceResult.sampledInfo?.score,
+    // Extended accent extraction info
+    extractedAccentCount,
   };
 
   return {
@@ -408,6 +500,9 @@ export function selectThemePalette(
       text_primary: textPrimaryHex,
       accent_primary: accentPrimary.hex,
       accent_secondary: accentSecondary.hex,
+      // Include tertiary/quaternary if extracted (undefined otherwise)
+      ...(accentTertiary && { accent_tertiary: accentTertiary.hex }),
+      ...(accentQuaternary && { accent_quaternary: accentQuaternary.hex }),
     },
     roleLocations,
     extractedColors: colors,

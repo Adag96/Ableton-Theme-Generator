@@ -57,6 +57,8 @@ export interface SemanticColorRoles {
   surface_secondary?: string;
   /** Optional 6th color for tertiary accent (experimental) */
   accent_tertiary?: string;
+  /** Optional 7th color for quaternary accent (hue injection zones) */
+  accent_quaternary?: string;
 }
 
 /** All 12+ roles resolved — no optional fields after derivation */
@@ -77,6 +79,8 @@ export interface ResolvedColorRoles {
   surface_secondary?: string;
   /** Optional: tertiary accent color (if provided in input) */
   accent_tertiary?: string;
+  /** Optional: quaternary accent color (if provided in input) */
+  accent_quaternary?: string;
 }
 
 /**

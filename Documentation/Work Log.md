@@ -1,8 +1,12 @@
 # Work Log
 
-## 2026-3-22 15:04
+## 2026-3-22 15:36
 - Added tooltips to theme preview modal swatches explaining what each color controls in Ableton (e.g., "Panels & backgrounds", "Text & icons", "Active toggles & progress", "Range indicators")
 - Created reusable Tooltip component with portal-based rendering to prevent clipping by modal boundaries
+- Enhanced hue injection to extract up to 4 accent colors from images instead of 2 — additional accents are applied to different UI zones (waveforms, loops, automation, spectrum) based on slider strength
+- Added strength-based accent gating: low strength (0-25%) colors only waveforms, medium (25-50%) adds loops, high (50-75%) adds automation, max (75-100%) adds spectrum
+- Improved color extraction algorithm to use perceptual distance (hue + saturation combined) instead of hue-only distance — colors like coral and tan are now recognized as distinct even at similar hues
+- Theme cards and detail modal now show additional accent swatches when hue injection is enabled
 
 ## 2026-3-20 20:45
 - Fixed hue injection for WaveformColor and DimmedWaveformColor — waveforms now visibly take on the accent color for both light and dark themes

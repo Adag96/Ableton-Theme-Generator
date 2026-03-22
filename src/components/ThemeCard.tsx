@@ -111,23 +111,33 @@ export const ThemeCard: React.FC<ThemeCardProps> = ({
           <div
             className="theme-swatch"
             style={{ backgroundColor: theme.colors.surface_base }}
-            title="Surface"
           />
           <div
             className="theme-swatch"
             style={{ backgroundColor: theme.colors.text_primary }}
-            title="Text"
           />
           <div
             className="theme-swatch"
             style={{ backgroundColor: theme.colors.accent_primary }}
-            title="Accent 1"
           />
           <div
             className="theme-swatch"
             style={{ backgroundColor: theme.colors.accent_secondary }}
-            title="Accent 2"
           />
+          {theme.hueInjection?.enabled && theme.colors.accent_tertiary && (
+            <div
+              className="theme-swatch"
+              style={{ backgroundColor: theme.colors.accent_tertiary }}
+              title="Accent 3"
+            />
+          )}
+          {theme.hueInjection?.enabled && theme.colors.accent_quaternary && (
+            <div
+              className="theme-swatch"
+              style={{ backgroundColor: theme.colors.accent_quaternary }}
+              title="Accent 4"
+            />
+          )}
         </div>
 
         <div className="theme-card-footer">
