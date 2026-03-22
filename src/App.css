@@ -207,29 +207,6 @@
   color: transparent !important;
 }
 
-/* Shimmer text for inline use */
-.shimmer-text {
-  background: linear-gradient(
-    90deg,
-    #FD896C 0%,
-    #9972FA 33%,
-    #69F7A7 66%,
-    #FD896C 100%
-  );
-  background-size: 300% 100%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  animation: holographic-shimmer 2s linear infinite;
-  cursor: pointer;
-  transition: filter var(--duration-fast) var(--ease-out);
-}
-
-.shimmer-text:hover {
-  animation-duration: 0.8s;
-  filter: brightness(1.15);
-}
-
 .version-value {
   font-size: clamp(11px, 1.5vh, 13px);
   font-weight: var(--font-weight-medium);

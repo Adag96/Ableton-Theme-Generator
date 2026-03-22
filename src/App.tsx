@@ -383,7 +383,7 @@ function AppContent() {
 
       <footer className="app-footer">
         <p className="footer-credit">
-          Made <a href="https://ko-fi.com/lonebody" target="_blank" rel="noopener noreferrer" className="shimmer-text" title="Support this project on Ko-fi">With Love</a> by <strong>Lonebody</strong>
+          Made by <strong>Lonebody</strong>
           <span className="footer-socials">
             <a
               href="https://www.instagram.com/lonebody/"
