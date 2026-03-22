@@ -45,6 +45,20 @@
   line-height: var(--line-height-relaxed);
 }
 
+.dialog-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin: 0 0 var(--space-lg) 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.dialog-checkbox-row input[type="checkbox"] {
+  cursor: pointer;
+}
+
 .dialog-actions {
   display: flex;
   justify-content: flex-end;

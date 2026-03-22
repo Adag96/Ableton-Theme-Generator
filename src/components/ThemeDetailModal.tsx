@@ -80,6 +80,7 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
   const [isInstalling, setIsInstalling] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isUninstallHovering, setIsUninstallHovering] = useState(false);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -176,18 +177,31 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
   };
 
   const handleDeleteClick = () => {
+    if (!theme) return;
+    const skipKey = theme.isInstalled ? 'deleteConfirm.skipInstalled' : 'deleteConfirm.skipAvailable';
+    if (localStorage.getItem(skipKey) === 'true') {
+      onDelete(theme.id);
+      onClose();
+      return;
+    }
     setConfirmDelete(true);
   };
 
   const handleDeleteConfirm = () => {
     if (!theme) return;
+    if (dontShowAgain) {
+      const skipKey = theme.isInstalled ? 'deleteConfirm.skipInstalled' : 'deleteConfirm.skipAvailable';
+      localStorage.setItem(skipKey, 'true');
+    }
     setConfirmDelete(false);
+    setDontShowAgain(false);
     onDelete(theme.id);
     onClose();
   };
 
   const handleDeleteCancel = () => {
     setConfirmDelete(false);
+    setDontShowAgain(false);
   };
 
   const handleSubmitToGallery = () => {
@@ -542,11 +556,13 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
           title="Delete Theme?"
           message={
             theme.isInstalled
-              ? 'This will permanently remove the theme from your library and delete the .ask file from Ableton. This action cannot be undone.'
+              ? <>This will permanently remove the theme from your library <strong>and delete the .ask file from Ableton</strong>. This action cannot be undone.</>
               : 'This will permanently remove the theme from your library. This action cannot be undone.'
           }
           confirmLabel="Delete"
           variant="destructive"
+          showDontShowAgain
+          onDontShowAgainChange={setDontShowAgain}
           onConfirm={handleDeleteConfirm}
           onCancel={handleDeleteCancel}
         />

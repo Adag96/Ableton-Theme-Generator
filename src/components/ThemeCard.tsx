@@ -47,20 +47,32 @@ export const ThemeCard: React.FC<ThemeCardProps> = ({
   const [isWorking, setIsWorking] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isUninstallHovering, setIsUninstallHovering] = useState(false);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
   const previewImageUrl = usePreviewImage(theme);
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    const skipKey = theme.isInstalled ? 'deleteConfirm.skipInstalled' : 'deleteConfirm.skipAvailable';
+    if (localStorage.getItem(skipKey) === 'true') {
+      onDelete();
+      return;
+    }
     setShowDeleteConfirm(true);
   };
 
   const handleDeleteConfirm = () => {
+    if (dontShowAgain) {
+      const skipKey = theme.isInstalled ? 'deleteConfirm.skipInstalled' : 'deleteConfirm.skipAvailable';
+      localStorage.setItem(skipKey, 'true');
+    }
     setShowDeleteConfirm(false);
+    setDontShowAgain(false);
     onDelete();
   };
 
   const handleDeleteCancel = () => {
     setShowDeleteConfirm(false);
+    setDontShowAgain(false);
   };
 
   const handleInstallClick = async (e: React.MouseEvent) => {
@@ -91,7 +103,7 @@ export const ThemeCard: React.FC<ThemeCardProps> = ({
   };
 
   return (
-    <div className="theme-card" onClick={onClick} style={{ cursor: 'pointer' }}>
+    <div className="theme-card" onClick={showDeleteConfirm ? undefined : onClick} style={{ cursor: 'pointer' }}>
       {previewImageUrl && (
         <div className="theme-card-preview">
           <img src={previewImageUrl} alt={theme.name} />
@@ -199,11 +211,13 @@ export const ThemeCard: React.FC<ThemeCardProps> = ({
         title="Delete Theme?"
         message={
           theme.isInstalled
-            ? 'This will permanently remove the theme from your library and delete the .ask file from Ableton. This action cannot be undone.'
+            ? <>This will permanently remove the theme from your library <strong>and delete the .ask file from Ableton</strong>. This action cannot be undone.</>
             : 'This will permanently remove the theme from your library. This action cannot be undone.'
         }
         confirmLabel="Delete"
         variant="destructive"
+        showDontShowAgain
+        onDontShowAgainChange={setDontShowAgain}
         onConfirm={handleDeleteConfirm}
         onCancel={handleDeleteCancel}
       />

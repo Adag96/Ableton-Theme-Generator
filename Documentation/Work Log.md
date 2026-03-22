@@ -1,5 +1,9 @@
 # Work Log
 
+## 2026-3-22 16:32
+- Added "Don't show this message again" checkbox to theme delete confirmation dialogs — separate preferences for available vs. installed themes to streamline bulk cleanup
+- Fixed delete confirmation dialog causing preview modal to flash open behind it when confirming deletion from theme card
+
 ## 2026-3-22 15:39
 - Added tooltips to theme preview modal swatches explaining what each color controls in Ableton (e.g., "Panels & backgrounds", "Text & icons", "Active toggles & progress", "Range indicators")
 - Created reusable Tooltip component with portal-based rendering to prevent clipping by modal boundaries

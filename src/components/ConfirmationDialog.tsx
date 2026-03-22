@@ -6,10 +6,12 @@ import './ConfirmationDialog.css';
 interface ConfirmationDialogProps {
   isOpen: boolean;
   title: string;
-  message: string;
+  message: React.ReactNode;
   confirmLabel?: string;
   cancelLabel?: string;
   variant?: 'default' | 'destructive';
+  showDontShowAgain?: boolean;
+  onDontShowAgainChange?: (checked: boolean) => void;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -21,6 +23,8 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   confirmLabel = 'Confirm',
   cancelLabel = 'Cancel',
   variant = 'default',
+  showDontShowAgain,
+  onDontShowAgainChange,
   onConfirm,
   onCancel,
 }) => {
@@ -44,6 +48,15 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
       <div className="dialog-content" onMouseDown={handleContentMouseDown}>
         <h3 className="dialog-title">{title}</h3>
         <p className="dialog-message">{message}</p>
+        {showDontShowAgain && (
+          <label className="dialog-checkbox-row">
+            <input
+              type="checkbox"
+              onChange={(e) => onDontShowAgainChange?.(e.target.checked)}
+            />
+            <span>Don't show this message again</span>
+          </label>
+        )}
         <div className="dialog-actions">
           <button
             type="button"
