@@ -28,6 +28,11 @@
   pointer-events: none;
 }
 
+/* Allow pointer events on color markers for tooltips */
+.image-magnifier-overlay .color-marker {
+  pointer-events: auto;
+}
+
 /* Magnifier loupe - rendered via portal at document.body level */
 .image-magnifier-loupe {
   border-radius: var(--radius-md);

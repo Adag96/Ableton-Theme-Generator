@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { CommunityTheme } from '../lib/supabase';
 import { ImageMagnifier } from './ImageMagnifier';
+import { Tooltip } from './Tooltip';
 import './CommunityThemeDetailModal.css';
 
 interface CommunityThemeDetailModalProps {
@@ -31,6 +32,7 @@ const CONTRAST_LABELS: Record<string, string> = {
 };
 
 const SWATCH_LABELS = ['Surface', 'Text', 'Accent 1', 'Accent 2'];
+const SWATCH_TOOLTIPS = ['Panels & backgrounds', 'Text & icons', 'Active toggles & progress', 'Range indicators'];
 
 export const CommunityThemeDetailModal: React.FC<CommunityThemeDetailModalProps> = ({
   isOpen,
@@ -223,13 +225,15 @@ export const CommunityThemeDetailModal: React.FC<CommunityThemeDetailModalProps>
           {/* Color Swatches */}
           <div className="community-modal-swatches">
             {swatchColors.slice(0, 4).map((color, i) => (
-              <div key={i} className="community-modal-swatch-item">
-                <div
-                  className="community-modal-swatch"
-                  style={{ backgroundColor: color }}
-                />
-                <span className="community-modal-swatch-label">{SWATCH_LABELS[i]}</span>
-              </div>
+              <Tooltip key={i} content={SWATCH_TOOLTIPS[i]}>
+                <div className="community-modal-swatch-item">
+                  <div
+                    className="community-modal-swatch"
+                    style={{ backgroundColor: color }}
+                  />
+                  <span className="community-modal-swatch-label">{SWATCH_LABELS[i]}</span>
+                </div>
+              </Tooltip>
             ))}
           </div>
         </div>

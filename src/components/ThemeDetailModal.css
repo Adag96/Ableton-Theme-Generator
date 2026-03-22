@@ -114,8 +114,31 @@
   border: 2px solid white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   transform: translate(-50%, -50%);
-  pointer-events: none;
   z-index: 10;
+  cursor: default;
+}
+
+.modal-preview-container .color-marker::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  border-radius: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 100;
+}
+
+.modal-preview-container .color-marker:hover::before {
+  opacity: 1;
 }
 
 .modal-preview-container .color-marker::after {

@@ -4,6 +4,7 @@ import { ConfirmationDialog } from './ConfirmationDialog';
 import { AuthModal } from './AuthModal';
 import { SubmitThemeModal } from './SubmitThemeModal';
 import { ImageMagnifier } from './ImageMagnifier';
+import { Tooltip } from './Tooltip';
 import { useAuth } from '../hooks/useAuth';
 import { useModalOverlayClose } from '../hooks/useModalOverlayClose';
 import './ThemeDetailModal.css';
@@ -228,7 +229,7 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
                     top: `${roleLocations.surface_base.y * 100}%`,
                     backgroundColor: theme.colors.surface_base,
                   }}
-                  title="Surface"
+                  data-tooltip="Panels & backgrounds"
                 />
               )}
               {roleLocations.text_primary && (
@@ -239,7 +240,7 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
                     top: `${roleLocations.text_primary.y * 100}%`,
                     backgroundColor: theme.colors.text_primary,
                   }}
-                  title="Text"
+                  data-tooltip="Text & icons"
                 />
               )}
               {roleLocations.accent_primary && (
@@ -250,7 +251,7 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
                     top: `${roleLocations.accent_primary.y * 100}%`,
                     backgroundColor: theme.colors.accent_primary,
                   }}
-                  title="Accent 1"
+                  data-tooltip="Active toggles & progress"
                 />
               )}
               {roleLocations.accent_secondary && (
@@ -261,7 +262,29 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
                     top: `${roleLocations.accent_secondary.y * 100}%`,
                     backgroundColor: theme.colors.accent_secondary,
                   }}
-                  title="Accent 2"
+                  data-tooltip="Range indicators"
+                />
+              )}
+              {theme.hueInjection?.enabled && roleLocations.accent_tertiary && theme.colors.accent_tertiary && (
+                <div
+                  className="color-marker"
+                  style={{
+                    left: `${roleLocations.accent_tertiary.x * 100}%`,
+                    top: `${roleLocations.accent_tertiary.y * 100}%`,
+                    backgroundColor: theme.colors.accent_tertiary,
+                  }}
+                  data-tooltip="Accent 3"
+                />
+              )}
+              {theme.hueInjection?.enabled && roleLocations.accent_quaternary && theme.colors.accent_quaternary && (
+                <div
+                  className="color-marker"
+                  style={{
+                    left: `${roleLocations.accent_quaternary.x * 100}%`,
+                    top: `${roleLocations.accent_quaternary.y * 100}%`,
+                    backgroundColor: theme.colors.accent_quaternary,
+                  }}
+                  data-tooltip="Accent 4"
                 />
               )}
             </ImageMagnifier>
@@ -323,34 +346,64 @@ export const ThemeDetailModal: React.FC<ThemeDetailModalProps> = ({
 
           <div className="modal-swatches-row">
             <div className="modal-swatches">
-              <div className="modal-swatch-item">
-                <div
-                  className="modal-swatch"
-                  style={{ backgroundColor: theme.colors.surface_base }}
-                />
-                <span className="modal-swatch-label">Surface</span>
-              </div>
-              <div className="modal-swatch-item">
-                <div
-                  className="modal-swatch"
-                  style={{ backgroundColor: theme.colors.text_primary }}
-                />
-                <span className="modal-swatch-label">Text</span>
-              </div>
-              <div className="modal-swatch-item">
-                <div
-                  className="modal-swatch"
-                  style={{ backgroundColor: theme.colors.accent_primary }}
-                />
-                <span className="modal-swatch-label">Accent 1</span>
-              </div>
-              <div className="modal-swatch-item">
-                <div
-                  className="modal-swatch"
-                  style={{ backgroundColor: theme.colors.accent_secondary }}
-                />
-                <span className="modal-swatch-label">Accent 2</span>
-              </div>
+              <Tooltip content="Panels & backgrounds">
+                <div className="modal-swatch-item">
+                  <div
+                    className="modal-swatch"
+                    style={{ backgroundColor: theme.colors.surface_base }}
+                  />
+                  <span className="modal-swatch-label">Surface</span>
+                </div>
+              </Tooltip>
+              <Tooltip content="Text & icons">
+                <div className="modal-swatch-item">
+                  <div
+                    className="modal-swatch"
+                    style={{ backgroundColor: theme.colors.text_primary }}
+                  />
+                  <span className="modal-swatch-label">Text</span>
+                </div>
+              </Tooltip>
+              <Tooltip content="Active toggles & progress">
+                <div className="modal-swatch-item">
+                  <div
+                    className="modal-swatch"
+                    style={{ backgroundColor: theme.colors.accent_primary }}
+                  />
+                  <span className="modal-swatch-label">Accent 1</span>
+                </div>
+              </Tooltip>
+              <Tooltip content="Range indicators">
+                <div className="modal-swatch-item">
+                  <div
+                    className="modal-swatch"
+                    style={{ backgroundColor: theme.colors.accent_secondary }}
+                  />
+                  <span className="modal-swatch-label">Accent 2</span>
+                </div>
+              </Tooltip>
+              {theme.hueInjection?.enabled && theme.colors.accent_tertiary && (
+                <Tooltip content="Accent 3">
+                  <div className="modal-swatch-item">
+                    <div
+                      className="modal-swatch"
+                      style={{ backgroundColor: theme.colors.accent_tertiary }}
+                    />
+                    <span className="modal-swatch-label">Accent 3</span>
+                  </div>
+                </Tooltip>
+              )}
+              {theme.hueInjection?.enabled && theme.colors.accent_quaternary && (
+                <Tooltip content="Accent 4">
+                  <div className="modal-swatch-item">
+                    <div
+                      className="modal-swatch"
+                      style={{ backgroundColor: theme.colors.accent_quaternary }}
+                    />
+                    <span className="modal-swatch-label">Accent 4</span>
+                  </div>
+                </Tooltip>
+              )}
             </div>
             <button
               className="modal-edit-button"

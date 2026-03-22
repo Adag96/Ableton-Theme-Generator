@@ -1,5 +1,9 @@
 # Work Log
 
+## 2026-3-22 15:04
+- Added tooltips to theme preview modal swatches explaining what each color controls in Ableton (e.g., "Panels & backgrounds", "Text & icons", "Active toggles & progress", "Range indicators")
+- Created reusable Tooltip component with portal-based rendering to prevent clipping by modal boundaries
+
 ## 2026-3-20 20:45
 - Fixed hue injection for WaveformColor and DimmedWaveformColor — waveforms now visibly take on the accent color for both light and dark themes
 - Added hue injection for LoopColor and OffGridLoopColor — loop braces, locators, and timeline markers now take on the secondary accent color
