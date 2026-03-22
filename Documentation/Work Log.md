@@ -1,11 +1,6 @@
 # Work Log
 
 ## 2026-3-22 19:06
-- Added generation animation that plays sci-fi visual feedback when generating a theme — 3D wireframe shapes (cube, octahedron, icosahedron) built from colored particle nodes with connecting lines
-- Animation randomly selects one of three 3D shape formations each time, with accelerating rotation and chaotic burst finale
-- Image preview hides during generation so the animation takes center stage
-
-## 2026-3-22 16:32
 - Added tooltips to theme preview modal swatches explaining what each color controls in Ableton (e.g., "Panels & backgrounds", "Text & icons", "Active toggles & progress", "Range indicators")
 - Created reusable Tooltip component with portal-based rendering to prevent clipping by modal boundaries
 - Enhanced hue injection to extract up to 4 accent colors from images instead of 2 — additional accents are applied to different UI zones (waveforms, loops, automation, spectrum) based on slider strength
@@ -15,6 +10,7 @@
 - Removed redundant "With Love" colored link from footer — keeping only the "Support Me" link
 - Added "Don't show this message again" checkbox to theme delete confirmation dialogs — separate preferences for available vs. installed themes to streamline bulk cleanup
 - Fixed delete confirmation dialog causing preview modal to flash open behind it when confirming deletion from theme card
+- First version of generation animation visual feedback, drawing a random 3D sci-fi vector shape out of notes that consist of the theme's colors
 
 ## 2026-3-20 20:45
 - Fixed hue injection for WaveformColor and DimmedWaveformColor — waveforms now visibly take on the accent color for both light and dark themes
