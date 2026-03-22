@@ -1,6 +1,6 @@
 # Work Log
 
-## 2026-3-22 19:06
+## 2026-3-22 21:24
 - Added tooltips to theme preview modal swatches explaining what each color controls in Ableton (e.g., "Panels & backgrounds", "Text & icons", "Active toggles & progress", "Range indicators")
 - Created reusable Tooltip component with portal-based rendering to prevent clipping by modal boundaries
 - Enhanced hue injection to extract up to 4 accent colors from images instead of 2 — additional accents are applied to different UI zones (waveforms, loops, automation, spectrum) based on slider strength
@@ -11,6 +11,8 @@
 - Added "Don't show this message again" checkbox to theme delete confirmation dialogs — separate preferences for available vs. installed themes to streamline bulk cleanup
 - Fixed delete confirmation dialog causing preview modal to flash open behind it when confirming deletion from theme card
 - First version of generation animation visual feedback, drawing a random 3D sci-fi vector shape out of notes that consist of the theme's colors
+- Mood sliders (warmth, saturation, brightness) now visually adjust the preview image in realtime via CSS filters
+- Saved theme previews bake in mood adjustments via per-pixel canvas processing, so thumbnails in My Themes reflect the mood-adjusted look
 
 ## 2026-3-20 20:45
 - Fixed hue injection for WaveformColor and DimmedWaveformColor — waveforms now visibly take on the accent color for both light and dark themes

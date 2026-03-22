@@ -513,6 +513,15 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
   const hasOverrides = Object.keys(colorOverrides).length > 0;
   const hasAdjustments = hasMoodAdjustments(mood);
 
+  // Compute CSS filter string to visually reflect mood adjustments on the preview image
+  const imageFilter = useMemo(() => {
+    if (!hasAdjustments) return undefined;
+    const hueRotate = (mood.warmth / 100) * 20;
+    const saturate = 1 + (mood.saturation / 100) * 0.5;
+    const brightness = 1 + (mood.brightness / 100) * 0.15;
+    return `hue-rotate(${hueRotate}deg) saturate(${saturate}) brightness(${brightness})`;
+  }, [mood, hasAdjustments]);
+
   return (
     <div className="import-view">
       <button className="import-back-button" onClick={onBack}>
@@ -580,6 +589,7 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
                     src={imageDataUrl}
                     alt={image.fileName}
                     className="import-preview-image"
+                    style={{ filter: imageFilter }}
                   />
                   {/* Draggable color markers - show for colors with original locations or dragged positions */}
                   {basePalette?.roleLocations && ROLES.map(role => {

@@ -21,6 +21,7 @@ import type { SavedTheme } from './types/theme-library';
 import { useThemeLibrary } from './hooks/useThemeLibrary';
 import { generateTheme, GENERATION_VERSION } from './theme/derivation';
 import { generateAskXml } from './theme/ask-generator';
+import { applyMoodToImageDataUrl, hasMoodAdjustments } from './utils/apply-mood-to-image';
 import './App.css';
 
 interface PendingTheme {
@@ -165,6 +166,11 @@ function AppContent() {
     let previewDataUrl: string | undefined;
     if (importedImage?.filePath && window.electronAPI) {
       previewDataUrl = (await window.electronAPI.readImageAsDataUrl(importedImage.filePath)) ?? undefined;
+    }
+
+    // Bake mood adjustments into saved preview image
+    if (previewDataUrl && palette.moodSliders && hasMoodAdjustments(palette.moodSliders)) {
+      previewDataUrl = await applyMoodToImageDataUrl(previewDataUrl, palette.moodSliders);
     }
 
     // When editing, skip the name dialog and update the theme directly
