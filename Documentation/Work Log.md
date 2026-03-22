@@ -1,5 +1,10 @@
 # Work Log
 
+## 2026-3-22 19:06
+- Added generation animation that plays sci-fi visual feedback when generating a theme — 3D wireframe shapes (cube, octahedron, icosahedron) built from colored particle nodes with connecting lines
+- Animation randomly selects one of three 3D shape formations each time, with accelerating rotation and chaotic burst finale
+- Image preview hides during generation so the animation takes center stage
+
 ## 2026-3-22 16:32
 - Added tooltips to theme preview modal swatches explaining what each color controls in Ableton (e.g., "Panels & backgrounds", "Text & icons", "Active toggles & progress", "Range indicators")
 - Created reusable Tooltip component with portal-based rendering to prevent clipping by modal boundaries

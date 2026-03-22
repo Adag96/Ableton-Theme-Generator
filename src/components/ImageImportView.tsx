@@ -8,6 +8,7 @@ import { hexToHsl, hslToHex } from '../theme/color-utils';
 import { generateRandomPalette } from '../theme/random-palette';
 import { ColorPickerPopover } from './ColorPickerPopover';
 import { DraggableColorMarker } from './DraggableColorMarker';
+import { GenerationAnimation } from './GenerationAnimation';
 import { createColorSampler, type ColorSampler } from '../utils/color-sampler';
 import './ImageImportView.css';
 
@@ -17,6 +18,9 @@ interface ImageImportViewProps {
   onContinue: (palette: PaletteSelectionResult) => void;
   onBack: () => void;
   editingTheme?: SavedTheme | null;
+  isGenerating?: boolean;
+  generationColors?: string[];
+  onAnimationComplete?: () => void;
 }
 
 type ColorRole = 'surface_base' | 'text_primary' | 'accent_primary' | 'accent_secondary';
@@ -94,6 +98,9 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
   onContinue,
   onBack,
   editingTheme,
+  isGenerating,
+  generationColors,
+  onAnimationComplete,
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -560,8 +567,8 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
         </>
       ) : (
         <div className="import-confirmation">
-          {/* Image preview - only when image-based */}
-          {image && (
+          {/* Image preview - only when image-based, hidden during generation animation */}
+          {image && !isGenerating && (
             <div className="import-preview">
               {imageDataUrl ? (
                 <div
@@ -607,6 +614,13 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
             </div>
           )}
 
+          {isGenerating && generationColors && onAnimationComplete ? (
+            <GenerationAnimation
+              colors={generationColors}
+              onComplete={onAnimationComplete}
+            />
+          ) : (
+          <>
           {/* Header for random palette mode */}
           {!image && randomPalette && (
             <div className="import-random-header">
@@ -882,6 +896,8 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
               {isExtracting ? 'Extracting...' : editingTheme ? 'Save Changes' : 'Generate Theme'}
             </button>
           </div>
+          </>
+          )}
         </div>
       )}
     </div>

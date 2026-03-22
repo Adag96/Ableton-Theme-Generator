@@ -40,6 +40,12 @@ function AppContent() {
   const [pendingTheme, setPendingTheme] = useState<PendingTheme | null>(null);
   const [editingTheme, setEditingTheme] = useState<SavedTheme | null>(null);
   const [showNameDialog, setShowNameDialog] = useState(false);
+  const [showGenerationAnimation, setShowGenerationAnimation] = useState(false);
+  const [animationPalette, setAnimationPalette] = useState<{
+    palette: PaletteSelectionResult;
+    xmlContent: string;
+    previewDataUrl?: string;
+  } | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const { user } = useAuth();
@@ -213,8 +219,18 @@ function AppContent() {
       return;
     }
 
-    setPendingTheme({ palette, xmlContent, previewDataUrl });
-    setShowNameDialog(true);
+    // Show generation animation before name dialog for new themes
+    setAnimationPalette({ palette, xmlContent, previewDataUrl });
+    setShowGenerationAnimation(true);
+  };
+
+  const handleAnimationComplete = () => {
+    setShowGenerationAnimation(false);
+    if (animationPalette) {
+      setPendingTheme(animationPalette);
+      setShowNameDialog(true);
+      setAnimationPalette(null);
+    }
   };
 
   const handleThemeNameConfirm = async (name: string) => {
@@ -353,6 +369,16 @@ function AppContent() {
             onContinue={handlePaletteReady}
             onBack={handleBackToLanding}
             editingTheme={editingTheme}
+            isGenerating={showGenerationAnimation}
+            generationColors={animationPalette ? [
+              animationPalette.palette.roles.surface_base,
+              animationPalette.palette.roles.text_primary,
+              animationPalette.palette.roles.accent_primary,
+              animationPalette.palette.roles.accent_secondary,
+              ...(animationPalette.palette.roles.accent_tertiary ? [animationPalette.palette.roles.accent_tertiary] : []),
+              ...(animationPalette.palette.roles.accent_quaternary ? [animationPalette.palette.roles.accent_quaternary] : []),
+            ] : []}
+            onAnimationComplete={handleAnimationComplete}
           />
         )}
       </main>
