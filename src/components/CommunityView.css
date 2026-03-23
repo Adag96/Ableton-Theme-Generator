@@ -223,7 +223,6 @@
   -webkit-backdrop-filter: var(--blur-surface);
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-lg);
-  overflow: hidden;
   transition: all var(--duration-normal) var(--ease-out);
   cursor: pointer;
 }
@@ -239,6 +238,7 @@
   aspect-ratio: 16/10;
   overflow: hidden;
   background: var(--surface-recessed);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 .community-card-image {

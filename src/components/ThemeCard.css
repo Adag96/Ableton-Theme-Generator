@@ -7,7 +7,6 @@
   backdrop-filter: var(--blur-surface);
   -webkit-backdrop-filter: var(--blur-surface);
   border-radius: var(--radius-lg);
-  overflow: hidden;
   border: 1px solid var(--surface-border);
   transition: all var(--duration-normal) var(--ease-out);
   position: relative;
@@ -26,6 +25,7 @@
   position: relative;
   overflow: hidden;
   background: var(--surface-recessed);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 .theme-card-preview img {

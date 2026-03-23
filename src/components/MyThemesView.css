@@ -20,7 +20,8 @@
   flex: 1;
   overflow-y: auto;
   min-height: 0;
-  padding-right: var(--space-sm);
+  padding: 1.5rem;
+  margin: -1.5rem;
 }
 
 .my-themes-back-button {
