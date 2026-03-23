@@ -1,7 +1,9 @@
 # Work Log
 
-## 2026-3-23 12:27
+## 2026-3-23 13:05
 - Fixed theme preview overlays (My Themes + Community Gallery) to scale properly at all window sizes — images shrink to keep all content visible with breathing room
+- Fixed theme detail modal clipping preview image at small window sizes — modal now allows more vertical space and scrolls instead of cutting off content
+- Fixed color marker dots overflowing outside the preview image boundary — markers now stay clamped within the image edges at all sizes
 
 ## 2026-3-22 21:24
 - Added tooltips to theme preview modal swatches explaining what each color controls in Ableton (e.g., "Panels & backgrounds", "Text & icons", "Active toggles & progress", "Range indicators")

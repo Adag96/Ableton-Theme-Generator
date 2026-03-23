@@ -56,8 +56,8 @@ export const DraggableColorMarker: React.FC<DraggableColorMarkerProps> = ({
       className={`color-marker ${isDragging ? 'color-marker-dragging' : ''} ${isActive ? 'color-marker-active' : ''}`}
       style={{
         backgroundColor: color,
-        left: `${position.x * 100}%`,
-        top: `${position.y * 100}%`,
+        left: `clamp(10px, ${position.x * 100}%, calc(100% - 10px))`,
+        top: `clamp(10px, ${position.y * 100}%, calc(100% - 10px))`,
       }}
       onMouseDown={handleMouseDown}
     />

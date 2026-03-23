@@ -29,8 +29,8 @@
   padding: var(--space-lg);
   width: min(90vw, 560px);
   min-width: 400px;
-  max-height: 75vh;
-  overflow: hidden;
+  max-height: 85vh;
+  overflow-y: auto;
   box-shadow: var(--shadow-elevated);
   border: 1px solid var(--surface-border);
   animation: modal-enter var(--duration-normal) var(--ease-spring);

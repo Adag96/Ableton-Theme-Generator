@@ -67,3 +67,11 @@ Each lesson follows this structure:
 **Root cause**: Not checking the Work Log for an existing same-day header before writing. This has happened multiple times despite being documented as a lesson AND in the /wrap skill.
 
 **Rule**: BEFORE writing ANY entry to Work Log: (1) Read the file, (2) Check if a `## 2026-X-XX` header already exists for today's date (ignore the time portion), (3) If yes, update that header's timestamp and append bullets to its list, (4) If no, create a new header. NEVER create a new `##` header if one already exists for the same date. This is non-negotiable.
+
+### 2026-03-23 | UI/UX | Modal image clipping — fix the container, not the image
+
+**What happened**: Preview image in ThemeDetailModal appeared too small at small window sizes. Attempted to fix by changing the image's `max-height` from `min(400px, 38vh)` to `min(400px, 100%)` — this made images blurry and poorly positioned. Then tried bumping to `50vh` — this made the image overflow the modal's `overflow: hidden` boundary, clipping the top of the image.
+
+**Root cause**: The image's `max-height: 38vh` was fine for the image itself. The actual constraint was the modal container: `max-height: 75vh` with `overflow: hidden`. At small windows, the modal didn't have enough room for image + info + actions, and hidden overflow silently clipped the image. Two failed attempts changed the wrong thing (the image sizing) instead of the right thing (the modal container).
+
+**Rule**: When content is clipped or undersized inside a modal, check the modal container's `max-height` and `overflow` first before touching child element sizing. Increase the container's `max-height` and use `overflow-y: auto` (scrollable) instead of `overflow: hidden` (clipping). Only change child sizing if the container is already giving enough room.
