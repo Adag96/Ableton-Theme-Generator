@@ -1,5 +1,8 @@
 # Work Log
 
+## 2026-3-23 12:27
+- Fixed theme preview overlays (My Themes + Community Gallery) to scale properly at all window sizes — images shrink to keep all content visible with breathing room
+
 ## 2026-3-22 21:24
 - Added tooltips to theme preview modal swatches explaining what each color controls in Ableton (e.g., "Panels & backgrounds", "Text & icons", "Active toggles & progress", "Range indicators")
 - Created reusable Tooltip component with portal-based rendering to prevent clipping by modal boundaries
