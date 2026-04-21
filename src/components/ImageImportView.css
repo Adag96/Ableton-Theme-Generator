@@ -263,12 +263,46 @@
 
 .import-preview {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
   width: 100%;
-  max-width: 400px;
-  max-height: 40vh;
+  max-width: 500px;
   flex-shrink: 1;
+}
+
+/* Side-by-side layout when both image and Ableton preview are shown */
+.import-preview-duo {
+  max-width: 90vw;
+  gap: var(--space-md);
+  align-items: stretch;
+}
+
+.import-preview-duo .import-preview-container {
+  flex: 0 1 auto;
+  max-width: 45%;
+}
+
+.import-preview-duo .import-preview-container .import-preview-image {
+  max-height: 45vh;
+}
+
+.import-preview-duo .import-preview-ableton {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Ableton SVG preview container */
+.import-preview-ableton {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--shadow-elevated);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.import-preview-ableton .ableton-preview-svg {
+  display: block;
 }
 
 .import-preview-container {

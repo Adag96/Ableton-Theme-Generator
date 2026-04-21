@@ -9,6 +9,7 @@ import { generateRandomPalette } from '../theme/random-palette';
 import { ColorPickerPopover } from './ColorPickerPopover';
 import { DraggableColorMarker } from './DraggableColorMarker';
 import { GenerationAnimation } from './GenerationAnimation';
+import { AbletonPreview } from './AbletonPreview';
 import { createColorSampler, type ColorSampler } from '../utils/color-sampler';
 import './ImageImportView.css';
 
@@ -166,7 +167,7 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
 
     setRandomPalette(null);
     setActivePickerRole(null);
-  }, [editingTheme]);
+  }, [editingTheme, image]);
 
   // Load image as data URL for preview
   useEffect(() => {
@@ -576,49 +577,64 @@ export const ImageImportView: React.FC<ImageImportViewProps> = ({
         </>
       ) : (
         <div className="import-confirmation">
-          {/* Image preview - only when image-based, hidden during generation animation */}
-          {image && !isGenerating && (
-            <div className="import-preview">
-              {imageDataUrl ? (
-                <div
-                className={`import-preview-container ${activePickerRole ? 'import-preview-eyedropper' : ''}`}
-                onMouseDown={handleImageMouseDown}
-              >
-                  <img
-                    ref={imageRef}
-                    src={imageDataUrl}
-                    alt={image.fileName}
-                    className="import-preview-image"
-                    style={{ filter: imageFilter }}
-                  />
-                  {/* Draggable color markers - show for colors with original locations or dragged positions */}
-                  {basePalette?.roleLocations && ROLES.map(role => {
-                    // Check if marker was explicitly hidden (user manually edited color via picker)
-                    if (markerPositions[role] === null) return null;
-
-                    // Use dragged position if available, otherwise original location
-                    const originalLocation = basePalette.roleLocations?.[role];
-                    const draggedPosition = markerPositions[role];
-                    const position = draggedPosition ?? originalLocation;
-
-                    // Don't render marker if no position available (synthetic colors)
-                    if (!position) return null;
-
-                    return (
-                      <DraggableColorMarker
-                        key={role}
-                        role={role}
-                        color={effectivePalette?.roles[role] ?? basePalette.roles[role]}
-                        position={position}
-                        onDrag={handleMarkerDrag}
-                        isActive={activePickerRole === role}
+          {/* Preview area - side by side image + Ableton preview */}
+          {!isGenerating && (image || effectivePalette) && (
+            <div className={`import-preview ${image && effectivePalette ? 'import-preview-duo' : ''}`}>
+              {/* Source image */}
+              {image && (
+                <>
+                  {imageDataUrl ? (
+                    <div
+                      className={`import-preview-container ${activePickerRole ? 'import-preview-eyedropper' : ''}`}
+                      onMouseDown={handleImageMouseDown}
+                    >
+                      <img
+                        ref={imageRef}
+                        src={imageDataUrl}
+                        alt={image.fileName}
+                        className="import-preview-image"
+                        style={{ filter: imageFilter }}
                       />
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="import-preview-loading">
-                  <div className="import-spinner" />
+                      {/* Draggable color markers */}
+                      {basePalette?.roleLocations && ROLES.map(role => {
+                        if (markerPositions[role] === null) return null;
+                        const originalLocation = basePalette.roleLocations?.[role];
+                        const draggedPosition = markerPositions[role];
+                        const position = draggedPosition ?? originalLocation;
+                        if (!position) return null;
+                        return (
+                          <DraggableColorMarker
+                            key={role}
+                            role={role}
+                            color={effectivePalette?.roles[role] ?? basePalette.roles[role]}
+                            position={position}
+                            onDrag={handleMarkerDrag}
+                            isActive={activePickerRole === role}
+                          />
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="import-preview-loading">
+                      <div className="import-spinner" />
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Ableton preview */}
+              {effectivePalette && (
+                <div className="import-preview-ableton">
+                  <AbletonPreview
+                    colors={{
+                      surface_base: effectivePalette.roles.surface_base,
+                      text_primary: effectivePalette.roles.text_primary,
+                      accent_primary: effectivePalette.roles.accent_primary,
+                      accent_secondary: effectivePalette.roles.accent_secondary,
+                    }}
+                    tone={selectedTone ?? 'dark'}
+                    contrastLevel={contrastLevel}
+                  />
                 </div>
               )}
             </div>

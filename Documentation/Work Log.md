@@ -1,7 +1,9 @@
 # Work Log
 
-## 2026-4-21 13:39
+## 2026-4-21 14:55
 - Updated "My Themes" description text on the landing page
+- Added live Ableton interface preview — a stylized geometric SVG that visualizes how theme colors map to Ableton's UI zones (browser, arrangement, mixer, detail view, transport) and updates in realtime as colors are adjusted
+- Preview shows side-by-side with the source image for image-based themes, or standalone for algorithmic/random themes
 
 ## 2026-3-23 23:56
 - Fixed theme preview overlays (My Themes + Community Gallery) to scale properly at all window sizes — images shrink to keep all content visible with breathing room
