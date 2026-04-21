@@ -1,5 +1,8 @@
 # Work Log
 
+## 2026-4-21 13:39
+- Updated "My Themes" description text on the landing page
+
 ## 2026-3-23 23:56
 - Fixed theme preview overlays (My Themes + Community Gallery) to scale properly at all window sizes — images shrink to keep all content visible with breathing room
 - Fixed theme detail modal clipping preview image at small window sizes — modal now allows more vertical space and scrolls instead of cutting off content
