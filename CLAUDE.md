@@ -1,5 +1,9 @@
 # Ableton Live 12 Theme Generator
 
+## System Map — Read First
+
+Before substantive work in this repo, read **`~/.claude/SYSTEM-MAP.md`** — it documents Adam's cross-project information architecture (repo vs vault placement rules, folder conventions, cross-reference patterns, audit process). Ableton Theme Generator participates in that system as a Tier 1 product repo; its corresponding Tier 2 docs (Product Brief, Development Roadmap, Distribution Plan, research artifacts) live in the Development vault under `PRODUCTS/APPLICATIONS/ABLETON THEME GENERATOR/`.
+
 ## Overview
 
 Desktop application that generates custom Ableton Live 12 themes from images. Users upload an image, the app extracts colors, generates theme variants, and exports `.ask` theme files. Also includes a community gallery for browsing, sharing, and installing themes made by others.
@@ -34,7 +38,7 @@ Implementation reference that ships with the code:
 
 Product-level planning, execution state, and decision logs live in the Development Obsidian vault:
 
-- **Location:** `~/Developer/Obsidian-Notes/Development/PRODUCTS/Ableton Theme Generator/`
+- **Location:** `~/Developer/Obsidian-Notes/Development/PRODUCTS/APPLICATIONS/ABLETON THEME GENERATOR/`
 - **Includes:**
   - **Product Brief** — vision, three pillars (access / create / share), current scope, what's shipped, what's in progress
   - **Development Roadmap** — phase-based execution plan (has a stale-status header — verify before relying on checkboxes)
