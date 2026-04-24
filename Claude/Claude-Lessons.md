@@ -27,14 +27,6 @@ Each lesson follows this structure:
 
 ## Lessons
 
-### 2026-02-18 | Workflow | Asana ticket lookup by custom field ID
-
-**What happened**: User provided ticket ID "ABL-12" (stored in a custom field). I used `asana_typeahead_search` which only searches task names — returned nothing.
-
-**Root cause**: Typeahead search is name-only. Custom field values require full-text search.
-
-**Rule**: When looking up Asana tickets by a custom field ID (like "ABL-12"), use `asana_search_tasks` with the `text` parameter, not `asana_typeahead_search`.
-
 ### 2026-02-19 | Workflow | Test theme output location
 
 **What happened**: Generated A/B comparison themes to a project-local directory (`test-themes/`), then had to manually copy them to Ableton's themes folder for user testing.
@@ -61,7 +53,7 @@ Each lesson follows this structure:
 
 ---
 
-### 2026-3-20 — Process — CRITICAL, REPEATED VIOLATION
+### 2026-03-20 | Process | CRITICAL: Duplicate Work Log headers (repeated violation)
 **What happened**: Created duplicate date headers in Work Log TWICE on the same day instead of appending to the existing one.
 
 **Root cause**: Not checking the Work Log for an existing same-day header before writing. This has happened multiple times despite being documented as a lesson AND in the /wrap skill.
