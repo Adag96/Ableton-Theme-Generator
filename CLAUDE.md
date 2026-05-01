@@ -2,7 +2,7 @@
 
 ## System Map — Read First
 
-Before substantive work in this repo, read **`~/.claude/SYSTEM-MAP.md`** — it documents Adam's cross-project information architecture (repo vs vault placement rules, folder conventions, cross-reference patterns, audit process). Ableton Theme Generator participates in that system as a Tier 1 product repo; its corresponding Tier 2 docs (Product Brief, Development Roadmap, Distribution Plan, research artifacts) live in the Development vault under `PRODUCTS/APPLICATIONS/ABLETON THEME GENERATOR/`.
+Before substantive work in this repo, read **`~/.claude/System Map.md`** — it documents Adam's cross-project information architecture (repo vs vault placement rules, folder conventions, cross-reference patterns, audit process). Ableton Theme Generator participates in that system as a Tier 1 product repo; its corresponding Tier 2 docs (Product Brief, Development Roadmap, Distribution Plan, research artifacts) live in the Development vault under `PRODUCTS/APPLICATIONS/ABLETON THEME GENERATOR/`.
 
 ## Overview
 
